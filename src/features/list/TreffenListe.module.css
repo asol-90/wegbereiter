@@ -1,0 +1,102 @@
+/* TreffenListe — scrollable list of TreffenKarten with interval separators. */
+
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  flex: 1;
+  min-height: 0;
+  padding-bottom: 32px;
+}
+
+/* ─── Interval separator ─── */
+.sep {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 0;
+  cursor: pointer;
+  user-select: none;
+  transition: opacity var(--dur-fast) var(--ease);
+}
+
+.sepLine {
+  flex: 1;
+  height: 0.5px;
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.sepLabel {
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  padding: 0 4px;
+}
+
+.sepIcon {
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity var(--dur-fast) var(--ease);
+}
+
+.sep:hover .sepIcon {
+  opacity: 0.6;
+}
+
+/* ─── Tone: regular — very subtle, fades into the background ─── */
+.sep-regular {
+  opacity: 0.45;
+}
+
+.sep-regular .sepLabel {
+  color: var(--t3);
+  font-weight: 400;
+}
+
+.sep-regular:hover {
+  opacity: 0.7;
+}
+
+/* ─── Tone: minor — noticeable but not alarming ─── */
+.sep-minor {
+  opacity: 0.75;
+}
+
+.sep-minor .sepLabel {
+  color: var(--t2);
+  font-weight: 500;
+}
+
+.sep-minor .sepLine {
+  background: rgba(0, 0, 0, 0.12);
+}
+
+.sep-minor:hover {
+  opacity: 1;
+}
+
+/* ─── Tone: major — stands out clearly ─── */
+.sep-major {
+  opacity: 1;
+}
+
+.sep-major .sepLabel {
+  color: var(--t-warn);
+  font-weight: 600;
+}
+
+.sep-major .sepLine {
+  height: 1px;
+  background: rgba(186, 117, 23, 0.25);
+}
+
+/* ─── Empty state ─── */
+.empty {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  color: var(--t3);
+  font-size: 13px;
+}

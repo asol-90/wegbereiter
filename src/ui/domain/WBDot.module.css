@@ -1,0 +1,8 @@
+.dot {
+  display: inline-block;
+  border-radius: var(--r-pill);
+  flex-shrink: 0;
+}
+.ring {
+  box-shadow: 0 0 0 1.5px var(--bg1);
+}

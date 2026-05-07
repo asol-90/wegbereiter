@@ -1,0 +1,39 @@
+.group {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px;
+  border-radius: var(--r-md);
+  background: var(--bg2);
+}
+
+.seg {
+  background: transparent;
+  color: var(--t3);
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease),
+    color var(--dur-fast) var(--ease);
+}
+
+.s-sm .seg {
+  padding: 3px 7px;
+  font-size: 10px;
+  min-height: 20px;
+}
+.s-md .seg {
+  padding: 4px 9px;
+  font-size: 11px;
+  min-height: 24px;
+}
+
+.seg:hover:not(.active) {
+  color: var(--t1);
+}
+
+.active {
+  background: var(--bg1);
+  color: var(--seg-color, var(--t1));
+  box-shadow: var(--sh-pill);
+  font-weight: 500;
+}

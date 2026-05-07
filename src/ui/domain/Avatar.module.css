@@ -1,0 +1,11 @@
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--r-pill);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  box-shadow: 0 0 0 1.5px var(--bg1);
+  flex-shrink: 0;
+  user-select: none;
+}

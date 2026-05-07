@@ -1,0 +1,15 @@
+.group {
+  display: inline-flex;
+  align-items: center;
+}
+
+.more {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--r-pill);
+  background: var(--bg3);
+  color: var(--t2);
+  font-weight: 500;
+  box-shadow: 0 0 0 1.5px var(--bg1);
+}

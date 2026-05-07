@@ -1,0 +1,7 @@
+.group {
+  display: flex;
+  flex-direction: column;
+}
+.group > details + details {
+  border-top: 1px solid var(--brd);
+}

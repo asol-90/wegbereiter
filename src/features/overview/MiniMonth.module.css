@@ -1,0 +1,114 @@
+.mmCal {
+  min-width: 0;
+  padding: 4px;
+  border: 1px solid transparent;
+  border-radius: var(--r-md);
+  transition: border-color var(--dur-fast) var(--ease);
+}
+
+.mmCalHl {
+  border-color: var(--brd2);
+}
+
+.mmCalStamm {
+  border-color: color-mix(in srgb, var(--stamm, #0F6E56) 30%, transparent);
+}
+
+.mmName {
+  font-size: 13px;
+  color: var(--t1);
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.mmHdr {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+}
+
+.mmHdr span {
+  font-size: 8px;
+  color: var(--t3);
+  text-align: center;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.mmWk {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  height: 15px;
+}
+
+.mmD {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-variant-numeric: tabular-nums;
+  color: var(--t3);
+  position: relative;
+}
+
+.mmDLabel {
+  position: relative;
+  z-index: 2;
+}
+
+.we {
+  color: var(--t2);
+  font-weight: 500;
+}
+
+.mmDe {
+  visibility: hidden;
+}
+
+/* ─── Shared band (Ferien, Feiertag, Stammaktionen, Stammtermine) ─── */
+.band {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 14px;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.bandFirst {
+  border-top-left-radius: var(--r-pill);
+  border-bottom-left-radius: var(--r-pill);
+}
+
+.bandLast {
+  border-top-right-radius: var(--r-pill);
+  border-bottom-right-radius: var(--r-pill);
+}
+
+/* ─── Heute ─── */
+.today .mmDLabel {
+  color: var(--bg1);
+  font-weight: 600;
+  background: var(--t1);
+  border-radius: var(--r-pill);
+  width: 14px;
+  height: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ─── Planungs-Marker ─── */
+.marker {
+  position: absolute;
+  left: 10%;
+  right: 10%;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 12px;
+  border-radius: var(--r-pill);
+  z-index: 1;
+  cursor: default;
+  transition: background var(--dur-fast) var(--ease);
+}

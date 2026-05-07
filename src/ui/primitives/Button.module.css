@@ -1,0 +1,87 @@
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border-radius: var(--r-md);
+  font-weight: 500;
+  line-height: 1;
+  transition: background var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease),
+    border-color var(--dur-fast) var(--ease), opacity var(--dur-fast) var(--ease);
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+  color: var(--t1);
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.full {
+  width: 100%;
+}
+
+.label {
+  display: inline-block;
+}
+
+/* ─── Sizes ─── */
+.s-sm {
+  padding: 5px 10px;
+  font-size: 11px;
+}
+.s-md {
+  padding: 7px 14px;
+  font-size: 13px;
+}
+.s-lg {
+  padding: 10px 18px;
+  font-size: 14px;
+}
+
+/* ─── Variants ─── */
+.v-primary {
+  background: var(--t1);
+  color: var(--bg1);
+}
+.v-primary:not(:disabled):hover {
+  background: #000;
+}
+
+.v-secondary {
+  background: var(--bg2);
+  color: var(--t1);
+}
+.v-secondary:not(:disabled):hover {
+  background: var(--bg3);
+}
+
+.v-ghost {
+  background: transparent;
+  color: var(--t2);
+}
+.v-ghost:not(:disabled):hover {
+  background: var(--bg2);
+  color: var(--t1);
+}
+
+.v-danger {
+  background: var(--bg-err);
+  color: var(--t-err);
+}
+.v-danger:not(:disabled):hover {
+  background: #f0cbc8;
+}
+
+.v-dashed {
+  background: transparent;
+  color: var(--t2);
+  border: 1px dashed var(--brd2);
+}
+.v-dashed:not(:disabled):hover {
+  color: var(--t1);
+  border-color: var(--t3);
+  background: var(--bg2);
+}

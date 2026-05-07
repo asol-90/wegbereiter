@@ -1,0 +1,275 @@
+/* PlanungsKalender — continuous scrollable month grid for the Kalenderansicht.
+   Mirrors the wireframe (planungsansicht-wireframe.html) closely. */
+
+.root {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1;
+  user-select: none;
+}
+
+/* ─── Sticky weekday header ─── */
+.hdr {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin-bottom: 4px;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  background: var(--bg1);
+  padding-bottom: 2px;
+}
+
+.hdr span {
+  text-align: center;
+  font-size: 9px;
+  color: var(--t3);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+/* ─── Scrollable rows ─── */
+.rows {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+/* ─── Week row ─── */
+.wk {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  height: 36px;
+}
+
+/* ─── Day cell (base) ─── */
+.d {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--t3);
+  position: relative;
+  cursor: default;
+}
+
+.dLabel {
+  position: relative;
+  z-index: 2;
+}
+
+/* ─── Alternating month shade ─── */
+.shade {
+  background: rgba(0, 0, 0, 0.025);
+}
+
+/* ─── Outside zeitraum → muted ─── */
+.outside {
+  opacity: 0.3;
+}
+
+/* ─── Weekend ─── */
+.we {
+  color: var(--t1);
+  font-weight: 500;
+}
+
+/* ─── Month label (first cell of new month) ─── */
+.ml {
+  position: relative;
+}
+
+.mlLabel {
+  position: absolute;
+  top: 1px;
+  left: 4px;
+  font-size: 8px;
+  color: var(--t3);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: 500;
+  z-index: 2;
+  pointer-events: none;
+}
+
+/* ─── Shared band (Ferien, Feiertag, Stammaktionen, Stammtermine) ─── */
+.band {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 14px;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.bandFirst {
+  border-top-left-radius: var(--r-pill);
+  border-bottom-left-radius: var(--r-pill);
+}
+
+.bandLast {
+  border-top-right-radius: var(--r-pill);
+  border-bottom-right-radius: var(--r-pill);
+}
+
+/* ─── Today ─── */
+.today .dLabel {
+  color: var(--bg1);
+  font-weight: 600;
+  background: var(--t1);
+  border-radius: var(--r-pill);
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ─── Treffen anchor cell ─── */
+.anc {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.ancBox {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: var(--bg1);
+  border: 0.5px solid rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--t1);
+  cursor: pointer;
+  box-shadow: var(--sh-card);
+  transition: border-color var(--dur-fast) var(--ease);
+  position: relative;
+  z-index: 3;
+}
+
+.ancBoxActive {
+  border-color: var(--t1);
+}
+
+.ancBoxHighlighted {
+  border-color: var(--acc);
+  box-shadow: 0 0 0 1.5px var(--acc);
+}
+
+/* ─── Click preview (tooltip) ─── */
+.preview {
+  position: absolute;
+  background: var(--bg1);
+  border: 0.5px solid rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  padding: 10px 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  width: 220px;
+  z-index: 20;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--dur-fast) var(--ease);
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.previewOpen {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.previewDate {
+  font-family: var(--serif);
+  font-size: 11px;
+  color: var(--t2);
+  margin-bottom: 3px;
+}
+
+.previewTitle {
+  font-family: var(--serif);
+  font-size: 14px;
+  color: var(--t1);
+  line-height: 1.25;
+}
+
+.previewRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 6px;
+}
+
+.previewLabel {
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--t3);
+}
+
+.previewWb {
+  display: flex;
+  gap: 4px;
+}
+
+.previewWbSlot {
+  width: 13px;
+  height: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.previewWbSlotSoll {
+  box-shadow: inset 0 0 0 1.2px var(--t1);
+}
+
+.previewWbDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+}
+
+/* ─── Preview detail button ─── */
+.previewBtn {
+  display: block;
+  width: 100%;
+  margin-top: 8px;
+  padding: 5px 0;
+  border: 0.5px solid rgba(0, 0, 0, 0.15);
+  border-radius: 6px;
+  background: var(--bg2);
+  color: var(--t2);
+  font-size: 11px;
+  font-family: var(--sans);
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease),
+    color var(--dur-fast) var(--ease);
+}
+
+.previewBtn:hover {
+  background: var(--bg3);
+  color: var(--t1);
+}
+
+/* ─── Empty state ─── */
+.empty {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  color: var(--t3);
+  font-size: 13px;
+}

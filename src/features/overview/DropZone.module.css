@@ -1,0 +1,33 @@
+.root {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(var(--acc-rgb, 70, 100, 180), 0.08);
+  border: 2px dashed var(--acc);
+  border-radius: var(--r-lg);
+  z-index: 10;
+  pointer-events: none;
+}
+
+.label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--acc);
+  padding: 8px 16px;
+  background: var(--bg1);
+  border-radius: var(--r-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.active {
+  /* subtle scale-back to indicate drop target */
+}

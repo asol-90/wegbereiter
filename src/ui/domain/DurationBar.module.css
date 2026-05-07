@@ -1,0 +1,83 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+}
+
+.track {
+  position: relative;
+  width: 100%;
+  background: var(--bg2);
+  border-radius: var(--r-pill);
+  overflow: hidden;
+}
+
+.fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  height: 100%;
+  border-radius: var(--r-pill);
+  transition: width var(--dur-base) var(--ease),
+    background var(--dur-fast) var(--ease);
+  z-index: 1;
+}
+
+.t-ok .fill {
+  background: var(--t-ok);
+}
+.t-warn .fill {
+  background: var(--t-warn);
+}
+.t-err .fill {
+  background: var(--t-err);
+}
+
+/* --- Zielintervall-Band: thin dashed frame behind the fill, mirrors the
+   pattern used by WBGoalBars so the widgets read as a family. --- */
+.targetBand {
+  position: absolute;
+  top: -2px;
+  bottom: -2px;
+  background: transparent;
+  border-left: 1.5px dashed var(--t3);
+  border-right: 1.5px dashed var(--t3);
+  z-index: 2;
+  pointer-events: none;
+}
+
+.targetBandHit {
+  border-color: var(--t-ok);
+  background: color-mix(in srgb, var(--t-ok) 10%, transparent);
+}
+
+.label {
+  font-size: 10px;
+  color: var(--t3);
+  font-variant-numeric: tabular-nums;
+}
+.t-warn .label {
+  color: var(--t-warn);
+}
+.t-err .label {
+  color: var(--t-err);
+}
+
+/* Stamm-Anteil (grüner Hintergrundbalken hinter dem fill) */
+.stammFill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  height: 100%;
+  background: var(--stamm, #0f6e56);
+  opacity: 0.4;
+  border-radius: var(--r-pill);
+  z-index: 0;
+}
+
+.labelStamm {
+  color: var(--stamm, #0f6e56);
+}
+
+.labelOver {
+  font-weight: 500;
+}

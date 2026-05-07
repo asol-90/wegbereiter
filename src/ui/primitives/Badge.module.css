@@ -1,0 +1,100 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border-radius: var(--r-sm);
+  line-height: 1;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.s-sm {
+  padding: 2px 6px;
+  font-size: 9px;
+  text-transform: uppercase;
+}
+.s-md {
+  padding: 3px 8px;
+  font-size: 10px;
+}
+
+/* --- soft (background tinted) --- */
+.v-soft.t-neutral {
+  background: var(--bg2);
+  color: var(--t2);
+}
+.v-soft.t-muted {
+  background: var(--bg2);
+  color: var(--t3);
+}
+.v-soft.t-accent {
+  background: var(--bg2);
+  color: var(--acc);
+}
+.v-soft.t-ok {
+  background: var(--bg-ok);
+  color: var(--t-ok);
+}
+.v-soft.t-warn {
+  background: var(--bg-warn);
+  color: var(--t-warn);
+}
+.v-soft.t-err {
+  background: var(--bg-err);
+  color: var(--t-err);
+}
+
+/* --- outline --- */
+.v-outline {
+  background: transparent;
+  border: 1px solid var(--brd);
+}
+.v-outline.t-neutral {
+  color: var(--t2);
+}
+.v-outline.t-muted {
+  color: var(--t3);
+}
+.v-outline.t-accent {
+  color: var(--acc);
+  border-color: var(--acc);
+}
+.v-outline.t-ok {
+  color: var(--t-ok);
+  border-color: var(--t-ok);
+}
+.v-outline.t-warn {
+  color: var(--t-warn);
+  border-color: var(--t-warn);
+}
+.v-outline.t-err {
+  color: var(--t-err);
+  border-color: var(--t-err);
+}
+
+/* --- solid --- */
+.v-solid.t-neutral {
+  background: var(--t1);
+  color: var(--bg1);
+}
+.v-solid.t-muted {
+  background: var(--t3);
+  color: var(--bg1);
+}
+.v-solid.t-accent {
+  background: var(--acc);
+  color: #fff;
+}
+.v-solid.t-ok {
+  background: var(--t-ok);
+  color: #fff;
+}
+.v-solid.t-warn {
+  background: var(--t-warn);
+  color: #fff;
+}
+.v-solid.t-err {
+  background: var(--t-err);
+  color: #fff;
+}

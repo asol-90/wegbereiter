@@ -1,0 +1,47 @@
+.landing {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+}
+
+.card {
+  max-width: 540px;
+  width: 100%;
+  padding: 32px;
+  background: var(--bg1);
+  border-radius: var(--r-lg);
+  box-shadow: var(--sh-card);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.title {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 28px;
+  margin: 0;
+}
+
+.lead {
+  color: var(--t2);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.link {
+  align-self: flex-start;
+  color: var(--acc);
+  font-weight: 500;
+  text-decoration: none;
+  padding: 8px 14px;
+  border-radius: var(--r-md);
+  background: var(--acc-bg);
+  transition: background var(--dur-fast) var(--ease);
+}
+.link:hover {
+  background: color-mix(in srgb, var(--acc-bg) 60%, var(--acc));
+  color: #fff;
+}

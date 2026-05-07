@@ -1,0 +1,74 @@
+.tabs {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  color: var(--t2);
+  cursor: pointer;
+  padding: 8px 12px;
+  font-size: 12px;
+  transition: color var(--dur-fast) var(--ease),
+    background var(--dur-fast) var(--ease),
+    border-color var(--dur-fast) var(--ease);
+}
+.tab:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.tab:hover:not(:disabled):not(.active) {
+  color: var(--t1);
+}
+
+.count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  padding: 0 5px;
+  height: 16px;
+  border-radius: var(--r-pill);
+  background: var(--bg2);
+  color: var(--t3);
+  font-size: 9px;
+  font-weight: 600;
+}
+
+/* underline */
+.v-underline {
+  border-bottom: 1px solid var(--brd);
+}
+.v-underline .tab {
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  padding: 8px 4px;
+  border-radius: 0;
+}
+.v-underline .tab.active {
+  color: var(--t1);
+  border-bottom-color: var(--t1);
+}
+.v-underline .tab.active .count {
+  background: var(--bg3);
+  color: var(--t1);
+}
+
+/* pill */
+.v-pill {
+  padding: 2px;
+  background: var(--bg2);
+  border-radius: var(--r-md);
+}
+.v-pill .tab {
+  border-radius: var(--r-sm);
+}
+.v-pill .tab.active {
+  background: var(--bg1);
+  color: var(--t1);
+  box-shadow: var(--sh-pill);
+}

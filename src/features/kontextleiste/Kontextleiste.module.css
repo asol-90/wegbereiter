@@ -1,0 +1,179 @@
+/* Kontextleiste — right panel in Calendar/List views.
+   Four sections: WB, Andachtsreihe, Abzeichen, Stamm-Kontext. */
+
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* ── Section header ── */
+.sectionLabel {
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--t3);
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+/* ── WB section ── */
+.wbHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.wbCharLabel {
+  font-size: 11px;
+  color: var(--t2);
+  font-weight: 500;
+}
+
+/* ── Checklist (shared by Andachtsreihe + Abzeichen) ── */
+.checkRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+  font-size: 12px;
+  color: var(--t1);
+  cursor: grab;
+  user-select: none;
+  transition: background var(--dur-fast) var(--ease);
+  border-radius: var(--r-sm);
+}
+
+.checkRow:hover {
+  background: var(--bg2);
+}
+
+.checkIcon {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.checkCircle {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1.5px solid var(--brd2);
+}
+
+.checkDone {
+  color: var(--acc);
+}
+
+.checkLabel {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  line-height: 1.3;
+}
+
+.checkCount {
+  flex-shrink: 0;
+  font-size: 10px;
+  color: var(--t3);
+  font-variant-numeric: tabular-nums;
+}
+
+.checkTooltip {
+  display: none;
+  position: absolute;
+  left: calc(100% + 6px);
+  top: 0;
+  background: var(--bg1);
+  border: 0.5px solid var(--brd2);
+  border-radius: var(--r-md);
+  padding: 6px 10px;
+  font-size: 11px;
+  color: var(--t1);
+  white-space: nowrap;
+  z-index: 20;
+  box-shadow: var(--sh-menu);
+  pointer-events: none;
+}
+
+.checkRow:hover .checkTooltip {
+  display: block;
+}
+
+/* ── Drag handle ── */
+.dragGrip {
+  flex-shrink: 0;
+  color: var(--t3);
+  opacity: 0;
+  transition: opacity var(--dur-fast) var(--ease);
+}
+
+.checkRow:hover .dragGrip {
+  opacity: 1;
+}
+
+/* ── Reihenfolge warning ── */
+.orderWarning {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 6px 8px;
+  font-size: 11px;
+  color: var(--t-warn, var(--t2));
+  background: var(--bg-warn, var(--bg2));
+  border-radius: var(--r-sm);
+  line-height: 1.4;
+  margin-top: 4px;
+}
+
+.orderWarning svg {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* ── Stamm-Kontext section ── */
+.stammThema {
+  font-family: var(--serif);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--t1);
+  line-height: 1.4;
+  margin-bottom: 2px;
+}
+
+.stammBeschreibung {
+  font-size: 12px;
+  color: var(--t2);
+  line-height: 1.4;
+  margin-bottom: 8px;
+}
+
+/* ── Accordion count badge ── */
+.accordionCount {
+  font-size: 10px;
+  color: var(--t3);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Empty / loading ── */
+.emptyHint {
+  font-size: 11px;
+  color: var(--t3);
+  font-style: italic;
+}
+
+/* ── Separator between sections ── */
+.separator {
+  border: none;
+  border-top: 0.5px solid var(--brd);
+  margin: 0;
+}

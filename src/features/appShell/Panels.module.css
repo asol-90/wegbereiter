@@ -1,0 +1,70 @@
+/* Two-panel layout. The separator is a pseudo-element on the second panel
+   (css selector `.panel + .panel::before`), inset 28px top/bottom, 0.5px. */
+.root {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+  width: 100%;
+}
+
+.s-main-side .r-main { flex: 0 0 65%; }
+.s-main-side .r-side { flex: 0 0 35%; }
+.s-side-main .r-side { flex: 0 0 35%; }
+.s-side-main .r-main { flex: 0 0 65%; }
+
+.panel {
+  position: relative;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.panel + .panel::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 28px;
+  bottom: 28px;
+  width: 0.5px;
+  background: var(--brd);
+}
+
+/* Serif panel-title, 20/28 padding to match the wireframe. */
+.title {
+  font-family: var(--serif);
+  font-size: 18px;
+  font-weight: 400;
+  color: var(--t1);
+  padding: 20px 28px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.titleText {
+  font-family: var(--serif);
+}
+
+.titleTrailing {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--sans);
+  font-size: 10px;
+  color: var(--t-ok);
+  background: color-mix(in srgb, var(--t-ok) 8%, transparent);
+  padding: 2px 8px;
+  border-radius: var(--r-sm);
+  font-weight: 500;
+}
+
+.body {
+  flex: 1;
+  min-height: 0;
+  padding: 20px 28px 24px;
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+}

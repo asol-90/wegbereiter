@@ -1,0 +1,30 @@
+.btn {
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--t3);
+  background: transparent;
+  transition: background var(--dur-fast) var(--ease),
+    color var(--dur-fast) var(--ease);
+  cursor: pointer;
+}
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.sh-circle {
+  border-radius: var(--r-pill);
+}
+.sh-square {
+  border-radius: var(--r-md);
+}
+.btn:not(:disabled):hover {
+  background: var(--bg2);
+  color: var(--t1);
+}
+.t-danger:not(:disabled):hover {
+  background: var(--bg-err);
+  color: var(--t-err);
+}

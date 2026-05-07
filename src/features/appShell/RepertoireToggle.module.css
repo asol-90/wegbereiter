@@ -1,0 +1,58 @@
+.root {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  background: var(--bg2);
+  border-radius: var(--r-pill);
+  padding: 3px;
+  border: none;
+  cursor: pointer;
+  font: inherit;
+}
+
+.root:focus-visible {
+  outline: 2px solid var(--acc);
+  outline-offset: 2px;
+}
+
+.slider {
+  position: absolute;
+  inset: 3px;
+  background: var(--bg1);
+  border-radius: var(--r-pill);
+  box-shadow: var(--sh-pill);
+  opacity: 0;
+  z-index: 0;
+  pointer-events: none;
+  transition: opacity var(--dur-fast) var(--ease);
+}
+
+.root.active .slider {
+  opacity: 1;
+}
+
+.inner {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px 3px 7px;
+  border-radius: var(--r-pill);
+  font-size: 11px;
+  color: var(--t3);
+  transition: color var(--dur-fast) var(--ease);
+  user-select: none;
+}
+
+.root:hover:not(.active) .inner {
+  color: var(--t2);
+}
+
+.root.active {
+  cursor: default;
+}
+
+.root.active .inner {
+  color: var(--t1);
+}

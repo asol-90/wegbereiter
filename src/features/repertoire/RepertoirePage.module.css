@@ -1,0 +1,766 @@
+/* RepertoirePage — Liste links, Detail rechts */
+
+/* ─── Liste ──────────────────────────────────────────────────────────── */
+
+.liste {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: 0;
+}
+
+.listeHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-bottom: 12px;
+  border-bottom: 0.5px solid var(--brd);
+  margin-bottom: 8px;
+}
+
+.searchRow {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.searchIcon {
+  position: absolute;
+  left: 8px;
+  color: var(--t3);
+  pointer-events: none;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 6px 8px 6px 28px;
+  border: 0.5px solid var(--brd);
+  border-radius: 6px;
+  background: var(--bg2);
+  font-size: 13px;
+  font-family: var(--sans);
+  color: var(--t1);
+  outline: none;
+}
+.searchInput:focus {
+  border-color: var(--acc);
+}
+
+.filterRow {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.typSelect {
+  flex: 1;
+  padding: 4px 6px;
+  border: 0.5px solid var(--brd);
+  border-radius: 6px;
+  background: var(--bg2);
+  font-size: 12px;
+  font-family: var(--sans);
+  color: var(--t2);
+  outline: none;
+}
+
+.newBtn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border: 0.5px solid var(--brd);
+  border-radius: 6px;
+  background: var(--bg2);
+  font-size: 12px;
+  font-family: var(--sans);
+  color: var(--t2);
+  cursor: pointer;
+  white-space: nowrap;
+}
+.newBtn:hover {
+  background: var(--bg3);
+}
+
+.listeBody {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.empty {
+  padding: 24px 0;
+  text-align: center;
+  color: var(--t3);
+  font-size: 13px;
+}
+
+.emptyHint {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 32px 16px;
+  text-align: center;
+  color: var(--t3);
+  font-size: 13px;
+}
+
+.emptyHintIcon {
+  opacity: 0.3;
+  margin-bottom: 4px;
+}
+
+.emptyHintSub {
+  font-size: 11px;
+  color: var(--t3);
+  opacity: 0.7;
+  max-width: 220px;
+  line-height: 1.4;
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.groupTitle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 4px 4px;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+  color: var(--t3);
+  font-family: var(--sans);
+}
+
+.groupCount {
+  margin-left: auto;
+  font-weight: 400;
+  color: var(--t3);
+  font-size: 10px;
+  opacity: 0.6;
+}
+
+.listItem {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 5px 8px;
+  border: none;
+  background: transparent;
+  text-align: left;
+  border-radius: 6px;
+  cursor: pointer;
+  width: 100%;
+  font-family: var(--sans);
+}
+.listItem:hover {
+  background: var(--bg2);
+}
+
+.listItemSelected {
+  background: var(--bg3);
+}
+.listItemSelected:hover {
+  background: var(--bg3);
+}
+
+.listItemName {
+  flex: 1;
+  font-size: 13px;
+  color: var(--t1);
+  font-weight: 400;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.listItemMeta {
+  font-size: 11px;
+  color: var(--t3);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.listItemTime {
+  font-size: 11px;
+  color: var(--t3);
+  white-space: nowrap;
+  flex-shrink: 0;
+  text-align: right;
+  min-width: 60px;
+}
+
+/* ─── Detail ─────────────────────────────────────────────────────────── */
+
+.detail {
+  display: flex;
+  flex-direction: column;
+}
+
+.detailHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 12px;
+  border-bottom: 0.5px solid var(--brd);
+  margin-bottom: 14px;
+}
+
+.detailTitle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--serif);
+  font-size: 15px;
+  color: var(--t1);
+}
+
+.detailQuelle {
+  font-size: 10px;
+  color: var(--t3);
+  background: var(--bg2);
+  padding: 2px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 500;
+}
+
+.detailBody {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.fieldLabel {
+  font-size: 10px;
+  color: var(--t3);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 500;
+  font-family: var(--sans);
+}
+
+.fieldInput {
+  font-size: 13px;
+  color: var(--t1);
+  padding: 5px 8px;
+  border: 0.5px solid var(--brd);
+  border-radius: 6px;
+  background: var(--bg2);
+  outline: none;
+  font-family: var(--sans);
+}
+.fieldInput:focus {
+  border-color: var(--acc);
+}
+
+.fieldTextarea {
+  font-size: 13px;
+  color: var(--t1);
+  padding: 6px 8px;
+  border: 0.5px solid var(--brd);
+  border-radius: 6px;
+  background: var(--bg2);
+  outline: none;
+  font-family: var(--sans);
+  resize: vertical;
+  min-height: 48px;
+}
+
+.fieldRow {
+  display: flex;
+  gap: 10px;
+}
+.fieldRow > .field {
+  flex: 1;
+}
+
+/* ─── WB section ─────────────────────────────────────────────────────── */
+
+.wbSection {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.wbHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.wbHint {
+  font-size: 10px;
+  color: var(--t3);
+  font-style: italic;
+}
+
+.wbGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.wbRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 0;
+}
+
+.wbDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.wbLabel {
+  font-size: 12px;
+  color: var(--t2);
+  flex: 1;
+}
+
+.wbValue {
+  font-size: 11px;
+  color: var(--t3);
+  min-width: 40px;
+  text-align: right;
+}
+
+/* ─── Footer ─────────────────────────────────────────────────────────── */
+
+.detailFooter {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 12px;
+  margin-top: 12px;
+  border-top: 0.5px solid var(--brd);
+}
+
+.footerLeft {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.deactivateBtn {
+  font-size: 12px;
+  padding: 5px 12px;
+  border-radius: 6px;
+  border: 0.5px solid var(--brd);
+  background: transparent;
+  color: var(--t-err);
+  cursor: pointer;
+  font-family: var(--sans);
+}
+.deactivateBtn:hover {
+  background: color-mix(in srgb, var(--t-err) 6%, transparent);
+}
+
+.deleteBtn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  padding: 5px 12px;
+  border-radius: 6px;
+  border: 0.5px solid var(--t-err);
+  background: transparent;
+  color: var(--t-err);
+  cursor: pointer;
+  font-family: var(--sans);
+}
+.deleteBtn:hover {
+  background: color-mix(in srgb, var(--t-err) 10%, transparent);
+}
+
+.saveBtn {
+  font-size: 12px;
+  padding: 5px 14px;
+  border-radius: 6px;
+  border: none;
+  background: var(--t1);
+  color: var(--bg1);
+  cursor: pointer;
+  font-weight: 500;
+  font-family: var(--sans);
+}
+.saveBtn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* ─── Empty detail state ─────────────────────────────────────────────── */
+
+.emptyDetail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 8px;
+  color: var(--t3);
+  font-size: 13px;
+}
+
+.emptyIcon {
+  opacity: 0.35;
+}
+
+/* ─── SegmentedControl row ──────────────────────────────────────────── */
+
+.segmentRow {
+  padding-bottom: 12px;
+  margin-bottom: 4px;
+}
+
+/* ─── Filter info (count label) ─────────────────────────────────────── */
+
+.filterInfo {
+  font-size: 11px;
+  color: var(--t3);
+  flex: 1;
+}
+
+/* ─── Temporär-Banner ───────────────────────────────────────────────── */
+
+.tempBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px;
+  margin-bottom: 8px;
+  background: color-mix(in srgb, var(--t-warn, #e6a817) 10%, transparent);
+  border: 0.5px solid color-mix(in srgb, var(--t-warn, #e6a817) 30%, transparent);
+  border-radius: 6px;
+  font-size: 12px;
+  color: var(--t2);
+  font-family: var(--sans);
+}
+
+.tempBannerLink {
+  border: none;
+  background: none;
+  color: var(--acc);
+  font-size: 12px;
+  font-family: var(--sans);
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+}
+.tempBannerLink:hover {
+  opacity: 0.8;
+}
+
+/* ─── Themen-Tags ───────────────────────────────────────────────────── */
+
+.tagRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 8px;
+  background: var(--bg3);
+  border-radius: 10px;
+  font-size: 11px;
+  color: var(--t2);
+  font-family: var(--sans);
+}
+
+.tagRemove {
+  border: none;
+  background: none;
+  color: var(--t3);
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1;
+  padding: 0 1px;
+}
+.tagRemove:hover {
+  color: var(--t-err);
+}
+
+.tagAdd {
+  border: 0.5px dashed var(--brd);
+  background: none;
+  color: var(--t3);
+  font-size: 11px;
+  font-family: var(--sans);
+  padding: 2px 8px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.tagAdd:hover {
+  background: var(--bg2);
+  color: var(--t2);
+}
+
+/* ─── Info text (Stufenbezug etc.) ──────────────────────────────────── */
+
+.infoText {
+  font-size: 12px;
+  color: var(--t2);
+  font-family: var(--sans);
+}
+
+/* ─── Badge indicator (Pfadfindertechnik-Liste) ─────────────────────── */
+
+.badgeIndicator {
+  margin-left: 4px;
+  color: var(--acc);
+  vertical-align: middle;
+}
+
+/* ─── Read-only field display ───────────────────────────────────────── */
+
+.readOnly {
+  background: transparent;
+  border-color: transparent;
+  cursor: default;
+}
+
+/* ─── Accordion (Andachtsreihen) ────────────────────────────────────── */
+
+.accordionItem {
+  display: flex;
+  flex-direction: column;
+}
+
+.accordionHeader {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 8px;
+  border: none;
+  background: transparent;
+  text-align: left;
+  border-radius: 6px;
+  cursor: pointer;
+  width: 100%;
+  font-family: var(--sans);
+}
+.accordionHeader:hover {
+  background: var(--bg2);
+}
+
+.artBadge {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 600;
+  color: var(--t3);
+  background: var(--bg3);
+  padding: 1px 6px;
+  border-radius: 3px;
+  margin-left: auto;
+}
+
+.accordionBody {
+  padding: 4px 8px 8px 26px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.einheitRow {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 12px;
+  font-family: var(--sans);
+  color: var(--t2);
+}
+
+.einheitIndex {
+  color: var(--t3);
+  font-size: 10px;
+  min-width: 16px;
+  text-align: right;
+}
+
+.einheitTitel {
+  flex: 1;
+}
+
+.einheitRef {
+  font-size: 11px;
+  color: var(--t3);
+  font-style: italic;
+}
+
+.buchquelleHint {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+  padding-top: 4px;
+  border-top: 0.5px solid var(--brd);
+  font-size: 11px;
+  color: var(--t3);
+  font-style: italic;
+}
+
+/* ─── Einheiten-Editor (Andachtsreihe Detail) ───────────────────────── */
+
+.einheitenSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.einheitenHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.einheitenList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.einheitEdit {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 6px 0;
+  border-bottom: 0.5px solid var(--brd);
+}
+
+.einheitEditIndex {
+  font-size: 11px;
+  color: var(--t3);
+  min-width: 18px;
+  text-align: right;
+  padding-top: 7px;
+}
+
+.einheitEditFields {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.einheitEditRow {
+  display: flex;
+  gap: 4px;
+}
+
+.fieldInputSm {
+  flex: 1;
+  font-size: 11px;
+  color: var(--t1);
+  padding: 3px 6px;
+  border: 0.5px solid var(--brd);
+  border-radius: 4px;
+  background: var(--bg2);
+  outline: none;
+  font-family: var(--sans);
+}
+.fieldInputSm:focus {
+  border-color: var(--acc);
+}
+.fieldInputSm::placeholder {
+  color: var(--t3);
+  opacity: 0.6;
+}
+
+.einheitRemoveBtn {
+  border: none;
+  background: none;
+  color: var(--t3);
+  cursor: pointer;
+  padding: 6px 2px;
+  line-height: 1;
+}
+.einheitRemoveBtn:hover {
+  color: var(--t-err);
+}
+
+/* ─── Abzeichen Detail — Anforderungen ──────────────────────────────── */
+
+.anforderungenList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.anforderungRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 0;
+  border-bottom: 0.5px solid var(--brd);
+}
+
+.anforderungInfo {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.anforderungName {
+  font-size: 13px;
+  color: var(--t1);
+  font-family: var(--sans);
+}
+
+.anforderungMeta {
+  font-size: 11px;
+  color: var(--t3);
+  font-family: var(--sans);
+}
+
+.statusBadgeGreen {
+  font-size: 10px;
+  color: var(--t-ok, #3a8);
+  background: color-mix(in srgb, var(--t-ok, #3a8) 10%, transparent);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 500;
+  white-space: nowrap;
+  font-family: var(--sans);
+}
+
+.statusBadgeBtn {
+  font-size: 10px;
+  color: var(--acc);
+  background: color-mix(in srgb, var(--acc) 8%, transparent);
+  border: 0.5px solid color-mix(in srgb, var(--acc) 25%, transparent);
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: var(--sans);
+}
+.statusBadgeBtn:hover {
+  background: color-mix(in srgb, var(--acc) 15%, transparent);
+}

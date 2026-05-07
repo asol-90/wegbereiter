@@ -1,0 +1,56 @@
+.wrap {
+  position: relative;
+}
+
+.card {
+  display: block;
+  padding: 10px 12px;
+  border-radius: var(--r-md);
+  border: 1.5px solid var(--stamm, #0F6E56);
+  background: color-mix(in srgb, var(--stamm, #0F6E56) 6%, var(--bg1));
+}
+
+.label {
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--stamm, #0F6E56);
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.thema {
+  font-family: var(--serif);
+  font-size: 13px;
+  color: var(--t1);
+  margin-bottom: 2px;
+}
+
+.range {
+  font-size: 10px;
+  color: var(--t3);
+}
+
+.counts {
+  font-size: 10px;
+  color: var(--t2);
+  margin-top: 4px;
+}
+
+.deleteBtn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 2;
+  opacity: 0;
+  transition: opacity var(--dur-fast) var(--ease);
+}
+
+.wrap:hover .deleteBtn,
+.deleteBtn:focus-visible {
+  opacity: 1;
+}
+
+.past {
+  opacity: 0.5;
+}

@@ -1,0 +1,459 @@
+/* TreffenKarte — interactive meeting card (concept §8.1 + §9).
+   Layout mirrors meeting-card-wireframes.html v9. */
+
+.card {
+  background: var(--bg1);
+  border: 0.5px solid rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  padding: 18px 22px 16px;
+  transition: box-shadow var(--dur-fast) var(--ease);
+}
+
+.cardDragOver {
+  box-shadow: inset 0 0 0 2px var(--acc);
+}
+
+/* ─── Head: date-cell | title ─── */
+.head {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 28px;
+  align-items: baseline;
+  padding-bottom: 16px;
+  border-bottom: 0.5px solid rgba(0, 0, 0, 0.1);
+}
+
+.dateCell {
+  font-family: var(--serif);
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: 8px;
+  position: relative;
+}
+
+/* Lock icon */
+.lock {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--t3);
+  border-radius: 8px;
+  transition: background var(--dur-fast) var(--ease),
+    color var(--dur-fast) var(--ease);
+  border: none;
+  background: none;
+  padding: 0;
+}
+
+.lock:hover {
+  background: var(--bg2);
+  color: var(--t1);
+}
+
+.lockActive {
+  color: var(--t1);
+}
+
+.weekday {
+  font-size: 11px;
+  color: var(--t2);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-family: var(--sans);
+  font-weight: 500;
+}
+
+.dayNum {
+  font-size: 22px;
+  color: var(--t1);
+  font-weight: 500;
+}
+
+.month {
+  font-size: 14px;
+  color: var(--t2);
+  margin-left: -2px;
+}
+
+/* ─── Editable title ─── */
+.titleInput {
+  font-family: var(--serif);
+  font-size: 19px;
+  color: var(--t1);
+  font-weight: 400;
+  line-height: 1.2;
+  min-width: 0;
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+}
+
+.titleInput::placeholder {
+  color: var(--t3);
+  font-style: italic;
+}
+
+.titleInput:focus {
+  box-shadow: 0 1px 0 0 var(--t3);
+}
+
+/* ─── Body: meta-col | content ─── */
+.body {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 28px;
+  padding-top: 16px;
+}
+
+.metaCol {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.blockLabel {
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--t3);
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+/* WB dots — clickable */
+.wbDots {
+  display: flex;
+  gap: 8px;
+}
+
+.wbSlot {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform var(--dur-fast) var(--ease);
+}
+
+.wbSlot:hover {
+  transform: scale(1.2);
+}
+
+.wbSlotSoll {
+  box-shadow: inset 0 0 0 1.5px var(--t1);
+}
+
+/* Content column */
+.content {
+  min-width: 0;
+}
+
+/* ─── Editable note ─── */
+.note {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 6px 0;
+  margin-bottom: 4px;
+  font-size: 12px;
+  color: var(--t2);
+  cursor: pointer;
+  border-bottom: 0.5px solid transparent;
+  transition: border-bottom-color var(--dur-fast) var(--ease);
+}
+
+.note:hover {
+  border-bottom-color: rgba(0, 0, 0, 0.1);
+}
+
+.noteIcon {
+  flex-shrink: 0;
+  color: var(--t3);
+  margin-top: 1px;
+}
+
+.noteText {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+  flex: 1;
+}
+
+.noteTextPlaceholder {
+  color: var(--t3);
+  font-style: italic;
+}
+
+/* Expanded note textarea */
+.noteExpanded {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 8px 0 12px;
+  margin-bottom: 8px;
+  border-bottom: 0.5px solid rgba(0, 0, 0, 0.1);
+}
+
+.noteTextarea {
+  flex: 1;
+  min-height: 48px;
+  font-family: var(--sans);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--t2);
+  border: none;
+  outline: none;
+  background: transparent;
+  resize: vertical;
+  padding: 0;
+  margin: 0;
+}
+
+.noteTextarea::placeholder {
+  color: var(--t3);
+  font-style: italic;
+}
+
+/* ─── Programmpunkte ─── */
+.points {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-bottom: 0;
+}
+
+.point {
+  display: grid;
+  grid-template-columns: 14px 16px 1fr auto auto 14px;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  font-size: 14px;
+  border-bottom: 0.5px solid rgba(0, 0, 0, 0.1);
+}
+
+.point:last-child {
+  border-bottom: none;
+}
+
+.pointHandle {
+  opacity: 0;
+  transition: opacity var(--dur-fast) var(--ease);
+  cursor: grab;
+}
+
+.point:hover .pointHandle {
+  opacity: 1;
+}
+
+.pointDragging {
+  opacity: 0.85;
+  background: var(--bg2);
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.pointName {
+  color: var(--t1);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Inline-edit name input */
+.pointNameInput {
+  font-size: 14px;
+  color: var(--t1);
+  border: none;
+  outline: none;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+  width: 100%;
+}
+
+.pointNameInput:focus {
+  box-shadow: 0 1px 0 0 var(--t3);
+}
+
+.pointResp {
+  color: var(--t2);
+  font-size: 13px;
+}
+
+/* Inline resp select */
+.pointRespSelect {
+  font-size: 13px;
+  color: var(--t2);
+  border: none;
+  outline: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  max-width: 100px;
+}
+
+.pointDur {
+  color: var(--t2);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  min-width: 48px;
+  text-align: right;
+}
+
+/* Inline duration input */
+.pointDurInput {
+  font-size: 13px;
+  color: var(--t2);
+  font-variant-numeric: tabular-nums;
+  border: none;
+  outline: none;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  width: 48px;
+  text-align: right;
+}
+
+.pointDurInput:focus {
+  box-shadow: 0 1px 0 0 var(--t3);
+}
+
+/* Typ icon for abstract points */
+.pointTypeIcon {
+  color: var(--acc);
+  opacity: 0.7;
+}
+
+/* Konkretisieren button */
+.pointKonkret {
+  font-size: 10px;
+  font-family: var(--sans);
+  color: var(--acc);
+  background: color-mix(in srgb, var(--acc) 8%, transparent);
+  border: 0.5px solid color-mix(in srgb, var(--acc) 20%, transparent);
+  border-radius: 4px;
+  padding: 1px 7px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background var(--dur-fast) var(--ease);
+}
+.pointKonkret:hover {
+  background: color-mix(in srgb, var(--acc) 15%, transparent);
+}
+
+/* Delete button (×) */
+.pointDelete {
+  color: var(--t3);
+  font-size: 13px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity var(--dur-fast) var(--ease),
+    color var(--dur-fast) var(--ease);
+  border: none;
+  background: none;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.point:hover .pointDelete {
+  opacity: 1;
+}
+
+.pointDelete:hover {
+  color: var(--t-err);
+}
+
+/* ─── Stamm-Blöcke (nicht verschiebbar, grün) ─── */
+.pointStamm {
+  display: grid;
+  grid-template-columns: 14px 16px 1fr auto auto 14px;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+  font-size: 14px;
+  border-bottom: 0.5px solid rgba(0, 0, 0, 0.1);
+}
+
+.pointStamm:last-child {
+  border-bottom: none;
+}
+
+.pointStamm .pointName {
+  color: var(--stamm, #0f6e56);
+}
+
+.pointStammResp {
+  color: var(--stamm, #0f6e56);
+  font-size: 13px;
+  opacity: 0.7;
+}
+
+.pointStammDur {
+  color: var(--stamm, #0f6e56);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  min-width: 48px;
+  text-align: right;
+  opacity: 0.7;
+}
+
+.pointStammIcon {
+  color: var(--stamm, #0f6e56);
+}
+
+.stammSectionLabel {
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--stamm, #0f6e56);
+  font-weight: 500;
+  padding: 6px 0 2px;
+  opacity: 0.6;
+}
+
+/* ─── Add button ─── */
+.add {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--t2);
+  padding: 6px 10px;
+  margin-left: 24px;
+  margin-top: 4px;
+  cursor: pointer;
+  border: 0.5px solid rgba(0, 0, 0, 0.08);
+  border-radius: var(--r-sm);
+  background: var(--bg2);
+  font-family: var(--sans);
+  transition: color var(--dur-fast) var(--ease),
+    background var(--dur-fast) var(--ease);
+}
+
+.add:hover {
+  color: var(--t1);
+  background: var(--bg3);
+}
+
+/* Duration bar row */
+.barRow {
+  margin-top: 6px;
+}

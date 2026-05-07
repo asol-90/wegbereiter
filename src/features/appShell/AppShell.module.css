@@ -1,0 +1,30 @@
+/* Page background matches the wireframe's off-white. */
+.page {
+  min-height: 100vh;
+  background: var(--bg-app);
+  padding: 24px 24px 48px;
+  display: flex;
+  justify-content: center;
+}
+
+/* The "shell" is the white rounded container. It flex-grows vertically so
+   the content area fills the viewport but never exceeds a reasonable max
+   width (laptop-optimized per concept §8). */
+.shell {
+  width: 100%;
+  max-width: 1200px;
+  min-height: calc(100vh - 72px);
+  background: var(--bg1);
+  border: 0.5px solid var(--brd);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.content {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+  overflow: hidden;
+}

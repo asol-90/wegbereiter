@@ -1,0 +1,43 @@
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--r-md);
+  background: transparent;
+  color: var(--t3);
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease),
+    color var(--dur-fast) var(--ease),
+    box-shadow var(--dur-fast) var(--ease);
+}
+
+.s-sm {
+  width: 24px;
+  height: 24px;
+}
+.s-md {
+  width: 30px;
+  height: 30px;
+}
+
+.btn:not(:disabled):hover {
+  background: var(--bg2);
+  color: var(--t1);
+}
+
+.pressed {
+  background: var(--bg2);
+  color: var(--t1);
+  box-shadow: inset 0 0 0 1px var(--brd);
+}
+
+.t-accent.pressed {
+  background: var(--acc-bg);
+  color: var(--acc);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--acc) 30%, transparent);
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

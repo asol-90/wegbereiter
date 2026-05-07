@@ -1,0 +1,96 @@
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: var(--r-pill);
+  border: 1px solid transparent;
+  color: var(--t1);
+  background: var(--bg2);
+  line-height: 1;
+  white-space: nowrap;
+  transition: background var(--dur-fast) var(--ease),
+    border-color var(--dur-fast) var(--ease),
+    color var(--dur-fast) var(--ease);
+}
+
+.s-sm {
+  padding: 3px 8px;
+  font-size: 10px;
+}
+.s-md {
+  padding: 4px 10px;
+  font-size: 11px;
+}
+
+.label {
+  display: inline-block;
+}
+
+.leading {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.interactive {
+  cursor: pointer;
+  background: transparent;
+  color: inherit;
+  border-color: transparent;
+  font: inherit;
+}
+.interactive:not(.selected):hover {
+  background: var(--bg2);
+}
+/* Keep selected contrast on hover — darken slightly instead of swapping bg. */
+.interactive.selected:hover {
+  filter: brightness(0.92);
+}
+
+.t-default {
+  color: var(--t2);
+}
+.t-accent {
+  color: var(--acc);
+  background: var(--bg2);
+}
+.t-ok {
+  color: var(--t-ok);
+  background: var(--bg-ok);
+}
+.t-warn {
+  color: var(--t-warn);
+  background: var(--bg-warn);
+}
+.t-err {
+  color: var(--t-err);
+  background: var(--bg-err);
+}
+
+.selected {
+  background: var(--t1);
+  color: var(--bg1);
+  border-color: var(--t1);
+}
+.selected.t-accent {
+  background: var(--acc);
+  color: #fff;
+  border-color: var(--acc);
+}
+
+.remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  border-radius: var(--r-pill);
+  background: transparent;
+  color: currentColor;
+  opacity: 0.7;
+  cursor: pointer;
+}
+.remove:hover {
+  opacity: 1;
+  background: rgba(0, 0, 0, 0.12);
+}

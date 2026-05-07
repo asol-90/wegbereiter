@@ -1,0 +1,1133 @@
+/* ─── Stepper ───────────────────────────────────────────────────────────── */
+
+.stepbar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+
+.step,
+.stepActive,
+.stepDone {
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  padding: 4px 10px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--brd);
+  color: var(--t3);
+  background: var(--bg1);
+}
+
+.stepDone {
+  color: var(--t2);
+  background: var(--bg2);
+  border-color: var(--brd);
+}
+
+.stepActive {
+  color: var(--bg1);
+  background: var(--t1);
+  border-color: var(--t1);
+}
+
+/* ─── Shared layout ─────────────────────────────────────────────────────── */
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.row2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* ─── Step 0: Rhythmus info (above Von/Bis) ─────────────────────────── */
+
+.rhythmusInfo {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  padding-right: 36px;
+  border-radius: var(--r-md);
+  background: var(--bg2);
+}
+
+.rhythmusInfoRow {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--t1);
+  flex-wrap: wrap;
+}
+
+.rhythmusInfoLabel {
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--t3);
+  font-weight: 500;
+  margin-right: 4px;
+}
+
+.rhythmusInfoSep {
+  color: var(--t3);
+}
+
+.editBtn {
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--r-md);
+  border: none;
+  background: transparent;
+  color: var(--t3);
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease),
+    color var(--dur-fast) var(--ease);
+}
+
+.editBtn:hover {
+  background: var(--bg3);
+  color: var(--t1);
+}
+
+.rhythmusEdit {
+  position: relative;
+  padding: 10px 12px;
+  padding-right: 36px;
+  border-radius: var(--r-md);
+  background: var(--bg2);
+}
+
+.rhythmusEditFields {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 10px;
+}
+
+.editBtnDone {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--r-md);
+  border: none;
+  background: transparent;
+  color: var(--t-ok);
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease);
+}
+
+.editBtnDone:hover {
+  background: var(--bg3);
+}
+
+/* ─── Step 0: Date row — Von + Bis with preset ──────────────────────── */
+
+.dateRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.bisField {
+  position: relative;
+}
+
+.presetBtn {
+  position: absolute;
+  top: 24px; /* below label */
+  right: 6px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--r-md);
+  border: none;
+  background: transparent;
+  color: var(--t3);
+  cursor: pointer;
+  z-index: 1;
+  transition: background var(--dur-fast) var(--ease),
+    color var(--dur-fast) var(--ease);
+}
+
+.presetBtn:hover {
+  background: var(--bg2);
+  color: var(--t1);
+}
+
+.presetDropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 4px;
+  min-width: 220px;
+  background: var(--bg1);
+  border: 1px solid var(--brd);
+  border-radius: var(--r-md);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  overflow: hidden;
+}
+
+.presetOption {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 8px 12px;
+  border: none;
+  background: transparent;
+  font-size: 13px;
+  font-family: inherit;
+  color: var(--t1);
+  cursor: pointer;
+  text-align: left;
+  gap: 12px;
+}
+
+.presetOption:hover {
+  background: var(--bg2);
+}
+
+.presetOption + .presetOption {
+  border-top: 1px solid var(--brd);
+}
+
+.presetDate {
+  font-size: 11px;
+  color: var(--t3);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.kontextHintInline {
+  margin: -4px 0 0;
+  font-size: 11px;
+  color: var(--t3);
+  font-style: italic;
+}
+
+/* ─── Team section ──────────────────────────────────────────────────── */
+
+.teamSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.teamChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.teamChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px 2px 2px;
+  border-radius: var(--r-pill);
+  background: var(--bg2);
+  font-size: 12px;
+  color: var(--t1);
+}
+
+.teamAvatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  color: white;
+  font-size: 10px;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.teamRemove {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--t3);
+  cursor: pointer;
+  border-radius: var(--r-md);
+  font-size: 16px;
+  font-weight: 300;
+  flex-shrink: 0;
+  transition: background var(--dur-fast) var(--ease),
+    color var(--dur-fast) var(--ease);
+}
+
+.teamRemove:hover {
+  background: var(--bg3);
+  color: var(--t1);
+}
+
+.teamAddRow {
+  display: flex;
+  gap: 8px;
+}
+
+.teamAddRow input {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ─── Termin-Vorschau ───────────────────────────────────────────────── */
+
+.terminList {
+  margin-top: 4px;
+  border: 1px solid var(--brd);
+  border-radius: var(--r-md);
+  overflow: hidden;
+}
+
+.terminListHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 12px;
+  background: var(--bg2);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--t2);
+}
+
+.terminListCount {
+  font-weight: 400;
+  color: var(--t3);
+}
+
+.terminRow {
+  display: grid;
+  grid-template-columns: 76px 1fr auto auto;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px;
+  border-top: 1px solid var(--brd);
+  font-size: 13px;
+  min-height: 28px;
+}
+
+.terminDate {
+  font-variant-numeric: tabular-nums;
+  color: var(--t2);
+  white-space: nowrap;
+  font-size: 12px;
+}
+
+.terminDateKontext {
+  color: var(--t-ok);
+}
+
+.terminLabel {
+  color: var(--t1);
+  min-width: 0;
+  font-size: 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.terminOrt {
+  font-weight: 400;
+  color: var(--t3);
+}
+
+.terminBudgetInfo {
+  font-size: 11px;
+  color: var(--t2);
+  white-space: nowrap;
+}
+
+.terminRight {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  justify-content: flex-end;
+}
+
+/* Stammaktion row — green background like before */
+.terminRowAktion {
+  background: rgba(15, 110, 86, 0.06);
+}
+.terminRowAktion .terminLabel strong {
+  color: var(--t-ok);
+}
+
+/* Skipped row (Ferien/Feiertag, default) */
+.terminSkipped {
+  background: var(--bg2);
+}
+.terminSkipped .terminDate,
+.terminSkipped .terminLabel {
+  color: var(--t3);
+  text-decoration: line-through;
+  text-decoration-color: rgba(0, 0, 0, 0.15);
+}
+
+/* Reinstated row ("findet statt" toggled on) */
+.terminReinstated {
+  background: rgba(186, 117, 23, 0.06);
+}
+.terminReinstated .terminDate,
+.terminReinstated .terminLabel {
+  color: var(--t-warn);
+  text-decoration: none;
+}
+
+/* Toggle button — icon button like the lock on TreffenCards */
+.terminToggle {
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--r-md);
+  border: none;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background var(--dur-fast) var(--ease),
+    color var(--dur-fast) var(--ease);
+}
+
+.terminToggleSkipped {
+  background: transparent;
+  color: var(--t3);
+}
+.terminToggleSkipped:hover {
+  background: var(--bg3);
+  color: var(--t2);
+}
+
+.terminToggleActive {
+  background: var(--bg2);
+  color: var(--t-warn);
+  box-shadow: inset 0 0 0 1px rgba(133, 79, 11, 0.2);
+}
+.terminToggleActive:hover {
+  background: rgba(186, 117, 23, 0.15);
+}
+
+/* Collapsed "show more" row */
+.terminRowCollapsed {
+  display: grid;
+  grid-template-columns: 76px 1fr auto auto;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px;
+  border-top: 1px solid var(--brd);
+  font-size: 12px;
+  color: var(--t3);
+  font-style: italic;
+  cursor: pointer;
+  min-height: 28px;
+}
+.terminRowCollapsed:hover {
+  background: var(--bg2);
+}
+
+.collapsedWarn {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  margin-left: 8px;
+  color: var(--t-warn);
+  font-style: normal;
+  font-weight: 500;
+}
+
+.terminListEmpty {
+  padding: 12px;
+  color: var(--t3);
+  font-size: 13px;
+  text-align: center;
+}
+
+/* Ferien badge (same color for both Ferien and Feiertage) */
+.terminBadgeFerien {
+  font-size: 10px;
+  padding: 1px 7px;
+  border-radius: var(--r-pill);
+  font-weight: 500;
+  white-space: nowrap;
+  background: rgba(186, 117, 23, 0.1);
+  color: var(--t-warn);
+}
+
+/* ─── Placeholder (Step 2 Ziele, Step 1 kein Kontext) ───────────────── */
+
+.placeholder {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 20px 22px;
+  border-radius: var(--r-md);
+  border: 1px dashed var(--brd);
+  background: var(--bg2);
+  color: var(--t2);
+  min-height: 180px;
+}
+
+.placeholder h3 {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: 16px;
+  color: var(--t1);
+  font-weight: 400;
+}
+
+.placeholder p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.placeholderHint {
+  font-size: 12px;
+  color: var(--t3);
+  font-style: italic;
+}
+
+/* ─── Error ─────────────────────────────────────────────────────────── */
+
+.error {
+  margin: 4px 0 0;
+  color: var(--t-err);
+  font-size: 12px;
+}
+
+/* ─── Step 1: Stamm-Kontext ─────────────────────────────────────────── */
+
+.kontextThema {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: 18px;
+  color: var(--t1);
+  font-weight: 400;
+}
+
+.kontextBeschreibung {
+  margin: 0;
+  font-size: 13px;
+  color: var(--t2);
+  line-height: 1.5;
+}
+
+.kontextMeta {
+  display: flex;
+  gap: 12px;
+  font-size: 12px;
+  color: var(--t3);
+  flex-wrap: wrap;
+}
+
+.kontextBloecke {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 12px;
+  border-radius: var(--r-md);
+  background: var(--bg2);
+  font-size: 12px;
+  color: var(--t2);
+}
+
+.kontextBloeckeLabel {
+  font-weight: 500;
+  color: var(--t1);
+  margin-bottom: 2px;
+}
+
+.kontextHint {
+  margin: 0;
+  font-size: 12px;
+  color: var(--t3);
+  font-style: italic;
+}
+
+/* ─── Step 1: Kontext — erweiterte Sektionen ───────────────────────── */
+
+.kontextSectionLabel {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--t3);
+  font-weight: 500;
+  margin-bottom: 6px;
+}
+
+.kontextAktivitaetenSection {
+  display: flex;
+  flex-direction: column;
+}
+
+.kontextAktivitaetenGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.kontextAktivitaetChip {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: var(--r-pill);
+  background: var(--bg2);
+  font-size: 12px;
+}
+
+.kontextAktivitaetName {
+  color: var(--t1);
+}
+
+.kontextAktivitaetTyp {
+  color: var(--t3);
+  font-size: 10px;
+}
+
+.kontextAktionen {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.kontextAktionRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 10px;
+  border-radius: var(--r-md);
+  background: rgba(15, 110, 86, 0.06);
+  font-size: 12px;
+}
+
+.kontextAktionDate {
+  font-variant-numeric: tabular-nums;
+  color: var(--t-ok);
+  white-space: nowrap;
+  min-width: 70px;
+}
+
+.kontextAktionName {
+  color: var(--t1);
+  font-weight: 500;
+}
+
+.kontextAktionOrt {
+  color: var(--t3);
+  margin-left: auto;
+}
+
+.kontextTreffenCompact {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.kontextTreffenDates {
+  margin: 0;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--t2);
+  line-height: 1.7;
+}
+
+.kontextTreffenBesonders {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 10px;
+  border-radius: var(--r-md);
+  background: rgba(186, 117, 23, 0.06);
+  font-size: 12px;
+}
+
+/* ─── Step 3: Vorschau / Zusammenfassung ────────────────────────────── */
+
+.summaryHeader {
+  display: flex;
+  align-items: flex-end;
+  gap: 16px;
+}
+
+.summaryHeader > :first-child {
+  flex: 1;
+}
+
+.summaryMeta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-bottom: 6px; /* align with input baseline */
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.summaryMetaItem {
+  font-size: 12px;
+  color: var(--t2);
+}
+
+.summaryMetaValue {
+  font-family: var(--serif);
+  font-weight: 600;
+  color: var(--t1);
+}
+
+.summaryMetaSep {
+  color: var(--t3);
+  font-size: 12px;
+}
+
+.summaryKontext {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 12px 14px;
+  background: var(--bg2);
+  border-radius: var(--r-md);
+  border-left: 3px solid var(--t2);
+}
+
+.summaryKontextThema {
+  margin: 0;
+  font-family: var(--serif);
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--t1);
+}
+
+.summarySectionLabel {
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--t3);
+  font-weight: 500;
+}
+
+.summarySectionText {
+  margin: 0;
+  font-size: 13px;
+  color: var(--t2);
+  line-height: 1.5;
+}
+
+.summaryZiele {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 14px;
+  background: var(--bg2);
+  border-radius: var(--r-md);
+}
+
+.summaryZielRow {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.summaryZielLabel {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--t2);
+  min-width: 110px;
+  flex-shrink: 0;
+}
+
+.summaryZielValue {
+  font-size: 13px;
+  color: var(--t1);
+}
+
+.summaryZielMeta {
+  font-size: 12px;
+  color: var(--t3);
+}
+
+.summaryWbDot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 2px;
+  vertical-align: middle;
+}
+
+.summaryTeam {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 14px;
+  background: var(--bg2);
+  border-radius: var(--r-md);
+}
+
+.summaryTeamChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.summaryTeamChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--t1);
+}
+
+.summaryTeamDot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* ─── Footer ────────────────────────────────────────────────────────── */
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.footerRight {
+  display: flex;
+  gap: 8px;
+}
+
+/* ─── Step 2: Ziele — Collapsible sections ──────────────────────────── */
+
+.zieleSection {
+  border: 1px solid var(--brd);
+  border-radius: var(--r-md);
+  overflow: hidden;
+}
+
+.zieleSectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--bg2);
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--t1);
+  transition: background var(--dur-fast) var(--ease);
+}
+
+.zieleSectionHeader:hover {
+  background: var(--bg3);
+}
+
+.zieleSectionArrow {
+  display: inline-block;
+  transition: transform var(--dur-fast) var(--ease);
+  font-size: 12px;
+}
+
+.zieleSectionArrow.arrowOpen {
+  transform: rotate(180deg);
+}
+
+.zieleSectionBody {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: var(--bg1);
+  border-top: 1px solid var(--brd);
+}
+
+/* ─── WB-Schwerpunkt ────────────────────────────────────────────────── */
+
+.modusBtnRow {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.modusBtn {
+  padding: 6px 12px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--brd);
+  background: var(--bg2);
+  color: var(--t2);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--dur-fast) var(--ease);
+}
+
+.modusBtn:hover {
+  background: var(--bg3);
+  color: var(--t1);
+}
+
+.modusBtnActive {
+  background: var(--t1);
+  color: var(--bg1);
+  border-color: var(--t1);
+}
+
+.wbModeText {
+  margin: 0;
+  font-size: 12px;
+  color: var(--t2);
+  font-style: italic;
+}
+
+.wbChips {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.wbChip {
+  padding: 6px 10px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--brd);
+  border-left: 3px solid transparent;
+  background: var(--bg2);
+  color: var(--t2);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all var(--dur-fast) var(--ease);
+}
+
+.wbChip:hover {
+  background: var(--bg3);
+  color: var(--t1);
+}
+
+.wbChipSelected {
+  background: var(--bg2);
+  color: var(--t1);
+  font-weight: 500;
+}
+
+/* ─── Toggle buttons ────────────────────────────────────────────────── */
+
+.toggleBtn {
+  padding: 6px 12px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--brd);
+  background: var(--bg2);
+  color: var(--t2);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--dur-fast) var(--ease);
+}
+
+.toggleBtn:hover {
+  background: var(--bg3);
+  color: var(--t1);
+}
+
+/* ─── Andachtsreihe ────────────────────────────────────────────────── */
+
+.andachtList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.andachtRow {
+  display: grid;
+  grid-template-columns: 28px 1fr 28px;
+  gap: 6px;
+  align-items: flex-start;
+}
+
+.andachtNumber {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 32px;
+  border-radius: var(--r-md);
+  background: var(--bg2);
+  font-size: 12px;
+  color: var(--t2);
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.andachtRow input {
+  font-size: 12px;
+}
+
+.andachtRemove {
+  width: 28px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--t3);
+  cursor: pointer;
+  border-radius: var(--r-md);
+  font-size: 18px;
+  font-weight: 300;
+  flex-shrink: 0;
+  transition: background var(--dur-fast) var(--ease),
+    color var(--dur-fast) var(--ease);
+}
+
+.andachtRemove:hover {
+  background: var(--bg3);
+  color: var(--t1);
+}
+
+.addEinheitBtn {
+  padding: 6px 12px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--brd);
+  background: var(--bg2);
+  color: var(--t2);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--dur-fast) var(--ease);
+}
+
+.addEinheitBtn:hover {
+  background: var(--bg3);
+  color: var(--t1);
+}
+
+/* ─── Abzeichen ────────────────────────────────────────────────────── */
+
+.abzeichenStufenRow {
+  display: flex;
+  gap: 6px;
+}
+
+.stufeBtn {
+  flex: 1;
+  padding: 6px 12px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--brd);
+  background: var(--bg2);
+  color: var(--t2);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--dur-fast) var(--ease);
+}
+
+.stufeBtn:hover {
+  background: var(--bg3);
+  color: var(--t1);
+}
+
+.stufeBtnSelected {
+  background: var(--t1);
+  color: var(--bg1);
+  border-color: var(--t1);
+}
+
+.abzeichenCardGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 8px;
+}
+
+.abzeichenCard {
+  padding: 8px 10px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--brd);
+  background: var(--bg2);
+  cursor: pointer;
+  transition: all var(--dur-fast) var(--ease);
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.abzeichenCard:hover {
+  background: var(--bg3);
+  border-color: var(--t2);
+}
+
+.abzeichenCardSelected {
+  background: var(--t1);
+  border-color: var(--t1);
+  color: var(--bg1);
+}
+
+.abzeichenCardName {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--t1);
+}
+
+.abzeichenCardSelected .abzeichenCardName {
+  color: var(--bg1);
+}
+
+.abzeichenCardMeta {
+  font-size: 10px;
+  color: var(--t3);
+}
+
+.abzeichenCardSelected .abzeichenCardMeta {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.abzeichenConfirm {
+  padding: 8px 10px;
+  border-radius: var(--r-md);
+  background: var(--bg2);
+  border-left: 3px solid var(--t1);
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 12px;
+}
+
+.abzeichenConfirm strong {
+  color: var(--t1);
+}
+
+.abzeichenConfirmMeta {
+  color: var(--t3);
+  margin-left: auto;
+}

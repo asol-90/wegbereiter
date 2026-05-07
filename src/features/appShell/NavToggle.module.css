@@ -1,0 +1,68 @@
+/* Sliding-pill segmented. Mirrors `.nav-toggle` from app-shell-v3.html. */
+.root {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  background: var(--bg2);
+  border-radius: var(--r-pill);
+  padding: 3px;
+  gap: 2px;
+}
+
+.slot {
+  position: relative;
+  z-index: 1;
+  width: 30px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--t3);
+  border-radius: var(--r-pill);
+  cursor: pointer;
+  padding: 0;
+  transition: color var(--dur-fast) var(--ease);
+  font: inherit;
+}
+
+.slot:hover:not(.active):not(.disabled) {
+  color: var(--t2);
+}
+
+.slot.active {
+  color: var(--t1);
+  cursor: default;
+}
+
+.slot.disabled {
+  color: var(--t3);
+  opacity: 0.25;
+  cursor: default;
+}
+
+.slot:focus-visible {
+  outline: 2px solid var(--acc);
+  outline-offset: 2px;
+}
+
+/* The white pill that glides behind the active slot. */
+.slider {
+  position: absolute;
+  top: 3px;
+  width: 30px;
+  height: 28px;
+  background: var(--bg1);
+  border-radius: var(--r-pill);
+  box-shadow: var(--sh-pill);
+  z-index: 0;
+  pointer-events: none;
+  transition: left var(--dur-slow) var(--ease),
+    opacity var(--dur-fast) var(--ease);
+}
+
+.root[data-pos='0'] .slider { left: 3px; }
+.root[data-pos='1'] .slider { left: calc(3px + 30px + 2px); }
+.root[data-pos='2'] .slider { left: calc(3px + 2 * (30px + 2px)); }
+.root[data-pos='none'] .slider { opacity: 0; }

@@ -1,0 +1,20 @@
+.kbd {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.key {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 16px;
+  padding: 1px 5px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--brd);
+  background: var(--bg2);
+  color: var(--t2);
+  font-family: var(--f-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: 10px;
+  line-height: 1;
+}

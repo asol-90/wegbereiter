@@ -1,0 +1,31 @@
+.root {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  flex-shrink: 0;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px;
+  color: var(--t3);
+}
+
+.metaLabel {
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.stammDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--t-ok);
+}

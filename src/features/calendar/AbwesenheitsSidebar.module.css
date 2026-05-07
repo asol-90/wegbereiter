@@ -1,0 +1,236 @@
+/* AbwesenheitsSidebar — vertical timeline with one column per team member. */
+
+.root {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+/* ── Header ── */
+.header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-bottom: 6px;
+  flex-shrink: 0;
+}
+
+.headerLabel {
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--t3);
+  font-weight: 500;
+}
+
+/* ── Avatar row ── */
+.avatarRow {
+  display: flex;
+  flex-shrink: 0;
+  padding-bottom: 6px;
+  /* offset = monthCol (30px) + treffenCol (12px) */
+  padding-left: 42px;
+  gap: 0;
+}
+
+.avatarSlot {
+  width: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatarSlot.highlighted {
+  filter: brightness(0.85);
+}
+
+/* ── Timeline ── */
+.timeline {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ── Month label column ── */
+.monthCol {
+  width: 30px;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.monthLabel {
+  position: absolute;
+  right: 4px;
+  font-size: 11px;
+  color: var(--t3);
+  font-weight: 500;
+  line-height: 1;
+  user-select: none;
+  transform: translateY(-5px);
+}
+
+/* ── Treffen diamond column ── */
+.treffenCol {
+  width: 12px;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.diamond {
+  position: absolute;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  background: var(--acc);
+  transform: translate(-50%, -50%) rotate(45deg);
+  z-index: 2;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.diamond.diamondHighlighted {
+  opacity: 1;
+  width: 6px;
+  height: 6px;
+  background: var(--t1);
+}
+
+/* ── Member columns container ── */
+.membersArea {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  position: relative;
+}
+
+/* ── Single member column ── */
+.memberCol {
+  width: 28px;
+  flex-shrink: 0;
+  position: relative;
+  cursor: crosshair;
+}
+
+/* ── Horizontal grid lines ── */
+.gridLines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.gridLine {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 0;
+  border-top: 0.5px dashed var(--brd);
+}
+
+.gridLine.monthBorder {
+  border-top-style: solid;
+  border-top-color: var(--brd2);
+}
+
+/* ── Absence block ── */
+.absBlock {
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  border-radius: 10px;
+  cursor: pointer;
+  z-index: 3;
+  transition: filter var(--dur-fast) var(--ease), box-shadow var(--dur-fast) var(--ease);
+}
+
+.absBlock:hover {
+  filter: brightness(0.90);
+}
+
+.absBlock.highlighted {
+  box-shadow: 0 0 0 1.5px var(--t1);
+}
+
+/* ── Resize handles ── */
+.resizeHandle {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 6px;
+  cursor: ns-resize;
+  z-index: 4;
+}
+
+.resizeHandle.top {
+  top: -3px;
+}
+
+.resizeHandle.bottom {
+  bottom: -3px;
+}
+
+/* ── Delete button on hover ── */
+.absDeleteBtn {
+  position: absolute;
+  top: 2px;
+  right: 1px;
+  opacity: 0;
+  transition: opacity var(--dur-fast) var(--ease);
+  z-index: 5;
+}
+
+.absBlock:hover .absDeleteBtn {
+  opacity: 1;
+}
+
+/* ── Drag selection ── */
+.dragSelection {
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  border: 1.5px dashed var(--t2);
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.04);
+  z-index: 4;
+  pointer-events: none;
+}
+
+/* ── Date label column (right of members area, shown during drag/resize) ── */
+.dateLabelCol {
+  position: relative;
+  width: 0; /* doesn't take space — labels overflow via position absolute */
+  flex-shrink: 0;
+}
+
+.dateLabel {
+  position: absolute;
+  left: 6px;
+  transform: translateY(-50%);
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--t2);
+  white-space: nowrap;
+  z-index: 10;
+  pointer-events: none;
+  background: var(--bg1);
+  padding: 1px 5px;
+  border-radius: var(--r-sm);
+  border: 0.5px solid var(--brd);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+/* ── Empty state ── */
+.emptyHint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  font-size: 11px;
+  color: var(--t3);
+  font-style: italic;
+  text-align: center;
+  padding: 0 12px;
+}

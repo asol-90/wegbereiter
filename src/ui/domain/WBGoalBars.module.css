@@ -1,0 +1,67 @@
+.grid {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  row-gap: 8px;
+  column-gap: 10px;
+  align-items: center;
+  width: 100%;
+}
+
+.row {
+  display: contents;
+}
+
+.label {
+  font-size: 11px;
+  color: var(--t2);
+  white-space: nowrap;
+}
+
+.trackWrap {
+  width: 100%;
+}
+
+.track {
+  position: relative;
+  height: 8px;
+  border-radius: var(--r-pill);
+  background: var(--bg2);
+  overflow: hidden;
+}
+
+.fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  border-radius: var(--r-pill);
+  transition: width var(--dur-base) var(--ease);
+  z-index: 1;
+}
+
+.targetBand {
+  position: absolute;
+  top: -2px;
+  bottom: -2px;
+  background: transparent;
+  border-left: 1.5px dashed var(--t2);
+  border-right: 1.5px dashed var(--t2);
+  z-index: 2;
+  pointer-events: none;
+}
+
+.targetHit {
+  border-color: var(--t-ok);
+  background: color-mix(in srgb, var(--t-ok) 10%, transparent);
+}
+
+.percent {
+  font-size: 10px;
+  color: var(--t3);
+  font-variant-numeric: tabular-nums;
+  min-width: 32px;
+  text-align: right;
+}
+
+.percentOff {
+  color: var(--t2);
+  font-weight: 500;
+}

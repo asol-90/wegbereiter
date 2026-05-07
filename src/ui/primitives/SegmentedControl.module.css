@@ -1,0 +1,41 @@
+.group {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px;
+  border-radius: var(--r-md);
+  background: var(--bg2);
+}
+
+.seg {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border-radius: var(--r-sm);
+  background: transparent;
+  color: var(--t2);
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease),
+    color var(--dur-fast) var(--ease);
+}
+.seg:hover {
+  color: var(--t1);
+}
+
+.s-sm .seg {
+  padding: 4px 10px;
+  font-size: 11px;
+  min-height: 22px;
+}
+.s-md .seg {
+  padding: 6px 12px;
+  font-size: 12px;
+  min-height: 28px;
+}
+
+.active {
+  background: var(--bg1);
+  color: var(--t1);
+  box-shadow: var(--sh-pill);
+}

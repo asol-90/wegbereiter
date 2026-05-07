@@ -1,0 +1,134 @@
+.page {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 48px 32px 120px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.pageHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pageTitle {
+  font-family: var(--serif);
+  font-size: 32px;
+  font-weight: 500;
+  margin: 0;
+}
+
+.pageDesc {
+  margin: 0;
+  color: var(--t2);
+  font-size: 13px;
+}
+
+.section {
+  background: var(--bg1);
+  border-radius: var(--r-lg);
+  box-shadow: var(--sh-card);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.sectionHeader {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--brd);
+}
+
+.sectionTitle {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 18px;
+  margin: 0;
+}
+
+.sectionDesc {
+  margin: 0;
+  color: var(--t3);
+  font-size: 11px;
+}
+
+.sectionBody {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.wbLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--t2);
+  min-width: 140px;
+}
+
+.wbBarWrap {
+  max-width: 420px;
+}
+
+.durationWrap {
+  max-width: 320px;
+}
+
+.subhead {
+  font-size: 11px;
+  color: var(--t3);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-top: 8px;
+}
+
+.sidepanel {
+  max-width: 320px;
+  padding: 6px 4px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--brd);
+  background: var(--bg1);
+}
+
+.mutedSmall {
+  font-size: 11px;
+  color: var(--t3);
+}
+
+.iconGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 8px;
+}
+
+.iconCell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 10px;
+  border-radius: var(--r-md);
+  background: var(--bg2);
+  color: var(--t2);
+  font-size: 9px;
+  text-align: center;
+}
