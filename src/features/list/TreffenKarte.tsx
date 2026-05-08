@@ -297,18 +297,20 @@ function SortableProgrammpunktRow({
         </span>
       )}
 
-      {/* Konkretisieren (only for abstract points) */}
-      {pp.kind === 'abstrakt' && onKonkretisieren && (
+      {/* Konkretisieren — always occupies col 6; hidden placeholder when not needed */}
+      {pp.kind === 'abstrakt' && onKonkretisieren ? (
         <button
-          className={styles.pointKonkret}
+          className={styles.pointKonkretIcon}
           onClick={() => {
             const a = pp as { typ: AktivitaetTyp; untertyp?: AktivitaetUntertyp }
             onKonkretisieren(treffenId, pp.id, a.typ, a.untertyp)
           }}
           title="Konkretisieren"
         >
-          Konkretisieren
+          <Icon name="crosshair" size={13} />
         </button>
+      ) : (
+        <span />
       )}
 
       {/* Delete */}
@@ -340,6 +342,7 @@ function StammBlockRow({ block }: { block: StammBlock }) {
       <span className={styles.pointName}>{block.name}</span>
       <span className={styles.pointStammResp}>Stamm</span>
       <span className={styles.pointStammDur}>{block.dauerMin} min</span>
+      <span /> {/* crosshair placeholder */}
       <span /> {/* delete placeholder */}
     </div>
   )

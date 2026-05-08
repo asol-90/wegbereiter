@@ -13,6 +13,7 @@
  *   - Hover on a marker reports `onPlanungHover(planungId)`.
  *   - The month gets a border when any of its Planungen is highlighted.
  */
+import { useState } from 'react'
 import type { PlanungId } from '@/domain/ids'
 import type { FerienCacheEntry, IsoDate, StammAktion } from '@/domain/types'
 import { isoToday } from '@/domain/dateUtils'
@@ -47,6 +48,7 @@ type Band = {
   bg: string
   isFirst: boolean
   isLast: boolean
+  hoverLabel?: string
 }
 
 export type MiniMonthProps = {
@@ -109,12 +111,13 @@ export function MiniMonth({
   markers,
   highlightedPlanungId,
   onPlanungHover,
-  stammCovered,
+  stammCovered: _stammCovered,
   stammDates,
   stammAktionen,
 }: MiniMonthProps) {
   const grid = buildMonthGrid(year, monthIndex)
   const today = isoToday()
+  const [stammHover, setStammHover] = useState<string | null>(null)
 
   const markerIndex = new Map<IsoDate, PlanungMarker[]>()
   for (const m of markers) {
@@ -141,9 +144,9 @@ export function MiniMonth({
       className={clsx(
         styles.mmCal,
         highlightedInMonth && styles.mmCalHl,
-        stammCovered && styles.mmCalStamm,
       )}
     >
+      {stammHover && <div className={styles.stammTooltip}>{stammHover}</div>}
       <div className={styles.mmName}>{MONTH_NAMES_DE[monthIndex]}</div>
       <div className={styles.mmHdr}>
         {WEEKDAY_HEADERS.map((h, i) => (
@@ -182,12 +185,14 @@ export function MiniMonth({
                 bg: BAND_STAMM,
                 isFirst: cell.iso === stammAkt.beginn,
                 isLast: cell.iso === stammAkt.ende,
+                hoverLabel: stammAkt.titel,
               })
             } else if (isStammDate) {
               bands.push({
                 bg: BAND_STAMM,
                 isFirst: true,
                 isLast: true,
+                hoverLabel: 'Stammtermin',
               })
             }
 
@@ -226,10 +231,13 @@ export function MiniMonth({
                     key={i}
                     className={clsx(
                       styles.band,
-                      b.isFirst && styles.bandFirst,
-                      b.isLast && styles.bandLast,
+                      b.isFirst && !b.isLast && styles.bandFirst,
+                      b.isLast && !b.isFirst && styles.bandLast,
+                      b.isFirst && b.isLast && styles.bandCircle,
                     )}
                     style={{ background: b.bg }}
+                    onMouseEnter={b.hoverLabel ? () => setStammHover(b.hoverLabel!) : undefined}
+                    onMouseLeave={b.hoverLabel ? () => setStammHover(null) : undefined}
                   />
                 ))}
                 {/* Planungs-Marker */}

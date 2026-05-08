@@ -91,7 +91,7 @@
   color: var(--t3);
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  font-weight: 500;
+  font-weight: 800;
   z-index: 2;
   pointer-events: none;
 }
@@ -116,6 +116,14 @@
 .bandLast {
   border-top-right-radius: var(--r-pill);
   border-bottom-right-radius: var(--r-pill);
+}
+
+.bandCircle {
+  left: 50%;
+  right: auto;
+  width: 20px;
+  transform: translate(-50%, -50%);
+  border-radius: var(--r-pill);
 }
 
 /* ─── Today ─── */
@@ -306,13 +314,13 @@
   margin-top: 2px;
 }
 
-/* ─── Stamm anchor box ─── */
+/* ─── Stamm anchor box (Stammaktionen only) ─── */
 .stammAncBox {
   width: 28px;
   height: 28px;
   border-radius: 6px;
   background: #c6e9e0;
-  border: 0.5px solid #5daa96;
+  border: 0.5px solid rgba(0, 0, 0, 0.35);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -327,8 +335,27 @@
 }
 
 .stammAncBoxActive {
-  border-color: #0a5c47;
-  box-shadow: 0 0 0 1.5px #0a5c47;
+  border-color: rgba(0, 0, 0, 0.6);
+}
+
+/* ─── Eigene Aktion anchor box (extra-aktion kind) ─── */
+.aktionAncBox {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.05);
+  border: 0.5px solid rgba(0, 0, 0, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--t1);
+  cursor: pointer;
+  box-shadow: var(--sh-card);
+  transition: border-color var(--dur-fast) var(--ease);
+  position: relative;
+  z-index: 3;
 }
 
 /* ─── Stammaktion connecting line ─── */
@@ -337,10 +364,24 @@
   top: 50%;
   transform: translateY(-50%);
   height: 2px;
-  background: #5daa96;
+  background: rgba(0, 0, 0, 0.25);
   z-index: 2;
   pointer-events: none;
   border-radius: 1px;
+}
+
+/* ─── Stammtermin circle inside treffen box — wraps the day number ─── */
+.ancDayStamm {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 14px;
+  border-radius: var(--r-pill);
+  background: rgb(184, 221, 209);
+  color: rgb(15, 110, 86);
+  position: relative;
+  z-index: 1;
 }
 
 /* ─── Day range highlight (hovered absence) ─── */

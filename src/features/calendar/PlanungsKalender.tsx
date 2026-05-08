@@ -97,7 +97,12 @@ function BandSpans({ bands }: { bands: Band[] }) {
       {bands.map((b, i) => (
         <span
           key={i}
-          className={clsx(styles.band, b.isFirst && styles.bandFirst, b.isLast && styles.bandLast)}
+          className={clsx(
+            styles.band,
+            b.isFirst && !b.isLast && styles.bandFirst,
+            b.isLast && !b.isFirst && styles.bandLast,
+            b.isFirst && b.isLast && styles.bandCircle,
+          )}
           style={{ background: b.bg }}
         />
       ))}
@@ -355,6 +360,11 @@ function DayCell({
   if (treffen) {
     const isOpen = activePreviewId === treffen.id
     const isStammTreffen = !!stammTreffenHere
+    const isEigenAktion = treffen.kind === 'extra-aktion'
+    // For single-day Stammtermine: hide the band (show dot inside box instead)
+    const visibleBands = isAnyStammDate
+      ? bands.filter((b) => b.bg !== BAND_STAMM)
+      : bands
     return (
       <div
         className={clsx(
@@ -367,11 +377,11 @@ function DayCell({
         title={anyStammAktHere?.titel ?? cls.feiertag?.name ?? cls.ferien?.name}
       >
         {cell.monthLabel && <span className={styles.mlLabel}>{cell.monthLabel}</span>}
-        <BandSpans bands={bands} />
+        <BandSpans bands={visibleBands} />
         <div
           className={clsx(
-            isStammTreffen ? styles.stammAncBox : styles.ancBox,
-            isOpen && (isStammTreffen ? styles.stammAncBoxActive : styles.ancBoxActive),
+            isEigenAktion ? styles.aktionAncBox : styles.ancBox,
+            isOpen && styles.ancBoxActive,
             isRangeHighlighted && styles.ancBoxHighlighted,
           )}
           onClick={() => onPreviewToggle(treffen.id)}
@@ -379,7 +389,9 @@ function DayCell({
           onMouseEnter={() => onTreffenHover?.(cell.iso)}
           onMouseLeave={() => onTreffenHover?.(null)}
         >
-          {cell.day}
+          {isAnyStammDate
+            ? <span className={styles.ancDayStamm}>{cell.day}</span>
+            : cell.day}
         </div>
         <TreffenPreview
           treffen={treffen}

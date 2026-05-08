@@ -33,12 +33,12 @@
   padding-bottom: 6px;
   /* offset = monthCol (30px) + treffenCol (12px) */
   padding-left: 42px;
-  gap: 2px;
+  gap: 0;
   flex-wrap: wrap;
 }
 
 .avatarSlot {
-  width: 32px;
+  width: 28px;
   display: flex;
   align-items: center;
   justify-content: center;

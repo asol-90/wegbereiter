@@ -238,7 +238,7 @@
 
 .point {
   display: grid;
-  grid-template-columns: 14px 16px 1fr auto auto 14px;
+  grid-template-columns: 14px 16px 1fr auto auto 14px 14px;
   align-items: center;
   gap: 10px;
   padding: 8px 0;
@@ -340,21 +340,25 @@
   opacity: 0.7;
 }
 
-/* Konkretisieren button */
-.pointKonkret {
-  font-size: 10px;
-  font-family: var(--sans);
+/* Konkretisieren icon button (crosshair) — col 6 in the 7-col grid */
+.pointKonkretIcon {
   color: var(--acc);
-  background: color-mix(in srgb, var(--acc) 8%, transparent);
-  border: 0.5px solid color-mix(in srgb, var(--acc) 20%, transparent);
-  border-radius: 4px;
-  padding: 1px 7px;
+  opacity: 0.6;
   cursor: pointer;
-  white-space: nowrap;
-  transition: background var(--dur-fast) var(--ease);
+  border: none;
+  background: none;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 3px;
+  flex-shrink: 0;
+  transition: opacity var(--dur-fast) var(--ease),
+    background var(--dur-fast) var(--ease);
 }
-.pointKonkret:hover {
-  background: color-mix(in srgb, var(--acc) 15%, transparent);
+.pointKonkretIcon:hover {
+  opacity: 1;
+  background: color-mix(in srgb, var(--acc) 10%, transparent);
 }
 
 /* Delete button (×) */
@@ -384,7 +388,7 @@
 /* ─── Stamm-Blöcke (nicht verschiebbar, grün) ─── */
 .pointStamm {
   display: grid;
-  grid-template-columns: 14px 16px 1fr auto auto 14px;
+  grid-template-columns: 14px 16px 1fr auto auto 14px 14px;
   align-items: center;
   gap: 10px;
   padding: 8px 0;

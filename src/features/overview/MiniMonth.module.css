@@ -1,24 +1,21 @@
 .mmCal {
   min-width: 0;
-  padding: 4px;
+  padding: 2px;
   border: 1px solid transparent;
   border-radius: var(--r-md);
   transition: border-color var(--dur-fast) var(--ease);
+  position: relative;
 }
 
 .mmCalHl {
   border-color: var(--brd2);
 }
 
-.mmCalStamm {
-  border-color: color-mix(in srgb, var(--stamm, #0F6E56) 30%, transparent);
-}
-
 .mmName {
   font-size: 13px;
   color: var(--t1);
   font-weight: 500;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
 }
 
 .mmHdr {
@@ -37,7 +34,7 @@
 .mmWk {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  height: 15px;
+  height: 13px;
 }
 
 .mmD {
@@ -71,7 +68,7 @@
   right: 0;
   top: 50%;
   transform: translateY(-50%);
-  height: 14px;
+  height: 10px;
   z-index: 0;
   pointer-events: none;
 }
@@ -86,14 +83,23 @@
   border-bottom-right-radius: var(--r-pill);
 }
 
+.bandCircle {
+  left: 50%;
+  right: auto;
+  height: 10px;
+  width: 16px;
+  transform: translate(-50%, -50%);
+  border-radius: var(--r-pill);
+}
+
 /* ─── Heute ─── */
 .today .mmDLabel {
   color: var(--bg1);
   font-weight: 600;
   background: var(--t1);
   border-radius: var(--r-pill);
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 10px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -102,13 +108,34 @@
 /* ─── Planungs-Marker ─── */
 .marker {
   position: absolute;
-  left: 10%;
-  right: 10%;
+  left: 50%;
   top: 50%;
-  transform: translateY(-50%);
-  height: 12px;
+  width: 16px;
+  height: 10px;
+  transform: translate(-50%, -50%);
   border-radius: var(--r-pill);
   z-index: 1;
   cursor: default;
   transition: background var(--dur-fast) var(--ease);
+}
+
+/* ─── Stammkontext hover tooltip ─── */
+.stammTooltip {
+  position: absolute;
+  bottom: calc(100% + 3px);
+  left: 0;
+  right: 0;
+  background: var(--bg1);
+  border: 0.5px solid color-mix(in srgb, var(--stamm, #0f6e56) 50%, transparent);
+  border-radius: var(--r-sm);
+  padding: 3px 6px;
+  font-size: 9px;
+  color: var(--stamm, #0f6e56);
+  text-align: center;
+  z-index: 20;
+  white-space: nowrap;
+  pointer-events: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  text-overflow: ellipsis;
 }

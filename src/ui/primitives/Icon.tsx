@@ -51,6 +51,7 @@ export type IconName =
   | 'more-horizontal'
   | 'award'
   | 'book-open'
+  | 'crosshair'
 
 type IconDef = {
   /** SVG inner markup as a React node. */
@@ -394,6 +395,18 @@ const ICONS: Record<IconName, IconDef> = {
       <>
         {path('M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z')}
         {path('M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z')}
+      </>
+    ),
+  },
+  crosshair: {
+    content: (
+      <>
+        {circle(12, 12, 10)}
+        {circle(12, 12, 3)}
+        {line(22, 12, 18, 12)}
+        {line(2, 12, 6, 12)}
+        {line(12, 2, 12, 6)}
+        {line(12, 22, 12, 18)}
       </>
     ),
   },
