@@ -28,17 +28,53 @@
 .avatarRow {
   display: flex;
   flex-shrink: 0;
+  align-items: center;
+  padding-top: 8px;
   padding-bottom: 6px;
   /* offset = monthCol (30px) + treffenCol (12px) */
   padding-left: 42px;
-  gap: 0;
+  gap: 2px;
+  flex-wrap: wrap;
 }
 
 .avatarSlot {
-  width: 28px;
+  width: 32px;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+/* ── Avatar add button/input ── */
+.avatarAddSlot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 26px;
+}
+
+.avatarAddInput {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  margin-left: 2px;
+}
+
+.memberInput {
+  width: 70px;
+  height: 24px;
+  padding: 0 6px;
+  border: 0.5px solid var(--brd2);
+  border-radius: var(--r-sm);
+  font-size: 11px;
+  font-family: var(--sans);
+  background: var(--bg1);
+  color: var(--t1);
+  outline: none;
+}
+
+.memberInput:focus {
+  border-color: var(--acc);
 }
 
 .avatarSlot.highlighted {
@@ -51,7 +87,7 @@
   min-height: 0;
   display: flex;
   position: relative;
-  overflow: hidden;
+  overflow: visible;
 }
 
 /* ── Month label column ── */
@@ -69,7 +105,7 @@
   font-weight: 500;
   line-height: 1;
   user-select: none;
-  transform: translateY(-5px);
+  transform: translateY(0);
 }
 
 /* ── Treffen diamond column ── */
@@ -104,6 +140,7 @@
   flex: 1;
   min-width: 0;
   position: relative;
+  overflow: hidden;
 }
 
 /* ── Single member column ── */
@@ -175,8 +212,9 @@
 /* ── Delete button on hover ── */
 .absDeleteBtn {
   position: absolute;
-  top: 2px;
-  right: 1px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   opacity: 0;
   transition: opacity var(--dur-fast) var(--ease);
   z-index: 5;
@@ -198,28 +236,30 @@
   pointer-events: none;
 }
 
-/* ── Date label column (right of members area, shown during drag/resize) ── */
-.dateLabelCol {
-  position: relative;
-  width: 0; /* doesn't take space — labels overflow via position absolute */
-  flex-shrink: 0;
-}
-
+/* ── Date labels (shown during drag/resize, float above member columns) ── */
 .dateLabel {
   position: absolute;
-  left: 6px;
+  left: 44px; /* aligns to the start of membersArea */
   transform: translateY(-50%);
   font-size: 10px;
   font-weight: 500;
   color: var(--t2);
   white-space: nowrap;
-  z-index: 10;
+  z-index: 20;
   pointer-events: none;
   background: var(--bg1);
   padding: 1px 5px;
   border-radius: var(--r-sm);
   border: 0.5px solid var(--brd);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+/* ── Footer ── */
+.footer {
+  flex-shrink: 0;
+  padding: 10px 0 4px;
+  display: flex;
+  justify-content: center;
 }
 
 /* ── Empty state ── */

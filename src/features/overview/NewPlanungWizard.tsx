@@ -852,8 +852,9 @@ export function NewPlanungWizard({ open, onClose, onCreated, initialZeitraum }: 
     try {
       setSaving(true)
       // Collect dates to exclude from the factory's generateTermine output:
-      // 1. All generated dates within the Stammkontext range (the kontext handles those)
-      // 2. Holiday-skipped dates outside the kontext range
+      // 1. Weekday-generated dates within the Stammkontext range are excluded to avoid
+      //    double-booking (Stammkontext treffen dates are passed separately as extraDates).
+      // 2. Holiday-skipped dates outside the kontext range.
       const excludeDates = new Set<IsoDate>()
       if (kontextRange) {
         for (const iso of generated) {
@@ -868,6 +869,10 @@ export function NewPlanungWizard({ open, onClose, onCreated, initialZeitraum }: 
         const hol = isHoliday(item.iso)
         if (hol && !reinstated.has(item.iso)) excludeDates.add(item.iso)
       }
+
+      // Stammkontext treffen become part of planung.treffen — the team plans
+      // content for these dates even though the schedule comes from the Stammkontext.
+      const extraDates = kontextTreffenInRange.map((t) => t.datum)
 
       // Build WB-Schwerpunkt if selected (not ausgewogen)
       const wbSchwerpunkt = wbModus !== 'ausgewogen'
@@ -915,6 +920,7 @@ export function NewPlanungWizard({ open, onClose, onCreated, initialZeitraum }: 
         name: nameOverride.trim() || undefined,
         stammKontextId: activeKontext?.id,
         excludeDates: excludeDates.size > 0 ? excludeDates : undefined,
+        extraDates: extraDates.length > 0 ? extraDates : undefined,
         wbSchwerpunkt,
         abzeichenAuswahl,
         andachtsreihenZuordnung,

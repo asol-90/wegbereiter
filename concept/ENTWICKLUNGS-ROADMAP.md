@@ -135,11 +135,22 @@ Verschiedene Fehler und Inkonsistenzen im bestehenden Ablauf korrigieren:
 
 ---
 
-### Phase 14 — Header-Zeile
+### Phase 14 — Header und Legende
 
-Die Topbar wird um Organisations-Chips erweitert. Links bleiben die vier Buttons (NavToggle + RepertoireToggle); der Repertoire-Button hat die gleiche Höhe wie die drei Nav-Icons davor.
+Die Topbar wird umgestaltet und eine Legende als Footer hinzugefügt.
 
-**Chips rechts neben den Buttons**:
+Header
+- Die Button für Jahresplanung, Planungsansicht, Listenansicht und Repertoire werden zentriert.
+- Alle sollen die gleiche Höhe haben und ein bisschen größer sein als bisher. Statt im Button soll die Beschriftung unterhalb sein. Bei den Button ohne Beschriftung wird die Beschriftung hinzugefügt
+- Der Button mit der Jahresplanung wird (analog zum Repertoire) aus dem segmented Button herausgelöst.
+- Der Einstellungsbutton wandert nach rechts unten in den Footer.
+
+Footer
+- zentral im Footer ist die Legende – sie speist sich aus den Einstellungen und besteht aus dem, was die Tabelle unten listet
+- in den Einstellungen können diese Werte (und nur diese Werte) bearbeitet werden. Der Platzhalter für die Drag-Zone entfällt
+- die Legende besteht aus jeweils einer kleinen Bubble in der beschriebenen Farbe mit einem Rand in der gleichen Farbe, nur etwas dunkler. Die Beschriftung steht rechts von der Bubble – mit einer für Footer/Legende üblichen kleinen Schriftgröße
+
+**Einträge in der Legende**:
 
 | Chip | Inhalt | Farbe | Settings |
 |---|---|---|---|

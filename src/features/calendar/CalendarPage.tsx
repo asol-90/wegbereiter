@@ -11,8 +11,11 @@ import { useCallback, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { format } from 'date-fns'
 import { de } from 'date-fns/locale'
-import type { Abwesenheit, IsoDate, StammAktion } from '@/domain/types'
+import type { Abwesenheit, IsoDate, Mitarbeiter, StammAktion, StammTreffen } from '@/domain/types'
 import { parseIso } from '@/domain/dateUtils'
+import { newId } from '@/domain/ids'
+import type { StammAktionId, StammTreffenId, TreffenId } from '@/domain/ids'
+import { removeTreffen, insertTreffen } from '@/domain/cascade'
 import { usePlanungen, usePlanungenActions } from '@/features/planungen'
 import { useFerienForYear } from '@/features/overview/useFerienForYear'
 import { useStammKontext } from '@/features/stammKontext'
@@ -67,7 +70,7 @@ export function CalendarPage() {
   const ferien = useFerienForYear(year)
   const { kontexte } = useStammKontext()
 
-  // Collect all Stammaktionen and Stammtermine for the Planung's zeitraum
+  // ── Stammkontext data ───────────────────────────────────────────────
   const stammAktionen = useMemo<StammAktion[]>(() => {
     if (!planung) return []
     const all: StammAktion[] = []
@@ -81,19 +84,25 @@ export function CalendarPage() {
     return all
   }, [kontexte, planung])
 
-  const stammDates = useMemo<IsoDate[]>(() => {
+  const stammTreffen = useMemo<StammTreffen[]>(() => {
     if (!planung) return []
-    const dates: IsoDate[] = []
+    const result: StammTreffen[] = []
     for (const k of kontexte) {
       for (const t of k.treffen) {
         if (t.datum >= planung.zeitraum.start && t.datum <= planung.zeitraum.ende) {
-          dates.push(t.datum)
+          result.push(t)
         }
       }
     }
-    return dates
+    return result
   }, [kontexte, planung])
 
+  const optedOutStammIds = useMemo(
+    () => new Set(planung?.stammOptOuts ?? []),
+    [planung],
+  )
+
+  // ── Navigation ──────────────────────────────────────────────────────
   const handleTreffenDoubleClick = useCallback(
     (treffenId: string) => {
       navigate(`/planung/${planungId}/liste#treffen-${treffenId}`)
@@ -105,19 +114,13 @@ export function CalendarPage() {
   const [hoveredTreffenDatum, setHoveredTreffenDatum] = useState<IsoDate | null>(null)
   const [hoveredAbwesenheit, setHoveredAbwesenheit] = useState<Abwesenheit | null>(null)
 
-  // Treffen dates covered by the hovered absence → highlight in calendar
-  const highlightedDates = useMemo(() => {
-    if (!hoveredAbwesenheit || !planung) return undefined
-    const dates = new Set<IsoDate>()
-    for (const t of planung.treffen) {
-      if (t.datum >= hoveredAbwesenheit.von && t.datum <= hoveredAbwesenheit.bis) {
-        dates.add(t.datum)
-      }
-    }
-    return dates.size > 0 ? dates : undefined
-  }, [hoveredAbwesenheit, planung])
+  // Full absence range passed to PlanungsKalender for background highlight
+  const hoveredRange = useMemo(
+    () => hoveredAbwesenheit ? { von: hoveredAbwesenheit.von, bis: hoveredAbwesenheit.bis } : null,
+    [hoveredAbwesenheit],
+  )
 
-  // ── Abwesenheiten update handler ──────────────────────────────────────
+  // ── Mutations ───────────────────────────────────────────────────────
   const handleAbwesenheitenUpdate = useCallback(
     (abwesenheiten: Abwesenheit[]) => {
       if (!planung) return
@@ -126,8 +129,76 @@ export function CalendarPage() {
     [planung, update],
   )
 
+  const handleTeamUpdate = useCallback(
+    (team: Mitarbeiter[]) => {
+      if (!planung) return
+      update({ ...planung, team, aktualisiertAm: new Date().toISOString() })
+    },
+    [planung, update],
+  )
+
+  const handleAddTreffen = useCallback(
+    (datum: IsoDate, kind: 'regulaer' | 'extra-aktion') => {
+      if (!planung) return
+      const newTreff = {
+        id: newId<TreffenId>(),
+        kind,
+        datum,
+        programm: [] as [],
+        fixiert: false,
+        sollWB: [] as [],
+      }
+      const { treffen, ueberhang } = insertTreffen(planung, [newTreff], null, 'shift')
+      update({ ...planung, treffen, ueberhang, aktualisiertAm: new Date().toISOString() })
+    },
+    [planung, update],
+  )
+
+  const handleDeleteTreffen = useCallback(
+    (treffenId: TreffenId, mode: 'cascade' | 'delete') => {
+      if (!planung) return
+      const { treffen, ueberhang } = removeTreffen(planung, treffenId, mode)
+      update({ ...planung, treffen, ueberhang, aktualisiertAm: new Date().toISOString() })
+    },
+    [planung, update],
+  )
+
+  // Abmelden: cascade-delete the Treffen at that date + add to stammOptOuts
+  const handleStammAbmelden = useCallback(
+    (stammId: StammTreffenId | StammAktionId, treffenId: TreffenId | null) => {
+      if (!planung) return
+      const stammOptOuts = [...planung.stammOptOuts, stammId]
+      if (treffenId) {
+        const { treffen, ueberhang } = removeTreffen(planung, treffenId, 'cascade')
+        update({ ...planung, treffen, ueberhang, stammOptOuts, aktualisiertAm: new Date().toISOString() })
+      } else {
+        update({ ...planung, stammOptOuts, aktualisiertAm: new Date().toISOString() })
+      }
+    },
+    [planung, update],
+  )
+
+  // Wieder anmelden: remove from stammOptOuts + create empty Treffen at that date
+  const handleStammWiederAnmelden = useCallback(
+    (stammId: StammTreffenId, datum: IsoDate) => {
+      if (!planung) return
+      const newTreff = {
+        id: newId<TreffenId>(),
+        kind: 'regulaer' as const,
+        datum,
+        programm: [] as [],
+        fixiert: false,
+        sollWB: [] as [],
+      }
+      const { treffen, ueberhang } = insertTreffen(planung, [newTreff], null, 'shift')
+      const stammOptOuts = planung.stammOptOuts.filter((x) => x !== stammId)
+      update({ ...planung, treffen, ueberhang, stammOptOuts, aktualisiertAm: new Date().toISOString() })
+    },
+    [planung, update],
+  )
+
   if (!loaded) {
-    return null // Store loading
+    return null
   }
 
   if (!planung) {
@@ -158,16 +229,23 @@ export function CalendarPage() {
           planung={planung}
           ferien={ferien}
           stammAktionen={stammAktionen}
-          stammDates={stammDates}
+          stammTreffen={stammTreffen}
+          optedOutStammIds={optedOutStammIds}
           onTreffenDoubleClick={handleTreffenDoubleClick}
           onTreffenHover={setHoveredTreffenDatum}
-          highlightedDates={highlightedDates}
+          hoveredRange={hoveredRange}
+          onAddTreffen={handleAddTreffen}
+          onDeleteTreffen={handleDeleteTreffen}
+          onStammAbmelden={handleStammAbmelden}
+          onStammWiederAnmelden={handleStammWiederAnmelden}
         />
       </Panel>
       <Panel role="side">
         <AbwesenheitsSidebar
           planung={planung}
           onUpdate={handleAbwesenheitenUpdate}
+          onTeamUpdate={handleTeamUpdate}
+          onNavigateToList={() => navigate(`/planung/${planungId}/liste`)}
           hoveredTreffenDatum={hoveredTreffenDatum}
           onAbwesenheitHover={setHoveredAbwesenheit}
         />

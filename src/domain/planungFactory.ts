@@ -29,6 +29,8 @@ export type CreatePlanungInput = {
   stammKontextId?: StammKontextId
   /** Dates to exclude from generated Treffen (e.g. Ferien-skipped). */
   excludeDates?: Set<IsoDate>
+  /** Extra dates to include as Treffen (e.g. StammKontext treffen within the planning period). */
+  extraDates?: IsoDate[]
   /** Planungsziele (Phase 10). */
   wbSchwerpunkt?: WBSchwerpunkt
   andachtsreihenZuordnung?: AndachtsreiheZuordnung[]
@@ -63,9 +65,12 @@ export function buildPlanung(input: CreatePlanungInput): Planung {
     input.weekday,
     input.rhythmus,
   )
-  const dates = input.excludeDates
+  const filtered = input.excludeDates
     ? allDates.filter((d) => !input.excludeDates!.has(d))
     : allDates
+  const extra = input.extraDates ?? []
+  const dateSet = new Set([...filtered, ...extra])
+  const dates = [...dateSet].sort()
   const nowIso = new Date().toISOString()
   const treffen: Treffen[] = dates.map((d) => ({
     id: newId<TreffenId>(),

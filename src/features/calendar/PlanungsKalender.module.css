@@ -167,6 +167,14 @@
   box-shadow: 0 0 0 1.5px var(--acc);
 }
 
+/* ─── Preview corner action (top-right trash icon) ─── */
+.previewCornerAction {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  z-index: 1;
+}
+
 /* ─── Click preview (tooltip) ─── */
 .preview {
   position: absolute;
@@ -262,6 +270,141 @@
 .previewBtn:hover {
   background: var(--bg3);
   color: var(--t1);
+}
+
+/* ─── Preview action row ─── */
+.previewActions {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.previewBtnDanger {
+  color: var(--err);
+  border-color: rgba(var(--err-rgb, 180, 40, 40), 0.25);
+}
+
+.previewBtnDanger:hover {
+  background: rgba(var(--err-rgb, 180, 40, 40), 0.07);
+  color: var(--err);
+}
+
+.previewBtnWarn {
+  color: var(--warn, #b45309);
+  border-color: rgba(180, 100, 0, 0.2);
+}
+
+.previewBtnWarn:hover {
+  background: rgba(180, 100, 0, 0.07);
+  color: var(--warn, #b45309);
+}
+
+/* ─── Preview sub-line (e.g. Ort) ─── */
+.previewSub {
+  font-size: 11px;
+  color: var(--t3);
+  margin-top: 2px;
+}
+
+/* ─── Stamm anchor box ─── */
+.stammAncBox {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: #c6e9e0;
+  border: 0.5px solid #5daa96;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 500;
+  color: #0a5c47;
+  cursor: pointer;
+  box-shadow: var(--sh-card);
+  transition: border-color var(--dur-fast) var(--ease);
+  position: relative;
+  z-index: 3;
+}
+
+.stammAncBoxActive {
+  border-color: #0a5c47;
+  box-shadow: 0 0 0 1.5px #0a5c47;
+}
+
+/* ─── Stammaktion connecting line ─── */
+.stammLine {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 2px;
+  background: #5daa96;
+  z-index: 2;
+  pointer-events: none;
+  border-radius: 1px;
+}
+
+/* ─── Day range highlight (hovered absence) ─── */
+.rangeHighlight {
+  background: rgba(var(--acc-rgb, 100, 130, 200), 0.07);
+}
+
+/* ─── Clickable empty day ─── */
+.dClickable {
+  cursor: pointer;
+}
+
+.dClickable:hover .dLabel {
+  color: var(--t1);
+}
+
+/* ─── Context menu (empty day click) ─── */
+.contextMenu {
+  position: absolute;
+  background: var(--bg1);
+  border: 0.5px solid rgba(0, 0, 0, 0.18);
+  border-radius: 8px;
+  padding: 4px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  width: 170px;
+  z-index: 20;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--dur-fast) var(--ease);
+  bottom: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.contextMenuOpen {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.contextMenuItem {
+  display: block;
+  width: 100%;
+  padding: 6px 8px;
+  border: none;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--t1);
+  font-size: 11px;
+  font-family: var(--sans);
+  cursor: pointer;
+  text-align: left;
+  transition: background var(--dur-fast) var(--ease);
+}
+
+.contextMenuItem:hover {
+  background: var(--bg2);
+}
+
+.contextMenuItemAccent {
+  color: #0a5c47;
+}
+
+.contextMenuItemAccent:hover {
+  background: rgba(10, 92, 71, 0.07);
 }
 
 /* ─── Empty state ─── */

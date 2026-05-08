@@ -7,20 +7,24 @@
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { addDays, differenceInCalendarDays, startOfWeek, endOfWeek } from 'date-fns'
-import type { Abwesenheit, IsoDate, Planung } from '@/domain/types'
+import type { Abwesenheit, IsoDate, Mitarbeiter, Planung } from '@/domain/types'
 import type { AbwesenheitId, MitarbeiterId } from '@/domain/ids'
 import { newId } from '@/domain/ids'
 import { parseIso, toIso } from '@/domain/dateUtils'
 import { Avatar } from '@/ui/domain'
-import { IconButton } from '@/ui/primitives'
+import { Button, IconButton } from '@/ui/primitives'
 import clsx from '@/ui/utils/clsx'
 import styles from './AbwesenheitsSidebar.module.css'
+
+const ACCENT_HUE_SEQUENCE = [220, 160, 40, 280, 70, 320]
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
 export type AbwesenheitsSidebarProps = {
   planung: Planung
   onUpdate: (abwesenheiten: Abwesenheit[]) => void
+  onTeamUpdate?: (team: Mitarbeiter[]) => void
+  onNavigateToList?: () => void
   hoveredTreffenDatum?: IsoDate | null
   onAbwesenheitHover?: (abwesenheit: Abwesenheit | null) => void
 }
@@ -103,10 +107,29 @@ function clampDate(iso: IsoDate, start: IsoDate, ende: IsoDate): IsoDate {
 export function AbwesenheitsSidebar({
   planung,
   onUpdate,
+  onTeamUpdate,
+  onNavigateToList,
   hoveredTreffenDatum,
   onAbwesenheitHover,
 }: AbwesenheitsSidebarProps) {
   const { team, abwesenheiten, zeitraum, treffen } = planung
+
+  const [addingMember, setAddingMember] = useState(false)
+  const [newMemberName, setNewMemberName] = useState('')
+  const addInputRef = useRef<HTMLInputElement>(null)
+
+  const handleAddMemberConfirm = useCallback(() => {
+    const name = newMemberName.trim()
+    if (!name || !onTeamUpdate) return
+    const newMember: Mitarbeiter = {
+      id: newId<MitarbeiterId>(),
+      name,
+      accentHue: ACCENT_HUE_SEQUENCE[team.length % ACCENT_HUE_SEQUENCE.length],
+    }
+    onTeamUpdate([...team, newMember])
+    setNewMemberName('')
+    setAddingMember(false)
+  }, [newMemberName, onTeamUpdate, team])
 
   const weekRows = useMemo(
     () => buildWeekRows(zeitraum.start, zeitraum.ende),
@@ -130,6 +153,8 @@ export function AbwesenheitsSidebar({
   onUpdateRef.current = onUpdate
   const totalRowsRef = useRef(totalRows)
   totalRowsRef.current = totalRows
+  const onAbwesenheitHoverRef = useRef(onAbwesenheitHover)
+  onAbwesenheitHoverRef.current = onAbwesenheitHover
 
   const yToRow = useCallback(
     (clientY: number): number => {
@@ -149,6 +174,34 @@ export function AbwesenheitsSidebar({
       if (!dragRef.current) return
       const row = yToRow(e.clientY)
       setDrag((prev) => prev ? { ...prev, currentRow: row } : null)
+
+      // Update crosshover live during drag
+      const d = dragRef.current
+      const rows = weekRowsRef.current
+      const zr = zeitraumRef.current
+      const abs = abwesenheitenRef.current
+      if (d.kind === 'create') {
+        const minRow = Math.min(d.startRow, row)
+        const maxRow = Math.max(d.startRow, row)
+        if (maxRow - minRow > 0.15) {
+          const von = clampDate(rowToDate(minRow, rows), zr.start, zr.ende)
+          const bis = clampDate(rowToDate(maxRow, rows), zr.start, zr.ende)
+          onAbwesenheitHoverRef.current?.({ id: '' as AbwesenheitId, mitarbeiterId: d.memberId, von, bis })
+        }
+      } else if (d.kind === 'resize') {
+        const target = abs.find((a) => a.id === d.absId)
+        if (target) {
+          const delta = row - d.startRow
+          let von = target.von
+          let bis = target.bis
+          if (d.edge === 'top') {
+            von = clampDate(rowToDate(dateToRow(target.von, rows) + delta, rows), zr.start, zr.ende)
+          } else {
+            bis = clampDate(rowToDate(dateToRow(target.bis, rows) + delta, rows), zr.start, zr.ende)
+          }
+          if (von < bis) onAbwesenheitHoverRef.current?.({ ...target, von, bis })
+        }
+      }
     }
 
     const handleUp = () => {
@@ -188,6 +241,7 @@ export function AbwesenheitsSidebar({
         }
       }
 
+      onAbwesenheitHoverRef.current?.(null)
       setDrag(null)
     }
 
@@ -246,7 +300,7 @@ export function AbwesenheitsSidebar({
           <span className={styles.headerLabel}>Abwesenheiten</span>
         </div>
         <div className={styles.emptyHint}>
-          Füge im Wizard Teammitglieder hinzu, um Abwesenheiten zu planen.
+          Noch keine Teammitglieder vorhanden.
         </div>
       </div>
     )
@@ -335,9 +389,49 @@ export function AbwesenheitsSidebar({
             key={m.id}
             className={clsx(styles.avatarSlot, absentOnHoveredDate.has(m.id) && styles.highlighted)}
           >
-            <Avatar name={m.name} initials={m.initials} size={22} />
+            <Avatar name={m.name} initials={m.initials} size={26} />
           </div>
         ))}
+        {/* Team member add */}
+        {onTeamUpdate && !addingMember && (
+          <div className={styles.avatarAddSlot}>
+            <IconButton
+              icon="plus"
+              size={12}
+              label="Teammitglied hinzufügen"
+              onClick={() => {
+                setAddingMember(true)
+                setTimeout(() => addInputRef.current?.focus(), 50)
+              }}
+            />
+          </div>
+        )}
+        {addingMember && (
+          <div className={styles.avatarAddInput}>
+            <input
+              ref={addInputRef}
+              className={styles.memberInput}
+              value={newMemberName}
+              onChange={(e) => setNewMemberName(e.target.value)}
+              placeholder="Name"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleAddMemberConfirm()
+                if (e.key === 'Escape') { setAddingMember(false); setNewMemberName('') }
+              }}
+              onBlur={() => {
+                if (!newMemberName.trim()) { setAddingMember(false); setNewMemberName('') }
+              }}
+            />
+            {newMemberName.trim() && (
+              <IconButton
+                icon="check"
+                size={11}
+                label="Bestätigen"
+                onClick={handleAddMemberConfirm}
+              />
+            )}
+          </div>
+        )}
       </div>
 
       {/* Timeline */}
@@ -459,18 +553,26 @@ export function AbwesenheitsSidebar({
           ))}
         </div>
 
-        {/* Date labels column — outside membersArea so they're not clipped */}
+        {/* Date labels — absolutely within timeline so they're never clipped by panel */}
         {dateTooltip && (
-          <div className={styles.dateLabelCol}>
+          <>
             <div className={styles.dateLabel} style={{ top: `${dateTooltip.topPct}%` }}>
               {dateTooltip.vonLabel}
             </div>
             <div className={styles.dateLabel} style={{ top: `${dateTooltip.bottomPct}%` }}>
               {dateTooltip.bisLabel}
             </div>
-          </div>
+          </>
         )}
       </div>
+
+      {onNavigateToList && (
+        <div className={styles.footer}>
+          <Button variant="secondary" size="sm" onClick={onNavigateToList}>
+            Weiter zur Detailplanung
+          </Button>
+        </div>
+      )}
     </div>
   )
 }
