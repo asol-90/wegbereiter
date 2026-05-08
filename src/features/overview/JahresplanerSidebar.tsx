@@ -32,6 +32,7 @@ import type { Planung, StammKontext, Aktivitaet } from '@/domain/types'
 import { parseIso, isoToday } from '@/domain/dateUtils'
 import { parseStammDatei, StammParseError, detectFileType } from '@/domain/stammParser'
 import { checkOverlap, clipKontext } from '@/domain/stammOverlap'
+import { repertoireStore } from '@/features/repertoire/repertoireStore'
 import { NewPlanungWizard } from './NewPlanungWizard'
 import { StammImportDialog } from './StammImportDialog'
 import { DropZone } from './DropZone'
@@ -76,10 +77,11 @@ function rowToPercent(row: number): number {
   return (row / 24) * 100
 }
 
-/** Does a Planung have any Treffen in the given year? */
+/** Does a Planung have any Treffen in the given year, or does its zeitraum overlap it? */
 function planungInYear(p: Planung, year: number): boolean {
   const prefix = `${year}`
-  return p.treffen.some((t) => t.datum.startsWith(prefix))
+  if (p.treffen.some((t) => t.datum.startsWith(prefix))) return true
+  return p.zeitraum.start <= `${year}-12-31` && p.zeitraum.ende >= `${year}-01-01`
 }
 
 /** Does a Kontext have data in the given year? */
@@ -233,7 +235,7 @@ export function JahresplanerSidebar({
 
   const handleConfirmImport = useCallback(async () => {
     if (!pendingImport) return
-    const { kontext: incoming } = pendingImport
+    const { kontext: incoming, aktivitaeten: incomingAktivitaeten } = pendingImport
     for (const existing of kontexte) {
       const result = checkOverlap(existing, incoming)
       if (result.kind === 'overlap') {
@@ -246,6 +248,9 @@ export function JahresplanerSidebar({
       }
     }
     await stammActions.importKontext(incoming)
+    for (const a of incomingAktivitaeten) {
+      await repertoireStore.saveAktivitaet(a)
+    }
     setPendingImport(null)
   }, [pendingImport, kontexte, stammActions])
 

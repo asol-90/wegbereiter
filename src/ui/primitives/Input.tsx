@@ -12,6 +12,8 @@ export type InputProps = {
   /** Placed right of the label area, e.g. a tag or clear button. */
   adornment?: ReactNode
   sizeVariant?: 'sm' | 'md'
+  /** Suppress the foot area entirely (no reserved space for hint/error). */
+  noFoot?: boolean
 } & InputHTMLAttributes<HTMLInputElement>
 
 export function Input({
@@ -20,6 +22,7 @@ export function Input({
   error,
   adornment,
   sizeVariant = 'md',
+  noFoot,
   className,
   id,
   ...rest
@@ -42,14 +45,16 @@ export function Input({
         )}
         {...rest}
       />
-      <span
-        className={clsx(
-          styles.foot,
-          error ? styles.errText : hint ? styles.hint : styles.footEmpty,
-        )}
-      >
-        {error ?? hint ?? '\u00A0'}
-      </span>
+      {!noFoot && (
+        <span
+          className={clsx(
+            styles.foot,
+            error ? styles.errText : hint ? styles.hint : styles.footEmpty,
+          )}
+        >
+          {error ?? hint ?? ' '}
+        </span>
+      )}
     </label>
   )
 }

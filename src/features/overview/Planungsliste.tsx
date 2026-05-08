@@ -18,6 +18,7 @@ import { parseStammDatei, StammParseError, detectFileType } from '@/domain/stamm
 import { checkOverlap, clipKontext } from '@/domain/stammOverlap'
 import type { StammKontext, Aktivitaet } from '@/domain/types'
 import { isoToday } from '@/domain/dateUtils'
+import { repertoireStore } from '@/features/repertoire/repertoireStore'
 import { NewPlanungWizard } from './NewPlanungWizard'
 import { PlanungsCard } from './PlanungsCard'
 import { StammKontextCard } from './StammKontextCard'
@@ -33,10 +34,11 @@ export type PlanungslisteProps = {
   onPlanungHover?: (id: PlanungId | null) => void
 }
 
-/** Does a Planung have any Treffen in the given year? */
+/** Does a Planung have any Treffen in the given year, or does its zeitraum overlap it? */
 function planungInYear(p: Planung, year: number): boolean {
   const prefix = `${year}`
-  return p.treffen.some((t) => t.datum.startsWith(prefix))
+  if (p.treffen.some((t) => t.datum.startsWith(prefix))) return true
+  return p.zeitraum.start <= `${year}-12-31` && p.zeitraum.ende >= `${year}-01-01`
 }
 
 /** Does a Kontext have any Treffen or Aktionen in the given year? */
@@ -136,9 +138,8 @@ export function Planungsliste({
 
   const handleConfirmImport = useCallback(async () => {
     if (!pendingImport) return
-    const { kontext: incoming } = pendingImport
+    const { kontext: incoming, aktivitaeten: incomingAktivitaeten } = pendingImport
 
-    // Clip overlapping existing contexts
     for (const existing of kontexte) {
       const result = checkOverlap(existing, incoming)
       if (result.kind === 'overlap') {
@@ -151,10 +152,11 @@ export function Planungsliste({
       }
     }
 
-    // Import the new context
     await stammActions.importKontext(incoming)
 
-    // TODO: Import aktivitaeten into Repertoire (Phase 9 dependency)
+    for (const a of incomingAktivitaeten) {
+      await repertoireStore.saveAktivitaet(a)
+    }
 
     setPendingImport(null)
   }, [pendingImport, kontexte, stammActions])

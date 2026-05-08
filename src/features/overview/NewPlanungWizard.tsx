@@ -12,6 +12,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { format, parseISO } from 'date-fns'
 import { de } from 'date-fns/locale'
 import {
+  AccordionGroup,
   Badge,
   Button,
   Input,
@@ -427,17 +428,18 @@ export function NewPlanungWizard({ open, onClose, onCreated, initialZeitraum }: 
   const [wbBereiche, setWbBereiche] = useState<WBKey[]>([])
 
   // Andachtsreihe
-  const [andachtEnabled, setAndachtEnabled] = useState(false)
+  type AndachtMode = 'none' | 'reihe' | 'sammlung' | 'new'
+  const [andachtMode, setAndachtMode] = useState<AndachtMode>('none')
+  const [andachtReiheId, setAndachtReiheId] = useState<AndachtsreiheId | null>(null)
+  const [andachtAusgewaehlt, setAndachtAusgewaehlt] = useState<Set<AndachtsEinheitId>>(new Set())
   const [andachtTitel, setAndachtTitel] = useState('')
   const [andachtEinheiten, setAndachtEinheiten] = useState<{ id: AndachtsEinheitId; titel: string }[]>([])
+  const andachtFocusRef = useRef<string | null>(null)
 
   // Abzeichen
   const [abzeichenEnabled, setAbzeichenEnabled] = useState(false)
   const [selectedAltersstufe, setSelectedAltersstufe] = useState<Altersstufe | null>(null)
   const [selectedAbzeichenId, setSelectedAbzeichenId] = useState<AbzeichenId | null>(null)
-
-  // Accordion state for Ziele sections
-  const [zieleOpen, setZieleOpen] = useState<Set<number>>(new Set([0])) // Start with WB section open
 
   // ─── Ferien data ──────────────────────────────────────────────────────
 
@@ -466,6 +468,16 @@ export function NewPlanungWizard({ open, onClose, onCreated, initialZeitraum }: 
     setTerminListExpanded(false)
     setBisPresetOpen(false)
     setNewTeamName('')
+    setAndachtMode('none')
+    setAndachtReiheId(null)
+    setAndachtAusgewaehlt(new Set())
+    setAndachtTitel('')
+    setAndachtEinheiten([])
+    setWbModus('ausgewogen')
+    setWbBereiche([])
+    setAbzeichenEnabled(false)
+    setSelectedAltersstufe(null)
+    setSelectedAbzeichenId(null)
     const wd = loaded ? config.defaultWeekday : 'freitag'
     const rk = loaded ? rhythmusToKey(config.defaultRhythmus) : 'weekly'
     const d = loaded ? config.defaultDauerMinuten : 90
@@ -538,7 +550,6 @@ export function NewPlanungWizard({ open, onClose, onCreated, initialZeitraum }: 
         setTeam([...mostRecent.team])
       }
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, loaded, config.defaultWeekday, config.defaultRhythmus, config.defaultDauerMinuten, planungen, kontexte, initialZeitraum])
 
   // Smart default end date: once Ferien are loaded and user hasn't changed ende manually
@@ -596,11 +607,6 @@ export function NewPlanungWizard({ open, onClose, onCreated, initialZeitraum }: 
     [kontextTreffenInRange],
   )
 
-  const generatedForGaps = useMemo(
-    () => generated.filter((iso) => !kontextDateSet.has(iso)),
-    [generated, kontextDateSet],
-  )
-
   const stammaktionenInRange = useMemo(() => {
     if (!hasKontext || !start || !ende) return []
     return activeKontext.stammaktionen
@@ -619,6 +625,14 @@ export function NewPlanungWizard({ open, onClose, onCreated, initialZeitraum }: 
     if (allDates.length === 0) return null
     return { von: allDates[0], bis: allDates[allDates.length - 1] }
   }, [hasKontext, activeKontext])
+
+  const generatedForGaps = useMemo(
+    () => generated.filter((iso) => {
+      if (kontextRange && iso >= kontextRange.von && iso <= kontextRange.bis) return false
+      return !kontextDateSet.has(iso)
+    }),
+    [generated, kontextDateSet, kontextRange],
+  )
 
   /** A generated date needs Ferien-handling only if outside the Kontext range. */
   function isOutsideKontext(iso: IsoDate): boolean {
@@ -686,6 +700,92 @@ export function NewPlanungWizard({ open, onClose, onCreated, initialZeitraum }: 
     [start, ferienYear1, ferienYear2, activeKontext],
   )
 
+  // ─── Datum-Begründungen ───────────────────────────────────────────────
+  // Reason wird nur gezeigt, wenn das Datum mit einem „smarten" Vorschlag
+  // zusammenfällt — nicht bei stumpfen Defaults (nächster Wochentag, +4 Monate).
+
+  const startReason = useMemo<string | null>(() => {
+    if (!start) return null
+    // Anschluss an vorherige Planung
+    const previous = planungen
+      .filter((p) => p.zeitraum.ende < start)
+      .sort((a, b) => b.zeitraum.ende.localeCompare(a.zeitraum.ende))[0]
+    if (previous && isoNextDay(previous.zeitraum.ende) === start) {
+      return `Beginnt im Anschluss an „${previous.name}"`
+    }
+    // Stammkontext-Start
+    if (activeKontext) {
+      const range = kontextDateRange(activeKontext)
+      if (range && range.von === start) {
+        return `Beginnt mit Stammkontext „${activeKontext.thema}"`
+      }
+    }
+    return null
+  }, [start, planungen, activeKontext])
+
+  const endeReason = useMemo<string | null>(() => {
+    if (!ende || !start) return null
+    // Stammkontext-Ende
+    if (activeKontext) {
+      const range = kontextDateRange(activeKontext)
+      if (range && range.bis === ende) {
+        return `Endet mit Stammkontext „${activeKontext.thema}"`
+      }
+    }
+    // Vor anschließender Planung
+    const next = planungen
+      .filter((p) => p.zeitraum.start > start)
+      .sort((a, b) => a.zeitraum.start.localeCompare(b.zeitraum.start))[0]
+    if (next && isoPrevDay(next.zeitraum.start) === ende) {
+      return `Endet vor „${next.name}"`
+    }
+    // Vor nächsten Ferien
+    const allFerien = [...(ferienYear1?.ferien ?? []), ...(ferienYear2?.ferien ?? [])]
+    const nextFerien = allFerien
+      .filter((f) => f.start > start)
+      .sort((a, b) => a.start.localeCompare(b.start))[0]
+    if (nextFerien && isoPrevDay(nextFerien.start) === ende) {
+      return `Endet vor ${nextFerien.name}`
+    }
+    return null
+  }, [ende, start, activeKontext, planungen, ferienYear1, ferienYear2])
+
+  // ─── Andachten: Repertoire-Listen + Stammandachts-Zählung ───────────
+
+  const availableReihen = useMemo(
+    () => repertoireState.andachtsreihen.filter((r) => r.art === 'reihe' && !r.deaktiviert),
+    [repertoireState.andachtsreihen],
+  )
+
+  const availableSammlungen = useMemo(
+    () => repertoireState.andachtsreihen.filter((r) => r.art === 'sammlung' && !r.deaktiviert),
+    [repertoireState.andachtsreihen],
+  )
+
+  const selectedSammlung = useMemo(() => {
+    if (andachtMode !== 'sammlung' || !andachtReiheId) return null
+    return availableSammlungen.find((s) => s.id === andachtReiheId) ?? null
+  }, [andachtMode, andachtReiheId, availableSammlungen])
+
+  /** Zähle Treffen, die bereits eine Stammandacht über den Stamm-Block-Default oder Override haben. */
+  const stammandachtenCount = useMemo(() => {
+    if (!hasKontext) return 0
+    const hasAndacht = (blocks: import('@/domain/types').StammBlock[] | undefined, fallback: import('@/domain/types').StammBlock[]) => {
+      const list = blocks ?? fallback
+      return list.some((b) => b.untertyp === 'andacht')
+    }
+    return kontextTreffenInRange.filter((t) =>
+      hasAndacht(t.anfangsBlock, activeKontext.defaultAnfangsBlock)
+      || hasAndacht(t.endBlock, activeKontext.defaultEndBlock),
+    ).length
+  }, [hasKontext, activeKontext, kontextTreffenInRange])
+
+  /** Treffen, die noch eine Andacht aus der Reihe brauchen. */
+  const teamAndachtsBedarf = useMemo(
+    () => Math.max(0, activeMeetingCount - stammandachtenCount),
+    [activeMeetingCount, stammandachtenCount],
+  )
+
   // ─── Team management ──────────────────────────────────────────────────
 
   function generateInitials(name: string): string {
@@ -751,8 +851,17 @@ export function NewPlanungWizard({ open, onClose, onCreated, initialZeitraum }: 
     if (err) { setStepIndex(0); setError(err); return }
     try {
       setSaving(true)
-      // Collect dates that were skipped (holiday + not reinstated + outside Kontext)
+      // Collect dates to exclude from the factory's generateTermine output:
+      // 1. All generated dates within the Stammkontext range (the kontext handles those)
+      // 2. Holiday-skipped dates outside the kontext range
       const excludeDates = new Set<IsoDate>()
+      if (kontextRange) {
+        for (const iso of generated) {
+          if (iso >= kontextRange.von && iso <= kontextRange.bis) {
+            excludeDates.add(iso)
+          }
+        }
+      }
       for (const item of mergedItems) {
         if (item.kind !== 'treffen' || item.source !== 'generated') continue
         if (!isOutsideKontext(item.iso)) continue
@@ -770,9 +879,9 @@ export function NewPlanungWizard({ open, onClose, onCreated, initialZeitraum }: 
         ? [{ abzeichenId: selectedAbzeichenId }]
         : []
 
-      // Save Andachtsreihe to IDB if configured
+      // Build Andachtsreihen-Zuordnung based on selected mode
       const andachtsreihenZuordnung: import('@/domain/types').AndachtsreiheZuordnung[] = []
-      if (andachtEnabled && andachtTitel.trim() && andachtEinheiten.length > 0) {
+      if (andachtMode === 'new' && andachtTitel.trim() && andachtEinheiten.some((e) => e.titel.trim())) {
         const reiheId = newId<AndachtsreiheId>()
         await saveAndachtsreihe({
           id: reiheId,
@@ -788,6 +897,13 @@ export function NewPlanungWizard({ open, onClose, onCreated, initialZeitraum }: 
             })),
         })
         andachtsreihenZuordnung.push({ reiheId })
+      } else if (andachtMode === 'reihe' && andachtReiheId) {
+        andachtsreihenZuordnung.push({ reiheId: andachtReiheId })
+      } else if (andachtMode === 'sammlung' && andachtReiheId && andachtAusgewaehlt.size > 0) {
+        andachtsreihenZuordnung.push({
+          reiheId: andachtReiheId,
+          ausgewaehlteEinheiten: Array.from(andachtAusgewaehlt),
+        })
       }
 
       const p = await create({
@@ -833,13 +949,20 @@ export function NewPlanungWizard({ open, onClose, onCreated, initialZeitraum }: 
     return (
       <div className={styles.kontextAktivitaetenSection}>
         <span className={styles.kontextSectionLabel}>Vorgeschlagene Aktivitäten</span>
-        <div className={styles.kontextAktivitaetenGrid}>
+        <div className={styles.kontextAktivitaetenList}>
           {stammAktivitaeten.map((a) => (
-            <div key={a.id} className={styles.kontextAktivitaetChip}>
-              <span className={styles.kontextAktivitaetName}>{a.name}</span>
+            <div key={a.id} className={styles.kontextAktivitaetRow}>
               <span className={styles.kontextAktivitaetTyp}>
                 {aktivitaetLabel(a.typ, a.untertyp)}
               </span>
+              <span className={styles.kontextAktivitaetName}>{a.name}</span>
+              {a.zeitMin > 0 && (
+                <span className={styles.kontextAktivitaetDauer}>
+                  {a.zeitMin === a.zeitMax
+                    ? `${a.zeitMin} Min`
+                    : `${a.zeitMin}–${a.zeitMax} Min`}
+                </span>
+              )}
             </div>
           ))}
         </div>
@@ -1012,13 +1135,6 @@ export function NewPlanungWizard({ open, onClose, onCreated, initialZeitraum }: 
 
     return (
       <div className={styles.terminList}>
-        <div className={styles.terminListHeader}>
-          <span>Termine</span>
-          <span className={styles.terminListCount}>
-            {activeMeetingCount} aktiv
-            {stammaktionenInRange.length > 0 && ` · ${stammaktionenInRange.length} Aktion${stammaktionenInRange.length !== 1 ? 'en' : ''}`}
-          </span>
-        </div>
         {rows}
       </div>
     )
@@ -1033,6 +1149,7 @@ export function NewPlanungWizard({ open, onClose, onCreated, initialZeitraum }: 
       title="Neue Planung"
       description="In vier Schritten zur fertigen Planung."
       size="lg"
+      closeOnBackdropClick={false}
       footer={
         <div className={styles.footer}>
           <Button variant="ghost" onClick={onClose} disabled={saving}>
@@ -1059,25 +1176,34 @@ export function NewPlanungWizard({ open, onClose, onCreated, initialZeitraum }: 
       }
     >
       <nav className={styles.stepbar} aria-label="Fortschritt">
-        {stepLabels(stepSequence).map((label, i) => (
-          <span
-            key={label}
-            className={
-              i === stepIndex
-                ? styles.stepActive
-                : i < stepIndex
-                  ? styles.stepDone
-                  : styles.step
-            }
-          >
-            {label}
-          </span>
-        ))}
+        {(['teamplanung', 'stammkontext', 'ziele', 'vorschau'] as LogicalStep[]).map((step) => {
+          const seqIdx = stepSequence.indexOf(step)
+          const isSkipped = seqIdx === -1
+          const isActive = !isSkipped && seqIdx === stepIndex
+          const isDone = !isSkipped && seqIdx < stepIndex
+          const label = isSkipped
+            ? STEP_META[step]
+            : `${seqIdx + 1} · ${STEP_META[step]}`
+          return (
+            <span
+              key={step}
+              className={
+                isSkipped ? styles.stepSkipped :
+                isActive ? styles.stepActive :
+                isDone ? styles.stepDone :
+                styles.step
+              }
+            >
+              {label}
+            </span>
+          )
+        })}
       </nav>
 
       {/* ── Step: Teamplanung ───────────────────────────────────── */}
       {currentStep === 'teamplanung' && (
         <div className={styles.section}>
+          <span className={styles.sectionLabel}>Zeitraum</span>
           {/* Rhythmus + Dauer — info text above Von/Bis */}
           {!editingRhythmus ? (
             <div className={styles.rhythmusInfo}>
@@ -1138,61 +1264,68 @@ export function NewPlanungWizard({ open, onClose, onCreated, initialZeitraum }: 
 
           {/* Von / Bis */}
           <div className={styles.dateRow}>
-            <Input
-              label="Von"
-              type="date"
-              value={start}
-              onChange={(e) => { setStart(e.target.value); setEndeWasAutoSet(false) }}
-              required
-            />
-            <div className={styles.bisField} ref={bisPresetRef}>
+            <div className={styles.dateField}>
               <Input
-                label="Bis"
+                label="Von"
                 type="date"
-                value={ende}
-                onChange={(e) => { setEnde(e.target.value); setEndeWasAutoSet(false) }}
+                value={start}
+                onChange={(e) => { setStart(e.target.value); setEndeWasAutoSet(false) }}
                 required
+                noFoot
               />
-              {bisPresets.length > 0 && (
-                <button
-                  type="button"
-                  className={styles.presetBtn}
-                  onClick={() => setBisPresetOpen((o) => !o)}
-                  title="Bis-Vorschläge"
-                >
-                  <Icon name="preset" size={14} />
-                </button>
+              {startReason && (
+                <p className={styles.dateReason}>{startReason}</p>
               )}
-              {bisPresetOpen && bisPresets.length > 0 && (
-                <div className={styles.presetDropdown}>
-                  {bisPresets.map((p) => (
-                    <button
-                      key={p.iso}
-                      type="button"
-                      className={styles.presetOption}
-                      onClick={() => {
-                        setEnde(p.iso)
-                        setEndeWasAutoSet(false)
-                        setBisPresetOpen(false)
-                      }}
-                    >
-                      <span>{p.label}</span>
-                      <span className={styles.presetDate}>{formatDateShort(p.iso)}</span>
-                    </button>
-                  ))}
-                </div>
+            </div>
+            <div className={styles.dateField}>
+              <div className={styles.bisField} ref={bisPresetRef}>
+                <Input
+                  label="Bis"
+                  type="date"
+                  value={ende}
+                  onChange={(e) => { setEnde(e.target.value); setEndeWasAutoSet(false) }}
+                  required
+                  noFoot
+                />
+                {bisPresets.length > 0 && (
+                  <button
+                    type="button"
+                    className={styles.presetBtn}
+                    onClick={() => setBisPresetOpen((o) => !o)}
+                    title="Bis-Vorschläge"
+                  >
+                    <Icon name="preset" size={14} />
+                  </button>
+                )}
+                {bisPresetOpen && bisPresets.length > 0 && (
+                  <div className={styles.presetDropdown}>
+                    {bisPresets.map((p) => (
+                      <button
+                        key={p.iso}
+                        type="button"
+                        className={styles.presetOption}
+                        onClick={() => {
+                          setEnde(p.iso)
+                          setEndeWasAutoSet(false)
+                          setBisPresetOpen(false)
+                        }}
+                      >
+                        <span>{p.label}</span>
+                        <span className={styles.presetDate}>{formatDateShort(p.iso)}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+              {endeReason && (
+                <p className={styles.dateReason}>{endeReason}</p>
               )}
             </div>
           </div>
 
-          {hasKontext && (
-            <p className={styles.kontextHintInline}>
-              Zeitraum aus Stammkontext „{activeKontext.thema}" vorgeschlagen.
-            </p>
-          )}
-
           {/* Team section */}
           <div className={styles.teamSection}>
+            <span className={styles.kontextSectionLabel}>Mitarbeiter</span>
             <div className={styles.teamChips}>
               {team.map((member) => (
                 <div
@@ -1216,29 +1349,26 @@ export function NewPlanungWizard({ open, onClose, onCreated, initialZeitraum }: 
                   </button>
                 </div>
               ))}
-            </div>
-            <div className={styles.teamAddRow}>
-              <Input
+              <input
+                type="text"
+                className={styles.teamInlineInput}
                 placeholder="Name hinzufügen…"
                 value={newTeamName}
                 onChange={(e) => setNewTeamName(e.target.value)}
                 onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
+                  if (e.key === 'Enter' && newTeamName.trim()) {
+                    e.preventDefault()
                     addTeamMember(newTeamName)
                   }
                 }}
               />
-              <Button
-                variant="secondary"
-                onClick={() => addTeamMember(newTeamName)}
-                disabled={!newTeamName.trim()}
-              >
-                +
-              </Button>
             </div>
           </div>
 
           {/* Termin-Vorschau */}
+          <span className={styles.sectionLabel}>
+            Termine ({activeMeetingCount - stammaktionenInRange.length} Treffen{stammaktionenInRange.length > 0 ? ` · ${stammaktionenInRange.length} Aktion${stammaktionenInRange.length !== 1 ? 'en' : ''}` : ''})
+          </span>
           {renderTerminPreview()}
 
           {error && <p className={styles.error}>{error}</p>}
@@ -1301,252 +1431,314 @@ export function NewPlanungWizard({ open, onClose, onCreated, initialZeitraum }: 
       {/* ── Step: Unsere Ziele ───────────────────────────────── */}
       {currentStep === 'ziele' && (
         <div className={styles.section}>
-          {/* Section 0: WB-Schwerpunkt */}
-          <div className={styles.zieleSection}>
-            <button
-              type="button"
-              className={styles.zieleSectionHeader}
-              onClick={() => {
-                const next = new Set(zieleOpen)
-                if (next.has(0)) next.delete(0)
-                else next.add(0)
-                setZieleOpen(next)
-              }}
-            >
-              <span>WB-Schwerpunkt</span>
-              <span className={`${styles.zieleSectionArrow} ${zieleOpen.has(0) ? styles.arrowOpen : ''}`}>▾</span>
-            </button>
-            {zieleOpen.has(0) && (
-              <div className={styles.zieleSectionBody}>
-                {/* Modus buttons */}
-                <div className={styles.modusBtnRow}>
-                  {(['ausgewogen', 'tendenz', 'fokus', 'haupt-neben', 'dominant'] as WbSchwerpunktModus[]).map((m) => (
-                    <button
-                      key={m}
-                      type="button"
-                      className={`${styles.modusBtn} ${wbModus === m ? styles.modusBtnActive : ''}`}
-                      onClick={() => {
-                        setWbModus(m)
-                        if (m === 'ausgewogen') setWbBereiche([])
-                      }}
-                    >
-                      {m === 'ausgewogen' && 'Ausgewogen'}
-                      {m === 'tendenz' && 'Tendenz'}
-                      {m === 'fokus' && 'Fokus'}
-                      {m === 'haupt-neben' && 'Haupt+Neben'}
-                      {m === 'dominant' && 'Dominant'}
-                    </button>
-                  ))}
-                </div>
-
-                {/* Mode-specific content */}
-                {wbModus === 'ausgewogen' && (
-                  <p className={styles.wbModeText}>Alle Bereiche gleichgewichtig</p>
-                )}
-
-                {(wbModus === 'tendenz' || wbModus === 'fokus' || wbModus === 'haupt-neben' || wbModus === 'dominant') && (
-                  <div className={styles.wbChips}>
-                    {WB_KEYS.map((key) => {
-                      const isSelected = wbBereiche.includes(key)
-                      const maxSelectable =
-                        wbModus === 'tendenz' ? 2
-                        : wbModus === 'fokus' ? 1
-                        : wbModus === 'haupt-neben' ? 2
-                        : wbModus === 'dominant' ? 1
-                        : 0
-
-                      return (
+          <AccordionGroup
+            mode="multi"
+            defaultOpen={['wb']}
+            items={[
+              {
+                id: 'wb',
+                title: <span className={styles.kontextSectionLabel}>Wachstumsbereich</span>,
+                children: (
+                  <div className={styles.zieleSectionBody}>
+                    {/* Tab-Leiste für Modus */}
+                    <div className={styles.wbTabRow}>
+                      {(['ausgewogen', 'tendenz', 'fokus', 'haupt-neben', 'dominant'] as WbSchwerpunktModus[]).map((m) => (
                         <button
-                          key={key}
+                          key={m}
                           type="button"
-                          className={`${styles.wbChip} ${isSelected ? styles.wbChipSelected : ''}`}
-                          style={{
-                            borderLeftColor: isSelected ? `var(${WB_CSS_VAR[key]})` : 'transparent',
-                          }}
+                          className={`${styles.wbTab} ${wbModus === m ? styles.wbTabActive : ''}`}
+                          onClick={() => { setWbModus(m); if (m === 'ausgewogen') setWbBereiche([]) }}
+                        >
+                          {m === 'ausgewogen' && 'Ausgewogen'}
+                          {m === 'tendenz' && 'Tendenz'}
+                          {m === 'fokus' && 'Fokus'}
+                          {m === 'haupt-neben' && 'Haupt+Neben'}
+                          {m === 'dominant' && 'Dominant'}
+                        </button>
+                      ))}
+                    </div>
+                    {/* Beschreibung */}
+                    <p className={styles.wbModeDesc}>
+                      {wbModus === 'ausgewogen' && 'Alle Wachstumsbereiche werden gleichgewichtig behandelt.'}
+                      {wbModus === 'tendenz' && 'Wähle ein bis zwei Bereiche, die tendenziell im Fokus stehen.'}
+                      {wbModus === 'fokus' && 'Wähle einen Bereich, der klar im Fokus steht.'}
+                      {wbModus === 'haupt-neben' && 'Wähle einen Haupt- und einen Nebenbereich.'}
+                      {wbModus === 'dominant' && 'Wähle einen Bereich, der dominant im Vordergrund steht.'}
+                    </p>
+                    {/* Checkbox-Liste */}
+                    <div className={styles.wbCheckList}>
+                      {WB_KEYS.map((key) => {
+                        const isAusgewogen = wbModus === 'ausgewogen'
+                        const selectedIndex = wbBereiche.indexOf(key)
+                        const isSelected = isAusgewogen || selectedIndex >= 0
+                        const maxSelectable =
+                          wbModus === 'tendenz' ? 2
+                          : wbModus === 'fokus' ? 1
+                          : wbModus === 'haupt-neben' ? 2
+                          : wbModus === 'dominant' ? 1
+                          : 0
+                        const checkLabel = wbModus === 'haupt-neben'
+                          ? (selectedIndex === 0 ? 'H' : selectedIndex === 1 ? 'N' : '')
+                          : (isSelected ? '✓' : '')
+                        return (
+                          <button
+                            key={key}
+                            type="button"
+                            role="checkbox"
+                            aria-checked={isSelected}
+                            disabled={isAusgewogen}
+                            className={styles.wbCheckRow}
+                            onClick={() => {
+                              if (selectedIndex >= 0) {
+                                setWbBereiche(wbBereiche.filter((k) => k !== key))
+                              } else if (wbBereiche.length < maxSelectable) {
+                                setWbBereiche([...wbBereiche, key])
+                              }
+                            }}
+                          >
+                            <span
+                              className={`${styles.wbCheckIcon} ${isSelected ? styles.wbCheckIconChecked : ''}`}
+                              style={isSelected ? { ['--wb-check-color' as string]: `var(${WB_CSS_VAR[key]})` } : undefined}
+                            >
+                              {checkLabel}
+                            </span>
+                            <span
+                              className={styles.wbColorBar}
+                              style={{ backgroundColor: `var(${WB_CSS_VAR[key]})` }}
+                            />
+                            <span className={styles.wbCheckLabel}>{WB_LABELS[key]}</span>
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
+                ),
+              },
+              {
+                id: 'andacht',
+                title: <span className={styles.kontextSectionLabel}>Andachtsreihe</span>,
+                children: (
+                  <div className={styles.zieleSectionBody}>
+                    <div className={styles.wbTabRow}>
+                      {(['none', 'reihe', 'sammlung', 'new'] as AndachtMode[]).map((m) => (
+                        <button
+                          key={m}
+                          type="button"
+                          className={`${styles.wbTab} ${andachtMode === m ? styles.wbTabActive : ''}`}
                           onClick={() => {
-                            if (isSelected) {
-                              setWbBereiche(wbBereiche.filter((k) => k !== key))
-                            } else if (wbBereiche.length < maxSelectable) {
-                              setWbBereiche([...wbBereiche, key])
+                            setAndachtMode(m)
+                            setAndachtReiheId(null)
+                            setAndachtAusgewaehlt(new Set())
+                            if (m !== 'new') {
+                              setAndachtTitel('')
+                              setAndachtEinheiten([])
                             }
                           }}
                         >
-                          {WB_LABELS[key]}
+                          {m === 'none' && 'Keine'}
+                          {m === 'reihe' && 'Reihe wählen'}
+                          {m === 'sammlung' && 'Aus Sammlung'}
+                          {m === 'new' && 'Neu anlegen'}
                         </button>
-                      )
-                    })}
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-
-          {/* Section 1: Andachtsreihe */}
-          <div className={styles.zieleSection}>
-            <button
-              type="button"
-              className={styles.zieleSectionHeader}
-              onClick={() => {
-                const next = new Set(zieleOpen)
-                if (next.has(1)) next.delete(1)
-                else next.add(1)
-                setZieleOpen(next)
-              }}
-            >
-              <span>Andachtsreihe</span>
-              <span className={`${styles.zieleSectionArrow} ${zieleOpen.has(1) ? styles.arrowOpen : ''}`}>▾</span>
-            </button>
-            {zieleOpen.has(1) && (
-              <div className={styles.zieleSectionBody}>
-                <button
-                  type="button"
-                  className={styles.toggleBtn}
-                  onClick={() => setAndachtEnabled(!andachtEnabled)}
-                >
-                  {andachtEnabled ? '✓' : ''} Andachtsreihe festlegen
-                </button>
-
-                {andachtEnabled && (
-                  <>
-                    <Input
-                      label="Titel der Reihe"
-                      placeholder="z.B. Frühjahrsfreizeit 2026"
-                      value={andachtTitel}
-                      onChange={(e) => setAndachtTitel(e.target.value)}
-                    />
-
-                    <div className={styles.andachtList}>
-                      {andachtEinheiten.map((einheit, i) => (
-                        <div key={einheit.id} className={styles.andachtRow}>
-                          <span className={styles.andachtNumber}>{i + 1}</span>
-                          <Input
-                            placeholder="Titel der Einheit"
-                            value={einheit.titel}
-                            onChange={(e) => {
-                              const updated = [...andachtEinheiten]
-                              updated[i] = { ...einheit, titel: e.target.value }
-                              setAndachtEinheiten(updated)
-                            }}
-                          />
-                          <button
-                            type="button"
-                            className={styles.andachtRemove}
-                            onClick={() => setAndachtEinheiten(andachtEinheiten.filter((_, idx) => idx !== i))}
-                            title="Entfernen"
-                          >
-                            ×
-                          </button>
-                        </div>
                       ))}
                     </div>
-
-                    <button
-                      type="button"
-                      className={styles.addEinheitBtn}
-                      onClick={() => {
-                        const newId_ = newId<AndachtsEinheitId>()
-                        setAndachtEinheiten([...andachtEinheiten, { id: newId_, titel: '' }])
-                      }}
-                    >
-                      + Einheit hinzufügen
-                    </button>
-                  </>
-                )}
-              </div>
-            )}
-          </div>
-
-          {/* Section 2: Abzeichen */}
-          <div className={styles.zieleSection}>
-            <button
-              type="button"
-              className={styles.zieleSectionHeader}
-              onClick={() => {
-                const next = new Set(zieleOpen)
-                if (next.has(2)) next.delete(2)
-                else next.add(2)
-                setZieleOpen(next)
-              }}
-            >
-              <span>Abzeichen</span>
-              <span className={`${styles.zieleSectionArrow} ${zieleOpen.has(2) ? styles.arrowOpen : ''}`}>▾</span>
-            </button>
-            {zieleOpen.has(2) && (
-              <div className={styles.zieleSectionBody}>
-                <button
-                  type="button"
-                  className={styles.toggleBtn}
-                  onClick={() => {
-                    setAbzeichenEnabled(!abzeichenEnabled)
-                    if (!abzeichenEnabled) {
-                      setSelectedAltersstufe(null)
-                      setSelectedAbzeichenId(null)
-                    }
-                  }}
-                >
-                  {abzeichenEnabled ? '✓' : ''} Abzeichen wählen
-                </button>
-
-                {abzeichenEnabled && (
-                  <>
-                    {/* Step A: Altersstufe selection */}
-                    <div className={styles.abzeichenStufenRow}>
+                    {andachtMode === 'reihe' && (
+                      availableReihen.length === 0 ? (
+                        <p className={styles.andachtHint}>
+                          Keine Andachtsreihen im Repertoire. Lege eine im Repertoire-Tab an oder wähle „Neu anlegen".
+                        </p>
+                      ) : (
+                        <div className={styles.andachtRepertoireList}>
+                          {availableReihen.map((r) => (
+                            <button
+                              key={r.id}
+                              type="button"
+                              className={`${styles.andachtRepertoireItem} ${andachtReiheId === r.id ? styles.andachtRepertoireItemSelected : ''}`}
+                              onClick={() => setAndachtReiheId(r.id)}
+                            >
+                              <div className={styles.andachtRepertoireName}>{r.name}</div>
+                              <div className={styles.andachtRepertoireMeta}>
+                                {r.einheiten.length} Einheit{r.einheiten.length !== 1 ? 'en' : ''}
+                                {r.buchquelle?.titel && ` · ${r.buchquelle.titel}`}
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      )
+                    )}
+                    {andachtMode === 'sammlung' && (
+                      availableSammlungen.length === 0 ? (
+                        <p className={styles.andachtHint}>
+                          Keine Sammlungen im Repertoire.
+                        </p>
+                      ) : (
+                        <>
+                          <Select<AndachtsreiheId | ''>
+                            label="Sammlung"
+                            options={[
+                              { value: '', label: '— wählen —' },
+                              ...availableSammlungen.map((s) => ({
+                                value: s.id,
+                                label: s.buchquelle?.titel ? `${s.name} (${s.buchquelle.titel})` : s.name,
+                              })),
+                            ]}
+                            value={andachtReiheId ?? ''}
+                            onValueChange={(v) => {
+                              setAndachtReiheId(v === '' ? null : (v as AndachtsreiheId))
+                              setAndachtAusgewaehlt(new Set())
+                            }}
+                          />
+                          {selectedSammlung && (
+                            <>
+                              <div className={styles.andachtCounter}>
+                                {andachtAusgewaehlt.size} aktiviert · {teamAndachtsBedarf} Treffen ohne Stammandacht
+                                {stammandachtenCount > 0 && (
+                                  <span className={styles.andachtCounterMeta}>
+                                    {' '}({stammandachtenCount} Stammandacht{stammandachtenCount !== 1 ? 'en' : ''} bereits gedeckt)
+                                  </span>
+                                )}
+                              </div>
+                              <div className={styles.andachtSammlungList}>
+                                {selectedSammlung.einheiten.map((einheit) => {
+                                  const aktiv = andachtAusgewaehlt.has(einheit.id)
+                                  return (
+                                    <button
+                                      key={einheit.id}
+                                      type="button"
+                                      className={`${styles.andachtSammlungItem} ${aktiv ? styles.andachtSammlungItemActive : ''}`}
+                                      onClick={() => {
+                                        const next = new Set(andachtAusgewaehlt)
+                                        if (aktiv) next.delete(einheit.id)
+                                        else next.add(einheit.id)
+                                        setAndachtAusgewaehlt(next)
+                                      }}
+                                    >
+                                      <span className={styles.andachtSammlungCheck}>{aktiv ? '✓' : ''}</span>
+                                      <span className={styles.andachtSammlungTitle}>{einheit.titel}</span>
+                                      {einheit.bibelstelle && (
+                                        <span className={styles.andachtSammlungMeta}>{einheit.bibelstelle}</span>
+                                      )}
+                                    </button>
+                                  )
+                                })}
+                              </div>
+                            </>
+                          )}
+                        </>
+                      )
+                    )}
+                    {andachtMode === 'new' && (
+                      <>
+                        <Input
+                          label="Titel der Reihe"
+                          placeholder="z.B. Frühjahrsfreizeit 2026"
+                          value={andachtTitel}
+                          onChange={(e) => setAndachtTitel(e.target.value)}
+                        />
+                        {teamAndachtsBedarf > 0 && (
+                          <p className={styles.andachtHint}>
+                            {teamAndachtsBedarf} Einheit{teamAndachtsBedarf !== 1 ? 'en' : ''} gebraucht ({activeMeetingCount} Treffen
+                            {stammandachtenCount > 0 && `, ${stammandachtenCount} mit Stammandacht`}).
+                          </p>
+                        )}
+                        <div className={styles.andachtList}>
+                          {andachtEinheiten.map((einheit, i) => (
+                            <div key={einheit.id} className={styles.andachtRow}>
+                              <span className={styles.andachtNumber}>{i + 1}</span>
+                              <Input
+                                placeholder="Titel der Einheit"
+                                value={einheit.titel}
+                                autoFocus={andachtFocusRef.current === (einheit.id as string)}
+                                onChange={(e) => {
+                                  const updated = [...andachtEinheiten]
+                                  updated[i] = { ...einheit, titel: e.target.value }
+                                  setAndachtEinheiten(updated)
+                                }}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') {
+                                    e.preventDefault()
+                                    const isLast = i === andachtEinheiten.length - 1
+                                    if (isLast && einheit.titel.trim()) {
+                                      const next = newId<AndachtsEinheitId>()
+                                      andachtFocusRef.current = next as string
+                                      setAndachtEinheiten([...andachtEinheiten, { id: next, titel: '' }])
+                                    }
+                                  }
+                                }}
+                              />
+                              <button
+                                type="button"
+                                className={styles.andachtRemove}
+                                onClick={() => setAndachtEinheiten(andachtEinheiten.filter((_, idx) => idx !== i))}
+                                title="Entfernen"
+                              >
+                                ×
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                        <button
+                          type="button"
+                          className={styles.addEinheitBtn}
+                          onClick={() => {
+                            const next = newId<AndachtsEinheitId>()
+                            andachtFocusRef.current = next as string
+                            setAndachtEinheiten([...andachtEinheiten, { id: next, titel: '' }])
+                          }}
+                        >
+                          + Einheit hinzufügen
+                        </button>
+                      </>
+                    )}
+                  </div>
+                ),
+              },
+              {
+                id: 'abzeichen',
+                title: <span className={styles.kontextSectionLabel}>Abzeichen</span>,
+                children: (
+                  <div className={styles.zieleSectionBody}>
+                    <div className={styles.wbTabRow}>
+                      <button
+                        type="button"
+                        className={`${styles.wbTab} ${!selectedAltersstufe ? styles.wbTabActive : ''}`}
+                        onClick={() => { setSelectedAltersstufe(null); setSelectedAbzeichenId(null) }}
+                      >
+                        Ohne
+                      </button>
                       {(['kundschafter', 'pfadfinder'] as Altersstufe[]).map((stufe) => (
                         <button
                           key={stufe}
                           type="button"
-                          className={`${styles.stufeBtn} ${selectedAltersstufe === stufe ? styles.stufeBtnSelected : ''}`}
-                          onClick={() => {
-                            setSelectedAltersstufe(stufe)
-                            setSelectedAbzeichenId(null)
-                          }}
+                          className={`${styles.wbTab} ${selectedAltersstufe === stufe ? styles.wbTabActive : ''}`}
+                          onClick={() => { setSelectedAltersstufe(stufe); setSelectedAbzeichenId(null) }}
                         >
                           {ALTERSSTUFE_LABELS[stufe]}
                         </button>
                       ))}
                     </div>
-
-                    {/* Step B: Abzeichen selection (if Altersstufe selected) */}
                     {selectedAltersstufe && (
-                      <div className={styles.abzeichenCardGrid}>
+                      <div className={styles.andachtRepertoireList}>
                         {abzeichenFuerStufe(selectedAltersstufe).map((abz) => (
                           <button
                             key={abz.id}
                             type="button"
-                            className={`${styles.abzeichenCard} ${selectedAbzeichenId === abz.id ? styles.abzeichenCardSelected : ''}`}
+                            className={`${styles.andachtRepertoireItem} ${selectedAbzeichenId === abz.id ? styles.andachtRepertoireItemSelected : ''}`}
                             onClick={() => setSelectedAbzeichenId(abz.id)}
                           >
-                            <div className={styles.abzeichenCardName}>{abz.name}</div>
-                            <div className={styles.abzeichenCardMeta}>
+                            <div className={styles.andachtRepertoireName}>{abz.name}</div>
+                            <div className={styles.andachtRepertoireMeta}>
                               {abz.anforderungen.length} Anforderung{abz.anforderungen.length !== 1 ? 'en' : ''}
                             </div>
                           </button>
                         ))}
                       </div>
                     )}
-
-                    {/* Confirmation when Abzeichen selected */}
-                    {selectedAbzeichenId && selectedAltersstufe && (
-                      <div className={styles.abzeichenConfirm}>
-                        {(() => {
-                          const abz = ABZEICHEN_KATALOG.find((a) => a.id === selectedAbzeichenId)
-                          return (
-                            <>
-                              <strong>{abz?.name}</strong>
-                              <span className={styles.abzeichenConfirmMeta}>
-                                {abz?.anforderungen.length} Anforderung{abz && abz.anforderungen.length !== 1 ? 'en' : ''}
-                              </span>
-                            </>
-                          )
-                        })()}
-                      </div>
-                    )}
-                  </>
-                )}
-              </div>
-            )}
-          </div>
-
+                  </div>
+                ),
+              },
+            ]}
+          />
           {error && <p className={styles.error}>{error}</p>}
         </div>
       )}
@@ -1554,25 +1746,37 @@ export function NewPlanungWizard({ open, onClose, onCreated, initialZeitraum }: 
       {/* ── Step: Vorschau & Zusammenfassung ─────────────────── */}
       {currentStep === 'vorschau' && (
         <div className={styles.section}>
-          {/* Name + Metadaten nebeneinander */}
-          <div className={styles.summaryHeader}>
-            <Input
-              label="Name der Planung"
-              placeholder={autoName || 'wird aus dem Zeitraum abgeleitet'}
-              value={nameOverride}
-              onChange={(e) => setNameOverride(e.target.value)}
-              hint={autoName && !nameOverride ? `Vorschlag: ${autoName}` : undefined}
-            />
-            <div className={styles.summaryMeta}>
-              <span className={styles.summaryMetaItem}>
-                <span className={styles.summaryMetaValue}>{activeMeetingCount}</span> Treffen
+          <Input
+            label="Eigener Name (optional)"
+            placeholder={autoName || 'z.B. Frühling 2026'}
+            value={nameOverride}
+            onChange={(e) => setNameOverride(e.target.value)}
+            hint={autoName && !nameOverride ? `Sonst: „${autoName}"` : undefined}
+            className={styles.summaryNameInput}
+          />
+          <div className={styles.summaryMetaWidget}>
+            <div className={styles.summaryMetaBlock}>
+              <span className={styles.summaryMetaBlockValueLg}>{activeMeetingCount}</span>
+              <span className={styles.summaryMetaBlockLabel}>Treffen</span>
+            </div>
+            <span className={styles.summaryMetaConnector}>von je</span>
+            <div className={styles.summaryMetaBlock}>
+              <span className={styles.summaryMetaBlockValue}>{dauer} min</span>
+              <span className={styles.summaryMetaBlockLabel}>Dauer</span>
+            </div>
+            <span className={styles.summaryMetaConnector}>zwischen</span>
+            <div className={styles.summaryMetaBlock}>
+              <span className={styles.summaryMetaBlockValue}>
+                {formatDateShort(start)} – {formatDateShort(ende)}
               </span>
-              <span className={styles.summaryMetaSep}>·</span>
-              <span className={styles.summaryMetaItem}>{dauer} min</span>
-              <span className={styles.summaryMetaSep}>·</span>
-              <span className={styles.summaryMetaItem}>
+              <span className={styles.summaryMetaBlockLabel}>Zeitraum</span>
+            </div>
+            <span className={styles.summaryMetaConnector}>jeweils</span>
+            <div className={styles.summaryMetaBlock}>
+              <span className={styles.summaryMetaBlockValue}>
                 {WEEKDAY_LABELS[weekday]}, {RHYTHMUS_LABELS[rhythmusK]}
               </span>
+              <span className={styles.summaryMetaBlockLabel}>Rhythmus</span>
             </div>
           </div>
 
@@ -1598,7 +1802,7 @@ export function NewPlanungWizard({ open, onClose, onCreated, initialZeitraum }: 
 
             {/* WB-Schwerpunkt */}
             <div className={styles.summaryZielRow}>
-              <span className={styles.summaryZielLabel}>WB-Schwerpunkt</span>
+              <span className={styles.summaryZielLabel}>Wachstumsbereich</span>
               {wbModus === 'ausgewogen' ? (
                 <span className={styles.summaryZielValue}>Ausgewogen</span>
               ) : (
@@ -1629,20 +1833,43 @@ export function NewPlanungWizard({ open, onClose, onCreated, initialZeitraum }: 
             {/* Andachtsreihe */}
             <div className={styles.summaryZielRow}>
               <span className={styles.summaryZielLabel}>Andachtsreihe</span>
-              {andachtEnabled && andachtTitel ? (
-                <span className={styles.summaryZielValue}>
-                  {andachtTitel}
-                  {andachtEinheiten.length > 0 && (
-                    <span className={styles.summaryZielMeta}>
-                      {' '}({andachtEinheiten.length} Einheit{andachtEinheiten.length !== 1 ? 'en' : ''})
+              {(() => {
+                if (andachtMode === 'new' && andachtTitel) {
+                  const validCount = andachtEinheiten.filter((e) => e.titel.trim()).length
+                  return (
+                    <span className={styles.summaryZielValue}>
+                      {andachtTitel}
+                      {validCount > 0 && (
+                        <span className={styles.summaryZielMeta}>
+                          {' '}({validCount} Einheit{validCount !== 1 ? 'en' : ''})
+                        </span>
+                      )}
                     </span>
-                  )}
-                </span>
-              ) : andachtEnabled ? (
-                <span className={styles.summaryZielMeta}>Aktiviert, noch ohne Titel</span>
-              ) : (
-                <span className={styles.summaryZielMeta}>Nicht festgelegt</span>
-              )}
+                  )
+                }
+                if (andachtMode === 'reihe' && andachtReiheId) {
+                  const r = availableReihen.find((x) => x.id === andachtReiheId)
+                  return r ? (
+                    <span className={styles.summaryZielValue}>
+                      {r.name}
+                      <span className={styles.summaryZielMeta}>
+                        {' '}({r.einheiten.length} Einheit{r.einheiten.length !== 1 ? 'en' : ''})
+                      </span>
+                    </span>
+                  ) : <span className={styles.summaryZielMeta}>—</span>
+                }
+                if (andachtMode === 'sammlung' && selectedSammlung) {
+                  return (
+                    <span className={styles.summaryZielValue}>
+                      {selectedSammlung.name}
+                      <span className={styles.summaryZielMeta}>
+                        {' '}({andachtAusgewaehlt.size} aktiviert)
+                      </span>
+                    </span>
+                  )
+                }
+                return <span className={styles.summaryZielMeta}>Nicht festgelegt</span>
+              })()}
             </div>
 
             {/* Abzeichen */}
@@ -1650,10 +1877,19 @@ export function NewPlanungWizard({ open, onClose, onCreated, initialZeitraum }: 
               <span className={styles.summaryZielLabel}>Abzeichen</span>
               {selectedAbzeichenId ? (
                 <span className={styles.summaryZielValue}>
-                  {ABZEICHEN_KATALOG.find((a) => a.id === selectedAbzeichenId)?.name ?? '—'}
-                  <span className={styles.summaryZielMeta}>
-                    {' '}({selectedAltersstufe ? ALTERSSTUFE_LABELS[selectedAltersstufe] : '—'})
-                  </span>
+                  {(() => {
+                    const abz = ABZEICHEN_KATALOG.find((a) => a.id === selectedAbzeichenId)
+                    return (
+                      <>
+                        {abz?.name ?? '—'}
+                        {abz?.altersstufe && (
+                          <span className={styles.summaryZielMeta}>
+                            {' '}({ALTERSSTUFE_LABELS[abz.altersstufe]})
+                          </span>
+                        )}
+                      </>
+                    )
+                  })()}
                 </span>
               ) : (
                 <span className={styles.summaryZielMeta}>Nicht festgelegt</span>

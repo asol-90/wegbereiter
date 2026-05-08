@@ -92,31 +92,46 @@ Zwei Komponenten: Kontextleiste für Kalender-/Listenansicht und überarbeitete 
 
 **Kontextleiste (11B)**: Rechter Panel in Kalender-/Listenansicht. WB-Sektion immer sichtbar (Donut + WBGoalBars mit Zielintervallen aus `wbZielverteilung.ts` + Charakterisierungs-Label). Andachtsreihe, Abzeichen und Stamm-Kontext als exclusive AccordionGroup mit Fortschritts-Badge. Checklisten mit Häkchen/Counter/Tooltip. Native HTML Drag-to-assign: CheckRows als Drag-Source, TreffenKarten als Drop-Target mit visuellem Feedback (inset box-shadow). Abzeichen aus `ABZEICHEN_KATALOG` (in-memory), Andachtsreihen aus IndexedDB. Wizard speichert Andachtsreihe in IDB. 131 Tests grün.
 
+### Phase 12 — Repertoire überarbeiten
+SegmentedControl mit 4 Bereichen: Aktivitäten (allg.), Pfadfindertechnik (mit Subkategorie-Überschriften), Andachtsreihen (Reihe vs. Sammlung), Abzeichen (read-only Katalog). Datenmodell erweitert um `Andachtsreihe` (art/buchquelle) + `AndachtsEinheit` (kapitelSeite) + `Planung.andachtsreihenZuordnung`. RepertoireStore um andachtsreihen + abzeichen ergänzt. Aktivitäten-Detail um Quell-Filter, Temp-Banner, Stufenbezug und Verwendungs-Anzeige erweitert.
+
 ---
 
 ## Offene Phasen
-
-### Phase 12 — Repertoire überarbeiten
-
-Vier Segmente statt drei Tabs. Konzeptionell durchdiskutiert, Details in `PHASE-12-SCOPE.md`. Kernaufgaben:
-
-1. **SegmentedControl mit 4 Bereichen**: Aktivitäten (allg.) · Pfadfindertechnik (eigener Tab mit Subkategorie-Überschriften) · Andachtsreihen (Reihe vs. Sammlung) · Abzeichen (read-only Katalog)
-2. **Andachtsreihen**: Reihe (sequenziell, komplett folgen) vs. Sammlung (Pool, Auswahl pro Planung). Buchquelle als Feld an der Reihe (Titel + Autor), Kapitel/Seite pro Einheit. Alle editierbar, auch planungsgebundene.
-3. **Abzeichen**: Read-only-Anzeige. Anforderungen sind abstrakt (Konkretisierung bei Treffen-Planung). „Ins Repertoire"-Button übernimmt Anforderung als Aktivität.
-4. **Aktivitäten erweitert**: Quell-Filter, Temp-Banner, Themen-Tags, Stufenbezug, Verwendungs-Anzeige im Detail.
-5. **Datenmodell**: `Andachtsreihe` + art/buchquelle, `AndachtsEinheit` + kapitelSeite, `Planung.andachtsreihenZuordnung` mit optionaler Einheiten-Auswahl für Sammlungen.
-6. **Store**: RepertoireStore um andachtsreihen + abzeichen erweitern.
-
----
 
 ### Phase 13 — Ablauf-Korrekturen
 
 Verschiedene Fehler und Inkonsistenzen im bestehenden Ablauf korrigieren:
 
-1. **Zeiten bei Initiierung**: Zeitraum-Berechnung und Termin-Generierung im Wizard prüfen und korrigieren.
-2. **Stammkontext bei Initiierung**: Verhalten wenn kein Stammkontext verbunden ist — kein Fehler, sondern sauberer Fallback. Stammkontext-Schritt im Wizard optional und klar kommuniziert.
-3. **Stammkontext als Planungsgrenzen**: Nutzung des Stammkontext-Zeitraums als Vorschlag/Begrenzung für den Planungszeitraum verbessern.
-4. **Planungsansicht (Monatskalender)**: Sinn und Interaktion der Kalenderansicht überdenken — was zeigt der Kalender, was kann man dort tun, wie verhält sich der Zusammenhang mit der Listenansicht.
+13a Überarbeitung der Initiierung
+- **Beenden des Dialogs**: Ein Klick außerhalb schließt den Dialog nicht mehr (dazu nur das x oder Esc)
+- 1 – Teamplanung
+  - **Zeiten bei Initiierung**: Zwei unterschiedliche Algorithmen für Vorschläge bei Start- und bei Endzeit. Bei der Initiierung wird entsprechend unter den Datumsfeldern der Grund für den Vorschlag angezeigt (bspw.: Beginnt/Endet mit Stammkontext/Herbstferien; Beginnt in Anschluss an vorherige Planung; …). Lücke zwischen Begründung und Datumsfeld schließen.
+  - **UI/UX bei Anlegen von Mitarbeitern** Überschrift über der Festlegung der Mitarbeiter („Mitarbeiter“). Plusbutton entfernen, bzw. in Inputfeld integrieren. Klick auf plus oder Enter legt neuen Mitarbeiter an. Das Inputfeld erscheint dann nicht unterhalb sondern inline (ggf. Zeilenumbruch, wenn kein Platz mehr in der Zeile)
+  - Während des Stammkontextes sollen keine „Regel-Termine“ erstellt werden. Bei Überlappung von Planung und Stammkontext gibt es Regeltermine nur außerhalb des Stammkontexts.
+- 2 – Stamm-Kontext
+  - **Stammkontext bei Initiierung**: Verhalten wenn kein Stammkontext verbunden ist — kein Fehler, sondern sauberer Fallback. Stammkontext-Schritt im Wizard optional und klar kommuniziert.
+  - Wenn ein Stammkontext angezeigt wird, sollen auch die Aktivitäten hervorgehoben werden (oberhalb der Aktionen, ähnliche Präsenz)
+- 3 – Zielsetzung
+  - Anstatt einzelner Blöcke ein Akkordeon (nicht exklusiv) mit Überschriften, die denen in den anderen Schritten gleichen
+  - „WB“ als Abkürzung wurde nur intern für die Entwicklung des Tools verwenden. In der UI bitte immer Wachstumsbereich(e). Die Auswahl von WB Zielen verfeinern (wirkt klobig, die Hervorhebung des gewählten Bereichs funktioniert nicht gut, bei Haupt/Neben wird nicht deutlich was was ist)
+  - Bei Andachten muss es möglich sein, die Andachtsreihen/-sammlungen aus dem Repertoire zu nutzen. Weiter braucht es die Möglichkeit, hier selbst anzulegen (UI und UX (!) muss auch hier deutlich einfach sein – bspw. nach Eingabe eines Themas direkt das Tippen des nächsten ermöglichen)
+  - Bei der Auswahl einer Andachtssammlung (nicht Reihen!) ist es sinnvoll, die Sammlung zu listen (als inaktive Andachten). Klick auf Andacht aktiviert diesen und ein Counter zeigt an, wie viele Treffen im Planungszeitraum sind (ggf. wie viele Treffen eine Stammandacht haben) und wie viele Andachten aus der Sammlung aktiviert wurden. Nur aktivierte Andachten landen im Andachtsreihenziel
+- 4 – Vorschau
+  - Es muss deutlicher werden, dass man einen Namen eintragen kann. Außerdem mehr Raum für die Meta-Daten rechts vom Namensfeld und diese präsenter dargestellt
+
+13b Planungsansicht (Monatskalender):
+- es muss möglich sein, Treffen zu löschen, neue Treffen oder Aktionen hinzuzufügen. Beim hinzufügen und entfernen von Treffen Kaskade beachten 
+  - klick auf Datum ohne Treffen/Aktion: Menu mit zwei Optionen (Treffen/Aktion hinzufügen)
+  - klick auf Datum mit Treffen/Aktion: overlay anzeigen. Das Overlay sollte für eigene Aktionen und reguläre Treffen einen Löschenbutton haben (Papierkorb), für Stammaktionen und -treffen einen Abmelden-Button.
+  - Stammaktionen und -treffen erscheinen als Cards im Kalender (so wie jetzt die Treffen), solange das Team davon nicht abgemeldet ist. Ein weiterer Klick auf so ein Datum ermöglicht neben Treffen/Aktion anlegen auch das wieder anmelden.
+- bei der Drag-Geste zur Markierung von Abwesenheit ist das Datum (start und ende der Abwesenheit) nicht sichtbar
+  - Crosshover bei Drag-Geste und Hover über eine Planung soll nicht nur Treffen hervorheben, sondern den kompletten Zeitraum im Kalender mittels Hintergrundfarbe hervorheben
+- der Löschen-Button im Abwesenheitsbalken soll zentriert sein
+- die Anwesenheitsliste
+  - braucht oberhalb der Avatare etwas mehr Luft. Auch der erste Monatsname ist halb abgeschnitten
+  - rechts von den Avataren: Möglichkeit, nachträglich Teammitglieder hinzuzufügen. Avatare etwas größer.
+  - unterhalb der Liste einen Button: weiter zur Detailplanung
 
 ---
 
@@ -145,13 +160,13 @@ Die Farbzuordnung hilft später bei der visuellen Zuordnung im Kalender: Denim-B
 
 ---
 
-### Phase 13 — Export
+### Phase 15 — Export
 
 PDF-Export der Planung (Treffenliste mit Programmpunkten, WB-Übersicht, Stammkontext-Zusammenfassung). iCal-Export (Treffen als Kalender-Einträge). Details bei Umsetzung zu klären.
 
 ---
 
-### Phase 14 — Raster
+### Phase 16 — Raster
 
 Templates für den Team-Freiraum zwischen Stamm-Blöcken.
 
@@ -170,7 +185,7 @@ Templates für den Team-Freiraum zwischen Stamm-Blöcken.
 
 ---
 
-### Phase 15 — Polish / A11y / Performance
+### Phase 17 — Polish / A11y / Performance
 
 Keyboard-Shortcuts (ohne ⌘K-Global). Focus-Management. Dark-Mode (falls gewünscht — nicht im Konzept, erst fragen). Bundle-Size-Review.
 
@@ -180,6 +195,6 @@ Keyboard-Shortcuts (ohne ⌘K-Global). Focus-Management. Dark-Mode (falls gewün
 
 1. Dieses Dokument lesen.
 2. `MEMORY.md` im Auto-Memory liefert die wichtigsten stehenden Präferenzen (Konzeptnähe, Hover-Semantik, Stammkontext global).
-3. Aktueller Task-Stand: `TaskList` aufrufen. **Phasen 1–10 sind abgeschlossen**; nächste offene Phase ist **Phase 11 (Kontextleiste + Jahresplaner-Sidebar)**.
+3. Aktueller Task-Stand: `TaskList` aufrufen. **Phasen 1–12 sind abgeschlossen**; nächste offene Phase ist **Phase 13 (Ablauf-Korrekturen)**.
 4. Konzept & Wireframes im Projektordner konsultieren, bevor größere Layouts/Interaktionen gebaut werden. Insbesondere `konzept-planungsziele-kontextleiste.md` für Phase 11 und `PHASE-8-SCOPE.md` für das Stammkontext-Datenmodell.
 5. Nach Abschluss jeder Phase: `tsc --noEmit` + `vitest run` + `vite build --outDir /tmp/vite-verify --emptyOutDir` grün halten.

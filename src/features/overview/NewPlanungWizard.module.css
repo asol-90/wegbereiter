@@ -9,7 +9,8 @@
 
 .step,
 .stepActive,
-.stepDone {
+.stepDone,
+.stepSkipped {
   font-size: 11px;
   font-weight: 500;
   letter-spacing: 0.04em;
@@ -18,6 +19,11 @@
   border: 1px solid var(--brd);
   color: var(--t3);
   background: var(--bg1);
+}
+
+.stepSkipped {
+  opacity: 0.45;
+  text-decoration: line-through;
 }
 
 .stepDone {
@@ -145,6 +151,18 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
+}
+
+.dateField {
+  display: flex;
+  flex-direction: column;
+}
+
+.dateReason {
+  margin: 2px 0 0;
+  font-size: 11px;
+  color: var(--t3);
+  line-height: 1.3;
 }
 
 .bisField {
@@ -288,20 +306,41 @@
   color: var(--t1);
 }
 
-.teamAddRow {
-  display: flex;
-  gap: 8px;
+.teamInlineInput {
+  flex: 0 1 160px;
+  min-width: 100px;
+  height: 26px;
+  padding: 0 10px;
+  border: 1px dashed var(--brd);
+  border-radius: 999px;
+  background: transparent;
+  font-size: 12px;
+  font-family: inherit;
+  color: var(--t1);
+  outline: none;
+  transition: border-color var(--dur-fast) var(--ease),
+    background var(--dur-fast) var(--ease);
 }
 
-.teamAddRow input {
-  flex: 1;
-  min-width: 0;
+.teamInlineInput::placeholder {
+  color: var(--t3);
+}
+
+.teamInlineInput:hover {
+  border-color: var(--t3);
+}
+
+.teamInlineInput:focus {
+  border-style: solid;
+  border-color: var(--t1);
+  background: var(--bg2);
+  border-radius: 999px;
+  outline: none;
 }
 
 /* ─── Termin-Vorschau ───────────────────────────────────────────────── */
 
 .terminList {
-  margin-top: 4px;
   border: 1px solid var(--brd);
   border-radius: var(--r-md);
   overflow: hidden;
@@ -575,12 +614,24 @@
 
 .kontextSectionLabel {
   display: block;
-  font-size: 10px;
-  letter-spacing: 0.06em;
+  font-size: 11px;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
   color: var(--t3);
   font-weight: 500;
   margin-bottom: 6px;
+}
+
+/* Section labels in wizard steps (Zeitraum, Termine, Mitarbeiter) */
+.sectionLabel {
+  display: block;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--t3);
+  font-weight: 500;
+  margin-top: 6px;
+  margin-bottom: -2px;
 }
 
 .kontextAktivitaetenSection {
@@ -588,29 +639,39 @@
   flex-direction: column;
 }
 
-.kontextAktivitaetenGrid {
+.kontextAktivitaetenList {
   display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
+  flex-direction: column;
+  gap: 4px;
 }
 
-.kontextAktivitaetChip {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 4px;
-  padding: 3px 10px;
-  border-radius: var(--r-pill);
-  background: var(--bg2);
+.kontextAktivitaetRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 10px;
+  border-radius: var(--r-md);
+  background: rgba(15, 110, 86, 0.06);
   font-size: 12px;
+}
+
+.kontextAktivitaetTyp {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--t-ok);
+  min-width: 70px;
 }
 
 .kontextAktivitaetName {
   color: var(--t1);
+  font-weight: 500;
 }
 
-.kontextAktivitaetTyp {
+.kontextAktivitaetDauer {
   color: var(--t3);
-  font-size: 10px;
+  font-size: 11px;
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
 }
 
 .kontextAktionen {
@@ -672,39 +733,52 @@
 
 /* ─── Step 3: Vorschau / Zusammenfassung ────────────────────────────── */
 
-.summaryHeader {
-  display: flex;
-  align-items: flex-end;
-  gap: 16px;
+.summaryNameInput input {
+  font-size: 16px;
+  padding: 10px 12px;
+  border: 1px solid var(--t3);
+  background: var(--bg1);
 }
 
-.summaryHeader > :first-child {
-  flex: 1;
+.summaryNameInput input:focus {
+  border-color: var(--t1);
 }
 
 .summaryMeta {
   display: flex;
-  align-items: center;
-  gap: 6px;
-  padding-bottom: 6px; /* align with input baseline */
-  white-space: nowrap;
-  flex-shrink: 0;
+  flex-wrap: wrap;
+  gap: 6px 20px;
+  padding: 10px 14px;
+  border-radius: var(--r-md);
+  background: var(--bg2);
 }
 
-.summaryMetaItem {
-  font-size: 12px;
-  color: var(--t2);
+.summaryMetaRow {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+}
+
+.summaryMetaLabel {
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--t3);
+  font-weight: 500;
+  align-self: center;
+}
+
+.summaryMetaText {
+  font-size: 13px;
+  color: var(--t1);
+  font-variant-numeric: tabular-nums;
 }
 
 .summaryMetaValue {
   font-family: var(--serif);
+  font-size: 18px;
   font-weight: 600;
   color: var(--t1);
-}
-
-.summaryMetaSep {
-  color: var(--t3);
-  font-size: 12px;
 }
 
 .summaryKontext {
@@ -827,50 +901,12 @@
   gap: 8px;
 }
 
-/* ─── Step 2: Ziele — Collapsible sections ──────────────────────────── */
-
-.zieleSection {
-  border: 1px solid var(--brd);
-  border-radius: var(--r-md);
-  overflow: hidden;
-}
-
-.zieleSectionHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  padding: 10px 12px;
-  background: var(--bg2);
-  border: none;
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--t1);
-  transition: background var(--dur-fast) var(--ease);
-}
-
-.zieleSectionHeader:hover {
-  background: var(--bg3);
-}
-
-.zieleSectionArrow {
-  display: inline-block;
-  transition: transform var(--dur-fast) var(--ease);
-  font-size: 12px;
-}
-
-.zieleSectionArrow.arrowOpen {
-  transform: rotate(180deg);
-}
+/* ─── Step 2: Ziele — Accordion body content layout ────────────────── */
 
 .zieleSectionBody {
-  padding: 12px;
   display: flex;
   flex-direction: column;
   gap: 8px;
-  background: var(--bg1);
-  border-top: 1px solid var(--brd);
 }
 
 /* ─── WB-Schwerpunkt ────────────────────────────────────────────────── */
@@ -918,15 +954,22 @@
 }
 
 .wbChip {
-  padding: 6px 10px;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
   border-radius: var(--r-pill);
   border: 1px solid var(--brd);
-  border-left: 3px solid transparent;
   background: var(--bg2);
   color: var(--t2);
   font-size: 12px;
   cursor: pointer;
   transition: all var(--dur-fast) var(--ease);
+}
+
+.wbChipLabel {
+  line-height: 1;
 }
 
 .wbChip:hover {
@@ -935,9 +978,32 @@
 }
 
 .wbChipSelected {
-  background: var(--bg2);
-  color: var(--t1);
+  background: var(--wb-chip-color, var(--bg2));
+  color: white;
+  border-color: var(--wb-chip-color, var(--brd));
   font-weight: 500;
+  padding-right: 8px;
+}
+
+.wbChipSelected:hover {
+  filter: brightness(0.95);
+  background: var(--wb-chip-color, var(--bg2));
+  color: white;
+}
+
+.wbChipBubble {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--wb-chip-color, var(--t1));
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
 }
 
 /* ─── Toggle buttons ────────────────────────────────────────────────── */
@@ -960,6 +1026,171 @@
 }
 
 /* ─── Andachtsreihe ────────────────────────────────────────────────── */
+
+.andachtModeRow {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.andachtModeBtn {
+  padding: 6px 12px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--brd);
+  background: var(--bg2);
+  color: var(--t2);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--dur-fast) var(--ease);
+}
+
+.andachtModeBtn:hover {
+  background: var(--bg3);
+  color: var(--t1);
+}
+
+.andachtModeBtnActive {
+  background: var(--t1);
+  color: var(--bg1);
+  border-color: var(--t1);
+}
+
+.andachtHint {
+  margin: 0;
+  font-size: 12px;
+  color: var(--t3);
+  font-style: italic;
+}
+
+.andachtRepertoireList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.andachtRepertoireItem {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 8px 10px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--brd);
+  background: var(--bg1);
+  cursor: pointer;
+  text-align: left;
+  transition: all var(--dur-fast) var(--ease);
+}
+
+.andachtRepertoireItem:hover {
+  background: var(--bg2);
+  border-color: var(--t2);
+}
+
+.andachtRepertoireItemSelected {
+  background: var(--bg2);
+  border-color: var(--t1);
+  border-left: 3px solid var(--t1);
+}
+
+.andachtRepertoireName {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--t1);
+}
+
+.andachtRepertoireMeta {
+  font-size: 11px;
+  color: var(--t3);
+}
+
+.andachtCounter {
+  padding: 6px 10px;
+  border-radius: var(--r-md);
+  background: var(--bg2);
+  font-size: 12px;
+  color: var(--t2);
+  font-variant-numeric: tabular-nums;
+}
+
+.andachtCounterMeta {
+  color: var(--t3);
+  font-size: 11px;
+}
+
+.andachtSammlungList {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  max-height: 240px;
+  overflow-y: auto;
+  border: 1px solid var(--brd);
+  border-radius: var(--r-md);
+}
+
+.andachtSammlungItem {
+  display: grid;
+  grid-template-columns: 22px 1fr auto;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  font-size: 12px;
+  color: var(--t3);
+  border-bottom: 1px solid var(--brd);
+  transition: background var(--dur-fast) var(--ease);
+}
+
+.andachtSammlungItem:last-child {
+  border-bottom: none;
+}
+
+.andachtSammlungItem:hover {
+  background: var(--bg2);
+}
+
+.andachtSammlungItemActive {
+  color: var(--t1);
+  background: rgba(15, 110, 86, 0.06);
+}
+
+.andachtSammlungItemActive:hover {
+  background: rgba(15, 110, 86, 0.1);
+}
+
+.andachtSammlungCheck {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  border: 1px solid var(--brd);
+  background: var(--bg1);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--t-ok);
+}
+
+.andachtSammlungItemActive .andachtSammlungCheck {
+  border-color: var(--t-ok);
+  background: var(--t-ok);
+  color: white;
+}
+
+.andachtSammlungTitle {
+  font-weight: 500;
+}
+
+.andachtSammlungMeta {
+  font-size: 11px;
+  color: var(--t3);
+  white-space: nowrap;
+}
 
 .andachtList {
   display: flex;
@@ -1130,4 +1361,168 @@
 .abzeichenConfirmMeta {
   color: var(--t3);
   margin-left: auto;
+}
+
+/* ─── WB Tabs (Modus-Auswahl) ───────────────────────────────────────── */
+
+.wbTabRow {
+  display: flex;
+  border-bottom: 1px solid var(--brd);
+  gap: 0;
+  margin-bottom: 2px;
+}
+
+.wbTab {
+  padding: 5px 10px;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  background: transparent;
+  color: var(--t3);
+  font-size: 12px;
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color var(--dur-fast) var(--ease),
+    border-color var(--dur-fast) var(--ease);
+}
+
+.wbTab:hover {
+  color: var(--t2);
+}
+
+.wbTabActive {
+  color: var(--t1);
+  border-bottom-color: var(--t1);
+}
+
+/* ─── WB Modus-Beschreibung ─────────────────────────────────────────── */
+
+.wbModeDesc {
+  margin: 0;
+  font-size: 12px;
+  color: var(--t2);
+  font-style: italic;
+}
+
+/* ─── WB Checkbox-Liste ─────────────────────────────────────────────── */
+
+.wbCheckList {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.wbCheckRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 8px;
+  border-radius: var(--r-md);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  width: 100%;
+  text-align: left;
+  font-family: inherit;
+  transition: background var(--dur-fast) var(--ease);
+}
+
+.wbCheckRow:hover:not(:disabled) {
+  background: var(--bg2);
+}
+
+.wbCheckRow:disabled {
+  cursor: default;
+}
+
+.wbColorBar {
+  width: 3px;
+  height: 20px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.wbCheckLabel {
+  flex: 1;
+  font-size: 13px;
+  color: var(--t1);
+  text-align: left;
+}
+
+.wbCheckIcon {
+  width: 20px;
+  height: 20px;
+  border-radius: 5px;
+  border: 1.5px solid var(--brd2);
+  background: var(--bg1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 700;
+  color: transparent;
+  transition: all var(--dur-fast) var(--ease);
+}
+
+.wbCheckIconChecked {
+  border-color: var(--wb-check-color, var(--t1));
+  background: var(--wb-check-color, var(--t1));
+  color: white;
+}
+
+.wbCheckRow:disabled .wbCheckIcon {
+  opacity: 0.55;
+}
+
+/* ─── Vorschau Meta-Widget ──────────────────────────────────────────── */
+
+.summaryMetaWidget {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 0;
+  padding: 14px 10px;
+  background: var(--bg2);
+  border-radius: var(--r-md);
+}
+
+.summaryMetaBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.summaryMetaBlockValue {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--t1);
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+
+.summaryMetaBlockValueLg {
+  font-family: var(--serif);
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--t1);
+  line-height: 1;
+}
+
+.summaryMetaBlockLabel {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--t3);
+  font-weight: 500;
+}
+
+.summaryMetaConnector {
+  font-size: 11px;
+  color: var(--t3);
+  font-style: italic;
 }

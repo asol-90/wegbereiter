@@ -148,7 +148,7 @@ function TreffenPreview({
         {treffen.titel ?? 'Treffen'}
       </div>
       <div className={styles.previewRow}>
-        <span className={styles.previewLabel}>WB</span>
+        <span className={styles.previewLabel}>Wachstumsbereiche</span>
         <div className={styles.previewWb}>
           {WB_KEYS.map((key) => {
             const tag = treffen.programm
