@@ -1,4 +1,12 @@
-/* Sliding-pill segmented. Mirrors `.nav-toggle` from app-shell-v3.html. */
+/* Outer wrapper: pill track on top, labels row below */
+.wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+}
+
+/* The beige pill track */
 .root {
   position: relative;
   display: inline-flex;
@@ -12,7 +20,7 @@
 .slot {
   position: relative;
   z-index: 1;
-  width: 30px;
+  width: 44px;
   height: 28px;
   display: inline-flex;
   align-items: center;
@@ -47,11 +55,11 @@
   outline-offset: 2px;
 }
 
-/* The white pill that glides behind the active slot. */
+/* Sliding white pill */
 .slider {
   position: absolute;
   top: 3px;
-  width: 30px;
+  width: 44px;
   height: 28px;
   background: var(--bg1);
   border-radius: var(--r-pill);
@@ -63,6 +71,25 @@
 }
 
 .root[data-pos='0'] .slider { left: 3px; }
-.root[data-pos='1'] .slider { left: calc(3px + 30px + 2px); }
-.root[data-pos='2'] .slider { left: calc(3px + 2 * (30px + 2px)); }
+.root[data-pos='1'] .slider { left: calc(3px + 44px + 2px); }
 .root[data-pos='none'] .slider { opacity: 0; }
+
+/* Labels row — same total width as the pill track */
+.labels {
+  display: flex;
+  width: 100%;
+}
+
+.label {
+  flex: 1;
+  text-align: center;
+  font-size: 9px;
+  letter-spacing: 0.02em;
+  color: var(--t3);
+  user-select: none;
+  transition: color var(--dur-fast) var(--ease);
+}
+
+.labelActive {
+  color: var(--t1);
+}

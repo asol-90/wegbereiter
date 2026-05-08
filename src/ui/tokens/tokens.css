@@ -32,6 +32,10 @@
   /* ─── Stammkontext ─── */
   --stamm: #0f6e56;
 
+  /* ─── Distrikt / Region (Denim-Blau) ─── */
+  --denim: #4a6fa5;
+  --denim-light: #bfd4ee;
+
   /* ─── Wachstumsbereiche (WB) ─── */
   --wb-k: #d85a30; /* körperlich */
   --wb-g: #1d9e75; /* gesellschaftlich */

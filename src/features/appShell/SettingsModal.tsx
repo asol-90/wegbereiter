@@ -10,13 +10,14 @@
  * Bundesland-Wechsel propagiert über `useFerienForYear` reaktiv in den
  * Jahreskalender.
  */
-import { Modal, Select, type SelectOption } from '@/ui/primitives'
+import { Input, Modal, Select, type SelectOption } from '@/ui/primitives'
 import {
   BUNDESLAND_KEYS,
   BUNDESLAND_LABELS,
   WEEKDAYS,
   type BundeslandKey,
   type Rhythmus,
+  type Teilstamm,
   type Weekday,
 } from '@/domain/types'
 import { useGlobalConfig } from '@/features/globalConfig'
@@ -44,6 +45,12 @@ const RHYTHMUS_OPTIONS: SelectOption<RhythmusKey>[] = [
   { value: 'weekly', label: 'wöchentlich' },
   { value: 'biweekly', label: '14-täglich' },
   { value: 'monthly', label: 'monatlich' },
+]
+
+const TEILSTAMM_OPTIONS: SelectOption<Teilstamm | ''>[] = [
+  { value: '', label: '— Teilstamm wählen —' },
+  { value: 'Kundschafter+', label: 'Kundschafter+' },
+  { value: 'Entdecker+', label: 'Entdecker+' },
 ]
 
 const DAUER_OPTIONS: SelectOption<string>[] = [
@@ -108,6 +115,21 @@ export function SettingsModal({ open, onClose }: SettingsModalProps) {
               )
             }}
           />
+          <Select<Teilstamm | ''>
+            label="Teilstamm"
+            options={TEILSTAMM_OPTIONS}
+            value={config.teilstamm ?? ''}
+            onValueChange={(v) => {
+              void patch({ teilstamm: v === '' ? null : v })
+            }}
+          />
+          <Input
+            label="Teamname"
+            value={config.teamname}
+            onChange={(e) => {
+              void patch({ teamname: e.target.value })
+            }}
+          />
         </section>
 
         <section className={styles.section}>
@@ -143,12 +165,6 @@ export function SettingsModal({ open, onClose }: SettingsModalProps) {
           </div>
         </section>
 
-        <section className={styles.sectionMuted}>
-          <h3 className={styles.sectionTitle}>Stamm-Datei &amp; Repertoire</h3>
-          <p className={styles.mutedNote}>
-            Upload und permanente Bibliothek folgen in einer späteren Phase.
-          </p>
-        </section>
       </div>
     </Modal>
   )

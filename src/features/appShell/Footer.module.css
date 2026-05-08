@@ -1,0 +1,64 @@
+.root {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 8px 16px;
+  border-top: 0.5px solid var(--brd);
+  flex-shrink: 0;
+}
+
+.legend {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Small pill — matches the Jahreskalender legend chip style */
+.pill {
+  width: 14px;
+  height: 7px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.pill[data-color='denim'] {
+  background: var(--denim-light);
+  border: 1px solid var(--denim);
+}
+
+.pill[data-color='ferien'] {
+  background: #faeeda;
+  border: 1px solid #c9933a;
+}
+
+.pill[data-color='stamm'] {
+  background: #b8ddd1;
+  border: 1px solid #5daa96;
+}
+
+.pill[data-color='planung'] {
+  background: #d0cdf5;
+  border: 1px solid var(--acc);
+}
+
+.chipLabel {
+  font-size: 10px;
+  color: var(--t2);
+  white-space: nowrap;
+}
+
+.settingsBtn {
+  position: absolute;
+  right: 16px;
+  display: flex;
+  align-items: center;
+}

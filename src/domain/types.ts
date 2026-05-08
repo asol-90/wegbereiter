@@ -96,12 +96,16 @@ export type Rhythmus =
 
 // ─── Global Config ──────────────────────────────────────────────────────────
 
+export type Teilstamm = 'Kundschafter+' | 'Entdecker+'
+
 export type GlobalConfig = {
   bundesland: BundeslandKey | null
   defaultWeekday: Weekday
   defaultRhythmus: Rhythmus
   defaultDauerMinuten: number
   lastActivePlanungId: PlanungId | null
+  teilstamm: Teilstamm | null
+  teamname: string
 }
 
 // ─── Mitarbeiter ────────────────────────────────────────────────────────────

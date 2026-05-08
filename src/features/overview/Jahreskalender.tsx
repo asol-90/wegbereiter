@@ -207,21 +207,6 @@ export function Jahreskalender({
           )
         })}
       </div>
-      <div className={styles.legend}>
-        <div className={styles.legendItem}>
-          <div className={styles.legendChip} />
-          Ferien / Feiertag
-        </div>
-        {stammCoveredMonths.size > 0 && (
-          <div className={styles.legendItem}>
-            <div className={styles.legendChipStamm} />
-            Stamm
-          </div>
-        )}
-        <div className={styles.legendHint}>
-          Hover über Planungskarte oder Markierung
-        </div>
-      </div>
     </div>
   )
 }

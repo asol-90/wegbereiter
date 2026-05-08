@@ -206,6 +206,6 @@ Keyboard-Shortcuts (ohne ⌘K-Global). Focus-Management. Dark-Mode (falls gewün
 
 1. Dieses Dokument lesen.
 2. `MEMORY.md` im Auto-Memory liefert die wichtigsten stehenden Präferenzen (Konzeptnähe, Hover-Semantik, Stammkontext global).
-3. Aktueller Task-Stand: `TaskList` aufrufen. **Phasen 1–12 sind abgeschlossen**; nächste offene Phase ist **Phase 13 (Ablauf-Korrekturen)**.
+3. Aktueller Task-Stand: `TaskList` aufrufen. **Phasen 1–12 sind abgeschlossen**; Phase 13 und 14 sind implementiert (Phase 13 ggf. noch uncommitted); nächste offene Phase ist **Phase 15 (Export)**.
 4. Konzept & Wireframes im Projektordner konsultieren, bevor größere Layouts/Interaktionen gebaut werden. Insbesondere `konzept-planungsziele-kontextleiste.md` für Phase 11 und `PHASE-8-SCOPE.md` für das Stammkontext-Datenmodell.
 5. Nach Abschluss jeder Phase: `tsc --noEmit` + `vitest run` + `vite build --outDir /tmp/vite-verify --emptyOutDir` grün halten.

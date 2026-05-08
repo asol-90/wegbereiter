@@ -8,6 +8,7 @@
  */
 import { Outlet } from 'react-router-dom'
 import { Topbar } from './Topbar'
+import { Footer } from './Footer'
 import styles from './AppShell.module.css'
 
 export function AppShell() {
@@ -18,6 +19,7 @@ export function AppShell() {
         <div className={styles.content}>
           <Outlet />
         </div>
+        <Footer />
       </div>
     </div>
   )

@@ -112,5 +112,7 @@ export function defaultGlobalConfig(): GlobalConfig {
     defaultRhythmus: { kind: 'weekly' },
     defaultDauerMinuten: 90,
     lastActivePlanungId: null,
+    teilstamm: null,
+    teamname: '',
   }
 }

@@ -10,7 +10,9 @@ const KEY = 'singleton'
 export async function getGlobalConfig(): Promise<GlobalConfig> {
   const db = await getDB()
   const cfg = await db.get('globalConfig', KEY)
-  return cfg ?? defaultGlobalConfig()
+  // Merge with defaults so that new fields added in later phases get their
+  // initial values for users who already have a stored config.
+  return cfg ? { ...defaultGlobalConfig(), ...cfg } : defaultGlobalConfig()
 }
 
 export async function saveGlobalConfig(cfg: GlobalConfig): Promise<void> {
