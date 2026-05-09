@@ -39,3 +39,10 @@
   align-items: center;
   gap: 8px;
 }
+
+.rightSlot {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+}
+

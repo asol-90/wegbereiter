@@ -1,0 +1,326 @@
+.notFound {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  gap: 16px;
+  color: var(--t2);
+  font-size: 14px;
+}
+
+/* ── Editor view (replaces sidebar when a Kontext is open) ── */
+.editorView {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
+.editorHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px 8px 12px;
+  border-bottom: 1px solid var(--br);
+  flex-shrink: 0;
+}
+
+.backBtn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  font-size: 12px;
+  color: var(--t2);
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: var(--r-sm);
+  transition: background 0.1s, color 0.1s;
+  white-space: nowrap;
+}
+
+.backBtn:hover {
+  background: var(--bg2);
+  color: var(--t1);
+}
+
+.editorTitle {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--t1);
+  min-width: 0;
+}
+
+.editorTitle span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.editorContent {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* ── Modals ── */
+.modalBody {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.modalFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.fieldLabel {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--t2);
+}
+
+.fieldInput {
+  width: 100%;
+  padding: 6px 8px;
+  font-size: 13px;
+  border: 1px solid var(--br);
+  border-radius: var(--r-sm);
+  background: var(--bg);
+  color: var(--t1);
+  outline: none;
+  transition: border-color 0.12s;
+  box-sizing: border-box;
+}
+
+.fieldInput:focus {
+  border-color: var(--acc);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--acc) 18%, transparent);
+}
+
+.fieldInputSm {
+  width: 80px;
+  padding: 6px 8px;
+  font-size: 13px;
+  border: 1px solid var(--br);
+  border-radius: var(--r-sm);
+  background: var(--bg);
+  color: var(--t1);
+  outline: none;
+  transition: border-color 0.12s;
+  box-sizing: border-box;
+}
+
+.fieldInputSm:focus {
+  border-color: var(--acc);
+}
+
+.fieldTextarea {
+  width: 100%;
+  padding: 6px 8px;
+  font-size: 13px;
+  border: 1px solid var(--br);
+  border-radius: var(--r-sm);
+  background: var(--bg);
+  color: var(--t1);
+  outline: none;
+  resize: vertical;
+  min-height: 56px;
+  transition: border-color 0.12s;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.fieldTextarea:focus {
+  border-color: var(--acc);
+}
+
+.treffenModalRow {
+  display: flex;
+  gap: 10px;
+}
+
+.treffenModalRow .field {
+  flex: 1;
+}
+
+/* ── DayPicker ── */
+.dayPickerBody {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dayPickerHint {
+  font-size: 13px;
+  color: var(--t2);
+  margin: 0 0 4px;
+}
+
+.dayPickerOption {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--br);
+  border-radius: var(--r-md);
+  background: var(--bg);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.1s, background 0.1s;
+  width: 100%;
+}
+
+.dayPickerOption:hover {
+  border-color: var(--acc);
+  background: color-mix(in srgb, var(--acc) 4%, transparent);
+}
+
+.dayPickerOption > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.dayPickerOptionTitle {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--t1);
+}
+
+.dayPickerOptionDesc {
+  font-size: 11px;
+  color: var(--t3);
+}
+
+/* ── Override-Section (Treffen-Dialog) ── */
+.overrideSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid var(--br);
+  border-radius: var(--r-md);
+}
+
+.overrideSectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.overrideToggleGroup {
+  display: flex;
+  border: 1px solid var(--br);
+  border-radius: var(--r-sm);
+  overflow: hidden;
+}
+
+.overrideToggle {
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 500;
+  background: transparent;
+  border: none;
+  color: var(--t3);
+  cursor: pointer;
+  transition: background 0.1s, color 0.1s;
+}
+
+.overrideToggleActive {
+  background: var(--acc);
+  color: #fff;
+}
+
+/* ── BlockPicker ── */
+.blockPicker {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.blockPickerEmpty {
+  font-size: 12px;
+  color: var(--t4);
+  font-style: italic;
+  margin: 0;
+}
+
+.blockPickerHint {
+  font-size: 11px;
+  color: var(--t3);
+  margin: 0;
+}
+
+.blockPickerRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px;
+  border: 1px solid var(--br);
+  border-radius: var(--r-sm);
+  cursor: grab;
+  background: var(--bg);
+}
+
+.blockPickerRow:active {
+  cursor: grabbing;
+}
+
+.blockPickerName {
+  flex: 1;
+  font-size: 12px;
+  color: var(--t1);
+}
+
+.blockPickerMeta {
+  font-size: 11px;
+  color: var(--t3);
+  flex-shrink: 0;
+}
+
+.blockPickerAvailable {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+.blockPickerAdd {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  font-size: 11px;
+  border: 1.5px dashed color-mix(in srgb, var(--acc) 40%, transparent);
+  border-radius: var(--r-pill);
+  background: none;
+  color: var(--acc);
+  cursor: pointer;
+  transition: border-color 0.1s, background 0.1s;
+}
+
+.blockPickerAdd:hover {
+  border-color: var(--acc);
+  background: color-mix(in srgb, var(--acc) 5%, transparent);
+}
+
+.dragHandle {
+  color: var(--t4);
+  flex-shrink: 0;
+  cursor: grab;
+}

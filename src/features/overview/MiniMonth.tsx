@@ -69,6 +69,10 @@ export type MiniMonthProps = {
   stammAktionen?: StammAktion[]
   /** Distrikt- and Regionaltaktionen that overlap this month (rendered blue). */
   externAktionen?: StammAktion[]
+  /** Optional Kontext-Range: days outside this range are dimmed and non-interactive. */
+  kontextRange?: { start: IsoDate; ende: IsoDate }
+  /** Called when an in-range day cell is clicked (only if kontextRange is set). */
+  onDayClick?: (date: IsoDate) => void
 }
 
 // ─── Color helpers ──────────────────────────────────────────────────────────
@@ -119,6 +123,8 @@ export function MiniMonth({
   stammDates,
   stammAktionen,
   externAktionen,
+  kontextRange,
+  onDayClick,
 }: MiniMonthProps) {
   const grid = buildMonthGrid(year, monthIndex)
   const today = isoToday()
@@ -234,6 +240,11 @@ export function MiniMonth({
               textColor = isWeekend ? TEXT_FERIEN_WE : TEXT_FERIEN
             }
 
+            const isOutOfRange =
+              kontextRange !== undefined &&
+              (cell.iso < kontextRange.start || cell.iso > kontextRange.ende)
+            const isClickable = !isOutOfRange && !!onDayClick
+
             return (
               <div
                 key={ci}
@@ -241,8 +252,12 @@ export function MiniMonth({
                   styles.mmD,
                   isWeekend && !textColor && styles.we,
                   isToday && styles.today,
+                  isOutOfRange && styles.mmDDisabled,
+                  isClickable && styles.mmDClickable,
                 )}
                 title={stammAkt?.titel ?? cls.feiertag?.name ?? cls.ferien?.name}
+                data-out-of-range={isOutOfRange ? '' : undefined}
+                onClick={isClickable ? () => onDayClick!(cell.iso) : undefined}
               >
                 {/* Bands: Ferien, Stammaktionen — all via shared .band */}
                 {bands.map((b, i) => (

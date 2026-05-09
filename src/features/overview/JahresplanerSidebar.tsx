@@ -13,29 +13,20 @@
  * 24 rows (2 per month: top = 1st–15th, bottom = 16th–end). Solid grid lines
  * at month boundaries, dashed at mid-month.
  *
- * Features:
- * - Planungs-Blöcke with cross-hover (highlight matching Planung in Jahreskalender)
- * - Kontext-Balken with info icon + hover tooltip
- * - Drag gesture over empty rows to create a new Planung
- * - Split button (Neue Planung / Kontext laden) + DropZone
+ * Drag on the timeline opens the NewPlanungWizard pre-filled with the selected range.
  */
-import { useCallback, useMemo, useRef, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { format } from 'date-fns'
 import { de } from 'date-fns/locale'
-import { ContextMenu, ConfirmDialog, IconButton, Modal, Input, Button, type MenuItem } from '@/ui/primitives'
+import { ConfirmDialog, IconButton, Modal, Input, Button } from '@/ui/primitives'
 import { Icon } from '@/ui/primitives/Icon'
 import { usePlanungen, usePlanungenActions } from '@/features/planungen'
-import { useStammKontext, useStammKontextActions } from '@/features/stammKontext'
+import { useStammKontext } from '@/features/stammKontext'
 import type { PlanungId, StammKontextId } from '@/domain/ids'
-import type { Planung, StammKontext, Aktivitaet } from '@/domain/types'
-import { parseIso, isoToday } from '@/domain/dateUtils'
-import { parseStammDatei, StammParseError, detectFileType } from '@/domain/stammParser'
-import { checkOverlap, clipKontext } from '@/domain/stammOverlap'
-import { repertoireStore } from '@/features/repertoire/repertoireStore'
+import type { Planung, StammKontext } from '@/domain/types'
+import { parseIso } from '@/domain/dateUtils'
 import { NewPlanungWizard } from './NewPlanungWizard'
-import { StammImportDialog } from './StammImportDialog'
-import { DropZone } from './DropZone'
 import clsx from '@/ui/utils/clsx'
 import styles from './JahresplanerSidebar.module.css'
 
@@ -158,7 +149,6 @@ export function JahresplanerSidebar({
   const { loaded, planungen } = usePlanungen()
   const { remove: removePlanung, update: updatePlanung } = usePlanungenActions()
   const { kontexte } = useStammKontext()
-  const stammActions = useStammKontextActions()
   const navigate = useNavigate()
 
   // ── Delete / edit state ──
@@ -167,20 +157,12 @@ export function JahresplanerSidebar({
   const [editTarget, setEditTarget] = useState<Planung | null>(null)
   const [editName, setEditName] = useState('')
 
-  // ── Wizard / import state ──
+  // ── Wizard state ──
   const [dialogOpen, setDialogOpen] = useState(false)
   const [wizardInitialZeitraum, setWizardInitialZeitraum] = useState<{
     start: string
     ende: string
   } | null>(null)
-  const [menuOpen, setMenuOpen] = useState(false)
-  const [menuAnchor, setMenuAnchor] = useState<{ x: number; y: number } | null>(null)
-  const [parseError, setParseError] = useState<string | null>(null)
-  const [pendingImport, setPendingImport] = useState<{
-    kontext: StammKontext
-    aktivitaeten: Aktivitaet[]
-  } | null>(null)
-  const fileInputRef = useRef<HTMLInputElement>(null)
 
   // ── Drag state ──
   const [dragStart, setDragStart] = useState<number | null>(null)
@@ -197,67 +179,9 @@ export function JahresplanerSidebar({
     [kontexte, displayYear],
   )
 
-  // ── File handling (mirrored from Planungsliste) ──
-  const handleFileDrop = useCallback((content: string, _fileName: string) => {
-    setParseError(null)
-    const fileType = detectFileType(content)
-    if (fileType === 'stammkontext') {
-      try {
-        const result = parseStammDatei(content)
-        setPendingImport(result)
-      } catch (e) {
-        setParseError(
-          e instanceof StammParseError
-            ? e.message
-            : 'Die Datei konnte nicht gelesen werden.',
-        )
-      }
-    } else {
-      setParseError('Unbekanntes Dateiformat. Erwartet: Stammkontext-JSON.')
-    }
-  }, [])
-
-  const handleFileInput = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0]
-      if (!file) return
-      const reader = new FileReader()
-      reader.onload = () => {
-        if (typeof reader.result === 'string') {
-          handleFileDrop(reader.result, file.name)
-        }
-      }
-      reader.readAsText(file)
-      e.target.value = ''
-    },
-    [handleFileDrop],
-  )
-
-  const handleConfirmImport = useCallback(async () => {
-    if (!pendingImport) return
-    const { kontext: incoming, aktivitaeten: incomingAktivitaeten } = pendingImport
-    for (const existing of kontexte) {
-      const result = checkOverlap(existing, incoming)
-      if (result.kind === 'overlap') {
-        const clipped = clipKontext(existing, result.overlapStart)
-        if (clipped) {
-          await stammActions.update(clipped)
-        } else {
-          await stammActions.remove(existing.id)
-        }
-      }
-    }
-    await stammActions.importKontext(incoming)
-    for (const a of incomingAktivitaeten) {
-      await repertoireStore.saveAktivitaet(a)
-    }
-    setPendingImport(null)
-  }, [pendingImport, kontexte, stammActions])
-
   // ── Drag handling ──
   const handleRowMouseDown = useCallback(
     (halfMonthIndex: number, e: React.MouseEvent) => {
-      // Only start drag in the plan column area (not on existing blocks)
       if ((e.target as HTMLElement).closest(`.${styles.planBlock}`)) return
       e.preventDefault()
       setDragStart(halfMonthIndex)
@@ -279,10 +203,8 @@ export function JahresplanerSidebar({
     if (dragStart !== null && dragEnd !== null) {
       const minRow = Math.min(dragStart, dragEnd)
       const maxRow = Math.max(dragStart, dragEnd)
-      // Convert half-month rows back to months
-      const startMonth = Math.floor(minRow / 2) // 0-based month
+      const startMonth = Math.floor(minRow / 2)
       const endMonth = Math.floor(maxRow / 2)
-      // Need at least 1 month span
       if (endMonth >= startMonth) {
         const startDay = minRow % 2 === 0 ? '01' : '15'
         const endDay = maxRow % 2 === 0 ? '15' : new Date(displayYear, endMonth + 1, 0).getDate().toString().padStart(2, '0')
@@ -295,25 +217,6 @@ export function JahresplanerSidebar({
     setDragStart(null)
     setDragEnd(null)
   }, [dragStart, dragEnd, displayYear])
-
-  // ── Menu ──
-  const menuItems: MenuItem[] = [
-    {
-      id: 'planung',
-      label: 'Neue Planung',
-      icon: 'plus',
-      onSelect: () => {
-        setWizardInitialZeitraum(null)
-        setDialogOpen(true)
-      },
-    },
-    {
-      id: 'kontext',
-      label: 'Kontext laden',
-      icon: 'upload',
-      onSelect: () => fileInputRef.current?.click(),
-    },
-  ]
 
   // ── Delete / Edit handlers ──
   const handleDeleteConfirm = useCallback(async () => {
@@ -383,70 +286,33 @@ export function JahresplanerSidebar({
   const hasData = yearPlanungen.length > 0 || yearKontexte.length > 0
 
   return (
-    <DropZone onFileDrop={handleFileDrop}>
-      <div
-        className={styles.root}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={() => {
-          if (isDragging) {
-            setDragStart(null)
-            setDragEnd(null)
-          }
-        }}
-      >
-        {/* Header */}
-        <div className={styles.header}>
-          <span className={styles.sectionLabel}>Planungen & Kontext</span>
-          <div className={styles.headerActions}>
-            <div className={styles.splitBtn}>
-              <button
-                type="button"
-                className={styles.splitMain}
-                onClick={() => {
-                  setWizardInitialZeitraum(null)
-                  setDialogOpen(true)
-                }}
-              >
-                <Icon name="plus" size={12} />
-                <span>Neu</span>
-              </button>
-              <button
-                type="button"
-                className={styles.splitChevron}
-                onClick={(e) => {
-                  const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
-                  setMenuAnchor({ x: rect.right, y: rect.bottom + 4 })
-                  setMenuOpen((prev) => !prev)
-                }}
-                aria-label="Weitere Optionen"
-              >
-                <Icon name="chevron-down" size={12} />
-              </button>
-            </div>
-            {menuOpen && menuAnchor && (
-              <ContextMenu
-                open={menuOpen}
-                sections={[{ id: 'main', items: menuItems }]}
-                position={menuAnchor}
-                onClose={() => setMenuOpen(false)}
-              />
-            )}
-          </div>
+    <div
+      className={styles.root}
+      onMouseUp={handleMouseUp}
+      onMouseLeave={() => {
+        if (isDragging) {
+          setDragStart(null)
+          setDragEnd(null)
+        }
+      }}
+    >
+      {/* Header */}
+      <div className={styles.header}>
+        <span className={styles.sectionLabel}>Planungen & Kontext</span>
+        <div className={styles.headerActions}>
+          <button
+            type="button"
+            className={styles.splitMain}
+            onClick={() => {
+              setWizardInitialZeitraum(null)
+              setDialogOpen(true)
+            }}
+          >
+            <Icon name="plus" size={12} />
+            <span>Neu</span>
+          </button>
         </div>
-
-        {/* Error banner */}
-        {parseError && (
-          <div className={styles.error}>
-            <span>{parseError}</span>
-            <button
-              className={styles.errorDismiss}
-              onClick={() => setParseError(null)}
-              aria-label="Schließen"
-            >
-              ×
-            </button>
-          </div>
-        )}
+      </div>
 
         {/* Timeline */}
         <div className={styles.timeline}>
@@ -631,44 +497,21 @@ export function JahresplanerSidebar({
 
             {/* Empty state */}
             {loaded && !hasData && !isDragging && (
-              <div className={styles.emptyHint}>
-                Ziehen um eine Planung anzulegen
-              </div>
+              <div className={styles.emptyHint}>Ziehen um eine Planung anzulegen</div>
             )}
           </div>
         </div>
 
-        {/* Hidden file input */}
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept=".json"
-          onChange={handleFileInput}
-          style={{ display: 'none' }}
-        />
-
-        {/* Import preview dialog */}
-        {pendingImport && (
-          <StammImportDialog
-            open
-            kontext={pendingImport.kontext}
-            aktivitaeten={pendingImport.aktivitaeten}
-            onConfirm={handleConfirmImport}
-            onCancel={() => setPendingImport(null)}
-          />
-        )}
-
         <NewPlanungWizard
-          open={dialogOpen}
-          onClose={() => {
-            setDialogOpen(false)
-            setWizardInitialZeitraum(null)
-          }}
-          onCreated={(p) => navigate(`/planung/${p.id}/kalender`)}
-          initialZeitraum={wizardInitialZeitraum ?? undefined}
-        />
+            open={dialogOpen}
+            onClose={() => {
+              setDialogOpen(false)
+              setWizardInitialZeitraum(null)
+            }}
+            onCreated={(p) => navigate(`/planung/${p.id}/kalender`)}
+            initialZeitraum={wizardInitialZeitraum ?? undefined}
+          />
 
-        {/* Delete confirmation */}
         <ConfirmDialog
           open={!!deleteTarget}
           onCancel={() => !deleting && setDeleteTarget(null)}
@@ -713,7 +556,6 @@ export function JahresplanerSidebar({
             />
           </div>
         </Modal>
-      </div>
-    </DropZone>
+    </div>
   )
 }

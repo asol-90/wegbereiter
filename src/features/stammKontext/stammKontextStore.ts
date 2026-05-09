@@ -6,8 +6,9 @@
  *
  * StammKontexte are sorted by the date of their first treffen/aktion (earliest first).
  */
-import type { StammKontext } from '@/domain/types'
-import type { StammKontextId } from '@/domain/ids'
+import type { StammKontext, IsoDate } from '@/domain/types'
+import type { StammKontextId, StammImportId } from '@/domain/ids'
+import { newId } from '@/domain/ids'
 import {
   deleteStammKontext,
   getStammKontext,
@@ -107,6 +108,35 @@ export class StammKontextStore {
         this.state.kontexte.filter((x) => x.id !== id),
       ),
     )
+  }
+
+  /**
+   * Create a new empty StammKontext (no treffen, no thema) and persist it.
+   * The `zeitraum` is informational only — callers use it to show context
+   * during creation; dates are added later via the editor.
+   */
+  async create(_zeitraum?: { start: IsoDate; ende: IsoDate }): Promise<StammKontext> {
+    const now = new Date().toISOString()
+    const kontext: StammKontext = {
+      id: newId<StammKontextId>(),
+      stammImportId: newId<StammImportId>(),
+      thema: '',
+      treffen: [],
+      stammaktionen: [],
+      distriktAktionen: [],
+      regionalAktionen: [],
+      defaultAnfangsBlock: [],
+      defaultEndBlock: [],
+      bearbeitetAm: now,
+      importiertAm: now,
+      importierteAktivitaetIds: [],
+    }
+    await saveStammKontext(kontext)
+    const persisted = (await getStammKontext(kontext.id)) ?? kontext
+    this.setState(
+      freezeState(true, [...this.state.kontexte, persisted]),
+    )
+    return persisted
   }
 
   /** Replace an existing Kontext with an updated version. */

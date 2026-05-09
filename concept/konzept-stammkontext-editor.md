@@ -266,3 +266,49 @@ Wird **nicht** in dieser Phase vorbereitet. Die App kennt kein Login, und der Ko
 2. **Thema als Kontext-Label**: Das `thema`-Feld des Stammkontexts dient bereits als primäre Bezeichnung (im Dropdown-Menü und in der Planungs-Zuweisung). Ein separates „Name"-Feld ist nicht nötig — das Thema IS der Name.
 
 3. **Stammkontext-Auswahl in Planungen**: Wenn mehrere Kontexte existieren, muss der Planungs-Wizard (Schritt 2) die Auswahl anbieten. Das ist eine Folgeanpassung an Wizard Schritt 2, aber kein Blocker für dieses Konzept.
+
+---
+
+## Umsetzungsstand (Mai 2026)
+
+### Umgesetzt
+
+**Einstieg & Navigation**
+- Kompass-Dropdown ersetzt durch einen einfachen **KontextToggle**-Button im Topbar (analog zu den anderen Nav-Buttons). Er leuchtet aktiv, solange `/stammkontext/…` geöffnet ist.
+
+**Übersichtsseite (`/stammkontext`)**
+- `KontextSidebar`: vertikaler Jahreskalender mit bestehenden Kontexten als klickbare Blöcke. Drag-Geste auf freiem Bereich öffnet den `NewKontextWizard`.
+- Drop-Zone am unteren Rand für JSON-Import (→ bekannter `StammImportDialog`-Flow).
+- Import-Button (Upload-Icon) im Header als alternative Einstiegsmöglichkeit.
+
+**Neuen Kontext anlegen**
+- `NewKontextWizard`: 2-Schritt-Modal statt des im Konzept beschriebenen inline-Bestätigungs-Banners.
+  - Schritt 1: Von/Bis, Wochentag, Rhythmus; generiert ferien-bewusste Terminliste (Ferien/Feiertag-Daten aus dem Cache, betroffene Termine standardmäßig deaktiviert).
+  - Schritt 2: Thema (Pflicht), Beschreibung, optionale Aktivitäten (Name + Typ).
+  - Nach Abschluss: Kontext + Aktivitäten werden angelegt, Navigation zur Editor-Seite.
+
+**Editor-Seite (`/stammkontext/:id`)**
+- Zweispalten-Layout: `Jahreskalender` links (read-only, ohne Planungs-Daten), Editor-Panel rechts.
+- Header mit Zurück-Link, Thema-Label und JSON-Export-Button.
+- `StammKontextEditorPanel` mit fünf Accordion-Sektionen (alle gleichzeitig offen möglich):
+  - **Thema**: Thema, Beschreibung, Bearbeitungsnotiz, Themen-Tag.
+  - **Stammzeit**: Anfangsblock + Endblock mit Drag-Reorder; jeder Eintrag hat Name, Dauer, Typ.
+  - **Treffen**: Liste chronologisch sortiert; Datum-Picker, Dauer, Anfang-/Ende-Override (Inline-Block-Listen), Hinzufügen/Löschen.
+  - **Aktionen**: Drei faltbare Gruppen (Stamm / Distrikt / Regional) mit Inline-Formularen (Titel, Beginn, Ende, Ort, Beschreibung).
+  - **Aktivitäten**: Kompakte Listenzeilen; Anlegen und Bearbeiten über ein Modal mit Name, Typ, Untertyp, Dauer-Range und WB-Editor. Aktivitäten werden direkt ins Repertoire geschrieben (`quelle: 'stamm-import'`).
+- Auto-Save via debounced `stammKontextStore.update`.
+- JSON-Export serialisiert den aktuellen Kontext im Import-Format.
+
+**Geteilter WB-Editor**
+- `WBAktivitaetEditor` (vier Wachstumsbereiche, vier Intensitätsstufen) ist jetzt sowohl im Stammkontext-Editor (Aktivitäten-Modal) als auch im **Repertoire** (`AktivitaetDetail`) eingebaut und editierbar.
+
+---
+
+### Offen
+
+| Bereich | Was fehlt |
+|---|---|
+| **Jahreskalender links** | Kontext-Daten werden nicht angezeigt. Treffen sollten als waldgrüne Punkte/Boxen erscheinen, Aktionen als farbige Balken (Stamm waldgrün, Distrikt/Regional denim-blau). |
+| **Kalender-Interaktion** | Klick auf freies Datum → Kurzmenü „Treffen / Aktion hinzufügen"; Klick auf bestehendes Element → scrollt Editor-Panel zur entsprechenden Zeile. |
+| **Warn-Toast** | Beim Löschen eines Treffens, das von einer Planung referenziert wird, soll ein Warnhinweis erscheinen. |
+| **Planungs-Wizard** | Bei mehreren Stammkontexten muss Schritt 2 des `NewPlanungWizard` eine Kontext-Zuweisung anbieten. |

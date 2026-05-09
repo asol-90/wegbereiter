@@ -8,7 +8,7 @@
  */
 import { useMemo } from 'react'
 import type { PlanungId } from '@/domain/ids'
-import type { Planung, StammKontext, StammAktion } from '@/domain/types'
+import type { IsoDate, Planung, StammKontext, StammAktion } from '@/domain/types'
 import type { PlanungMarker } from './MiniMonth'
 import { IconButton } from '@/ui/primitives/IconButton'
 import { MiniMonth } from './MiniMonth'
@@ -27,6 +27,10 @@ export type JahreskalenderProps = {
   onGoBack: () => void
   onGoForward: () => void
   onGoToday: () => void
+  /** Optional Kontext-Range: days outside this range are dimmed in each MiniMonth. */
+  kontextRange?: { start: IsoDate; ende: IsoDate }
+  /** Called when an in-range day cell is clicked. */
+  onDayClick?: (date: IsoDate) => void
 }
 
 /**
@@ -144,6 +148,8 @@ export function Jahreskalender({
   onGoBack,
   onGoForward,
   onGoToday,
+  kontextRange,
+  onDayClick,
 }: JahreskalenderProps) {
   const ferien = useFerienForYear(year)
   const { kontexte } = useStammKontext()
@@ -222,6 +228,8 @@ export function Jahreskalender({
               stammDates={stammDatesMap.get(monthKey)}
               stammAktionen={stammAktionenMap.get(monthKey)}
               externAktionen={externAktionenMap.get(monthKey)}
+              kontextRange={kontextRange}
+              onDayClick={onDayClick}
             />
           )
         })}

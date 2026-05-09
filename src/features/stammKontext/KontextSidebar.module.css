@@ -1,0 +1,240 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  gap: 0;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-shrink: 0;
+  padding-bottom: 10px;
+}
+
+.sectionLabel {
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--t3);
+  font-weight: 500;
+}
+
+.importBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 6px;
+  background: none;
+  border: none;
+  color: var(--t3);
+  cursor: pointer;
+  border-radius: var(--r-sm);
+  transition: background 0.1s, color 0.1s;
+}
+
+.importBtn:hover {
+  background: var(--bg2);
+  color: var(--t2);
+}
+
+.errorBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 10px;
+  background: color-mix(in srgb, var(--err) 10%, transparent);
+  border: 1px solid color-mix(in srgb, var(--err) 30%, transparent);
+  border-radius: var(--r-sm);
+  font-size: 12px;
+  color: var(--err);
+  flex-shrink: 0;
+  margin-bottom: 8px;
+}
+
+.errorDismiss {
+  background: none;
+  border: none;
+  color: var(--err);
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+/* ── Timeline ── */
+.timeline {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 36px 1fr;
+  grid-template-rows: repeat(24, 1fr);
+}
+
+.monthLabel {
+  grid-column: 1;
+  font-size: 11px;
+  color: var(--t3);
+  font-weight: 500;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: 3px 4px 0 0;
+  line-height: 1;
+  user-select: none;
+}
+
+.halfRow {
+  grid-column: 2;
+  border-top: 0.5px solid var(--brd);
+  position: relative;
+}
+
+.halfRow.dashed {
+  border-top-style: dashed;
+}
+
+.halfRow.first {
+  border-top: none;
+}
+
+/* ── Kontext column ── */
+.kontextCol {
+  grid-column: 2;
+  position: relative;
+  cursor: crosshair;
+}
+
+.kontextBlock {
+  position: absolute;
+  left: 6px;
+  right: 4px;
+  padding: 6px 10px;
+  cursor: pointer;
+  overflow: hidden;
+  background: #b8ddd1;
+  border: 0.5px solid color-mix(in srgb, #b8ddd1 60%, transparent);
+  transition: filter 0.1s, opacity 0.1s;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.kontextBlock:hover {
+  filter: brightness(0.94);
+}
+
+.kontextBlock.active {
+  outline: 2px solid var(--acc);
+  outline-offset: 1px;
+}
+
+.kontextBlock.roundedTop { border-radius: 8px 8px 0 0; }
+.kontextBlock.roundedBottom { border-radius: 0 0 8px 8px; }
+.kontextBlock.roundedBoth { border-radius: 8px; }
+.kontextBlock.middle { border-radius: 0; }
+
+.kontextName {
+  font-size: 12px;
+  font-weight: 600;
+  color: #1a4a3e;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.kontextRange {
+  font-size: 10px;
+  color: #2d6b5c;
+  white-space: nowrap;
+}
+
+.kontextDeleteBtn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: none;
+  background: color-mix(in srgb, #1a4a3e 15%, transparent);
+  border-radius: var(--r-sm);
+  color: #1a4a3e;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s, background 0.1s;
+}
+
+.kontextDeleteBtn:hover {
+  background: color-mix(in srgb, #1a4a3e 30%, transparent);
+}
+
+.kontextBlock:hover .kontextDeleteBtn {
+  opacity: 1;
+}
+
+.dragSelection {
+  position: absolute;
+  left: 6px;
+  right: 4px;
+  background: color-mix(in srgb, var(--acc) 15%, transparent);
+  border: 1.5px dashed var(--acc);
+  border-radius: var(--r-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.dragLabel {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--acc);
+}
+
+.emptyHint {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  color: var(--t4);
+  pointer-events: none;
+}
+
+/* ── Drop zone ── */
+.dropZoneOuter {
+  flex-shrink: 0;
+}
+
+.dropZoneArea {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 10px;
+  margin-top: 8px;
+  flex-shrink: 0;
+  border: 1.5px dashed var(--brd);
+  border-radius: var(--r-md);
+  color: var(--t3);
+  font-size: 11px;
+  cursor: pointer;
+  transition: border-color 0.1s, color 0.1s, background 0.1s;
+}
+
+.dropZoneArea:hover {
+  border-color: var(--t2);
+  color: var(--t2);
+  background: var(--bg2);
+}

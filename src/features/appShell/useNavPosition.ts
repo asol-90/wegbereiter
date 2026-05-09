@@ -28,6 +28,8 @@ export type NavState = {
   planungId: string | null
   /** True while the repertoire route is active. */
   repertoireActive: boolean
+  /** True while any /stammkontext/* route is active. */
+  kontextActive: boolean
 }
 
 type PlanungMatch = { planungId?: string }
@@ -45,7 +47,10 @@ export function useNavPosition(): NavState {
 /** Exported for testing — pure function over the pathname. */
 export function derive(pathname: string): NavState {
   if (matchPath(repertoireMatch, pathname)) {
-    return { position: 'none', planungId: null, repertoireActive: true }
+    return { position: 'none', planungId: null, repertoireActive: true, kontextActive: false }
+  }
+  if (pathname === '/stammkontext' || pathname.startsWith('/stammkontext/')) {
+    return { position: 'none', planungId: null, repertoireActive: false, kontextActive: true }
   }
   const kalender = matchPath<PlanungMatch, typeof kalenderMatch>(
     kalenderMatch,
@@ -56,6 +61,7 @@ export function derive(pathname: string): NavState {
       position: 1,
       planungId: kalender.params.planungId ?? null,
       repertoireActive: false,
+      kontextActive: false,
     }
   }
   const liste = matchPath<PlanungMatch, typeof listeMatch>(listeMatch, pathname)
@@ -64,11 +70,12 @@ export function derive(pathname: string): NavState {
       position: 2,
       planungId: liste.params.planungId ?? null,
       repertoireActive: false,
+      kontextActive: false,
     }
   }
   if (matchPath(overviewMatch, pathname)) {
-    return { position: 0, planungId: null, repertoireActive: false }
+    return { position: 0, planungId: null, repertoireActive: false, kontextActive: false }
   }
   // Unknown path → behave like overview (redirect happens at router level).
-  return { position: 0, planungId: null, repertoireActive: false }
+  return { position: 0, planungId: null, repertoireActive: false, kontextActive: false }
 }

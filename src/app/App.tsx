@@ -15,6 +15,7 @@ import { OverviewPage } from '@/features/overview/OverviewPage'
 import { CalendarPage } from '@/features/calendar/CalendarPage'
 import { ListPage } from '@/features/list/ListPage'
 import { RepertoirePage } from '@/features/repertoire/RepertoirePage'
+import { StammKontextPage } from '@/features/stammKontext/StammKontextPage'
 import { KitShowcase } from '../dev/KitShowcase'
 
 export function App() {
@@ -33,6 +34,8 @@ export function App() {
               />
               <Route path="/planung/:planungId/liste" element={<ListPage />} />
               <Route path="/repertoire" element={<RepertoirePage />} />
+              <Route path="/stammkontext" element={<StammKontextPage />} />
+              <Route path="/stammkontext/:id" element={<StammKontextPage />} />
             </Route>
             <Route path="/dev/kit" element={<KitShowcase />} />
             <Route path="*" element={<Navigate to="/" replace />} />

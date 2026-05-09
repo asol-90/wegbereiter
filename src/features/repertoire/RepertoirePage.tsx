@@ -25,7 +25,7 @@ import {
   type AktivitaetTyp,
   type AktivitaetUntertyp,
 } from '@/domain/aktivitaetKatalog'
-import { WB_KEYS, WB_LABELS, WB_STEPS } from '@/domain/wb'
+import { WBAktivitaetEditor } from '@/ui/domain-primitives/WBAktivitaetEditor'
 import { ALTERSSTUFE_LABELS } from '@/domain/abzeichenKatalog'
 import styles from './RepertoirePage.module.css'
 
@@ -387,28 +387,14 @@ function AktivitaetDetail({
         <div className={styles.wbSection}>
           <div className={styles.wbHeader}>
             <span className={styles.fieldLabel}>Wachstumsbereiche</span>
-            <span className={styles.wbHint}>
-              {hasWBOverride ? 'Eigene Werte' : 'Standard aus Typ'}
-            </span>
+            {!hasWBOverride && (
+              <span className={styles.wbHint}>Standard aus Typ</span>
+            )}
           </div>
-          <div className={styles.wbGrid}>
-            {WB_KEYS.map((key) => {
-              const defaultVal = defaults[key]
-              const overrideTag = draft.wbTags.find((t) => t.key === key)
-              const currentVal = overrideTag ? overrideTag.intensity : defaultVal
-              const step = WB_STEPS.find((s) => Math.abs(s.value - currentVal) < 0.05)
-              return (
-                <div key={key} className={styles.wbRow}>
-                  <span
-                    className={styles.wbDot}
-                    style={{ background: `var(${key === 'koerperlich' ? '--wb-k' : key === 'gesellschaftlich' ? '--wb-g' : key === 'geistig' ? '--wb-i' : '--wb-s'})` }}
-                  />
-                  <span className={styles.wbLabel}>{WB_LABELS[key]}</span>
-                  <span className={styles.wbValue}>{step?.label ?? currentVal.toFixed(2)}</span>
-                </div>
-              )
-            })}
-          </div>
+          <WBAktivitaetEditor
+            value={draft.wbTags}
+            onChange={(tags) => setField('wbTags', tags)}
+          />
         </div>
 
         <label className={styles.field}>

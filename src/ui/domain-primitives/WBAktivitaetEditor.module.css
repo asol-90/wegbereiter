@@ -1,0 +1,90 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.label {
+  width: 110px;
+  flex-shrink: 0;
+  font-size: 13px;
+  color: var(--t2);
+  text-transform: capitalize;
+}
+
+.steps {
+  display: flex;
+  gap: 4px;
+}
+
+.step {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1.5px solid var(--wb-color, var(--br));
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.1s, transform 0.1s;
+  flex-shrink: 0;
+}
+
+.step:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--wb-color, var(--br)) 25%, transparent);
+}
+
+.step[data-active] {
+  background: var(--wb-color, var(--br));
+  border-color: var(--wb-color, var(--br));
+}
+
+.step[data-selected] {
+  background: var(--wb-color, var(--br));
+  border-color: var(--wb-color, var(--br));
+}
+
+.step:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* Dash indicator (step value = 0) */
+.step[data-zero] {
+  border-color: transparent;
+  background: transparent;
+  color: var(--t3);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.step[data-zero]:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--wb-color, var(--br)) 25%, transparent);
+  border-color: transparent;
+}
+
+.reset {
+  align-self: flex-start;
+  margin-top: 4px;
+  background: none;
+  border: none;
+  font-size: 11px;
+  color: var(--t3);
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.reset:hover {
+  color: var(--t2);
+}

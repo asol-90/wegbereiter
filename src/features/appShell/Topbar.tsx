@@ -6,6 +6,7 @@ import styles from './Topbar.module.css'
 import { NavToggle } from './NavToggle'
 import { RepertoireToggle } from './RepertoireToggle'
 import { JahresplanungToggle } from './JahresplanungToggle'
+import { KontextToggle } from './KontextToggle'
 import { useNavPosition } from './useNavPosition'
 
 export function Topbar() {
@@ -21,6 +22,9 @@ export function Topbar() {
         <JahresplanungToggle position={nav.position} />
         <NavToggle position={nav.position} planungId={nav.planungId} />
         <RepertoireToggle active={nav.repertoireActive} />
+      </div>
+      <div className={styles.rightSlot}>
+        <KontextToggle active={nav.kontextActive} />
       </div>
     </div>
   )

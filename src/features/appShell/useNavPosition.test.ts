@@ -7,6 +7,7 @@ describe('derive(pathname)', () => {
       position: 0,
       planungId: null,
       repertoireActive: false,
+      kontextActive: false,
     })
   })
 
@@ -15,6 +16,7 @@ describe('derive(pathname)', () => {
       position: 1,
       planungId: 'abc-123',
       repertoireActive: false,
+      kontextActive: false,
     })
   })
 
@@ -23,6 +25,7 @@ describe('derive(pathname)', () => {
       position: 2,
       planungId: 'demo',
       repertoireActive: false,
+      kontextActive: false,
     })
   })
 
@@ -31,6 +34,16 @@ describe('derive(pathname)', () => {
       position: 'none',
       planungId: null,
       repertoireActive: true,
+      kontextActive: false,
+    })
+  })
+
+  it('returns pos=none and kontextActive for /stammkontext/* routes', () => {
+    expect(derive('/stammkontext/some-id')).toEqual({
+      position: 'none',
+      planungId: null,
+      repertoireActive: false,
+      kontextActive: true,
     })
   })
 
@@ -39,5 +52,6 @@ describe('derive(pathname)', () => {
     expect(s.position).toBe(0)
     expect(s.planungId).toBeNull()
     expect(s.repertoireActive).toBe(false)
+    expect(s.kontextActive).toBe(false)
   })
 })

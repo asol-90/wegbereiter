@@ -119,6 +119,26 @@
   transition: background var(--dur-fast) var(--ease);
 }
 
+/* ─── Kontext-Range ─── */
+.mmDDisabled {
+  opacity: 0.22;
+  pointer-events: none;
+}
+
+.mmDClickable {
+  cursor: pointer;
+}
+
+.mmDClickable:hover .mmDLabel {
+  background: color-mix(in srgb, var(--acc) 10%, transparent);
+  border-radius: var(--r-pill);
+  width: 16px;
+  height: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
 /* ─── Stammkontext hover tooltip ─── */
 .stammTooltip {
   position: absolute;
