@@ -84,6 +84,19 @@ export function CalendarPage() {
     return all
   }, [kontexte, planung])
 
+  const externAktionen = useMemo<StammAktion[]>(() => {
+    if (!planung) return []
+    const all: StammAktion[] = []
+    for (const k of kontexte) {
+      for (const a of [...(k.distriktAktionen ?? []), ...(k.regionalAktionen ?? [])]) {
+        if (a.beginn <= planung.zeitraum.ende && a.ende >= planung.zeitraum.start) {
+          all.push(a)
+        }
+      }
+    }
+    return all
+  }, [kontexte, planung])
+
   const stammTreffen = useMemo<StammTreffen[]>(() => {
     if (!planung) return []
     const result: StammTreffen[] = []
@@ -229,6 +242,7 @@ export function CalendarPage() {
           planung={planung}
           ferien={ferien}
           stammAktionen={stammAktionen}
+          externAktionen={externAktionen}
           stammTreffen={stammTreffen}
           optedOutStammIds={optedOutStammIds}
           onTreffenDoubleClick={handleTreffenDoubleClick}

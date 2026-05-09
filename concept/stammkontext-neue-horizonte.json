@@ -1,0 +1,158 @@
+{
+  "typ": "stammkontext",
+  "version": 1,
+  "bearbeitetAm": "2026-05-07T00:00:00",
+  "bearbeitungsNotiz": "Planung Frühjahr/Sommer 2026 – erstellt am 07.05.2026. Keine Treffen in Sommerferien (04.07.–14.08.) und Herbstferien (12.10.–24.10.) sowie an gesetzlichen Feiertagen Thüringens.",
+  "thema": "Neue Horizonte",
+  "themaBeschreibung": "Neue Horizonte lädt ein, den Blick nach vorne zu richten: Was liegt hinter dem nächsten Hügel, hinter der nächsten Kurve im Weg? Wir erkunden neue Orte, stellen uns neuen Herausforderungen. Was erweitert den Horizont und wohin führt unser Weg – als Gruppe, als Mensch, im Glauben? Wir wollen erleben, dass Jesus uns in die Weite führt.",
+  "themenTag": "neue-horizonte",
+  "defaultAnfangsBlock": [
+    { "name": "Stammrunde", "typ": "sonstiges", "dauerMin": 15 },
+    { "name": "Andacht", "typ": "andacht", "dauerMin": 10 }
+  ],
+  "defaultEndBlock": [
+    { "name": "Abschlussrunde", "typ": "sonstiges", "dauerMin": 10 }
+  ],
+  "treffen": [
+    { "id": "t-01", "art": "treffen", "datum": "2026-05-08", "dauerMin": 120 },
+    { "id": "t-02", "art": "treffen", "datum": "2026-05-15", "dauerMin": 120 },
+    { "id": "t-03", "art": "treffen", "datum": "2026-05-22", "dauerMin": 120 },
+    { "id": "t-04", "art": "treffen", "datum": "2026-05-29", "dauerMin": 120 },
+    { "id": "t-05", "art": "treffen", "datum": "2026-06-05", "dauerMin": 120 },
+    { "id": "t-06", "art": "treffen", "datum": "2026-06-12", "dauerMin": 120 },
+    { "id": "t-07", "art": "treffen", "datum": "2026-06-19", "dauerMin": 120 },
+    { "id": "t-08", "art": "treffen", "datum": "2026-06-26", "dauerMin": 120 },
+    { "id": "t-09", "art": "treffen", "datum": "2026-08-21", "dauerMin": 120 },
+    { "id": "t-10", "art": "treffen", "datum": "2026-08-28", "dauerMin": 120 },
+    { "id": "t-11", "art": "treffen", "datum": "2026-09-04", "dauerMin": 120 },
+    { "id": "t-12", "art": "treffen", "datum": "2026-09-11", "dauerMin": 120 },
+    { "id": "t-13", "art": "treffen", "datum": "2026-09-18", "dauerMin": 120 },
+    { "id": "t-14", "art": "treffen", "datum": "2026-09-25", "dauerMin": 120 },
+    { "id": "t-15", "art": "treffen", "datum": "2026-10-02", "dauerMin": 120 },
+    { "id": "t-16", "art": "treffen", "datum": "2026-10-09", "dauerMin": 120 }
+  ],
+  "stammaktionen": [
+    {
+      "id": "sa-1",
+      "titel": "Magdeburger Allee Fest",
+      "beginn": "2026-06-06",
+      "ende": "2026-06-06",
+      "ort": "",
+      "beschreibung": ""
+    },
+    {
+      "id": "sa-3",
+      "titel": "Rangers Gottesdienst – 25. Jubiläum",
+      "beginn": "2026-09-06",
+      "ende": "2026-09-06",
+      "ort": "",
+      "beschreibung": ""
+    }
+  ],
+  "distriktAktionen": [
+    {
+      "id": "da-1",
+      "titel": "Distriktcamp",
+      "beginn": "2026-07-10",
+      "ende": "2026-07-20",
+      "ort": "",
+      "beschreibung": ""
+    }
+  ],
+  "regionalAktionen": [
+    {
+      "id": "ra-1",
+      "titel": "Lilienhajk",
+      "beginn": "2026-08-28",
+      "ende": "2026-08-30",
+      "ort": "",
+      "beschreibung": ""
+    }
+  ],
+  "aktivitaeten": [
+    {
+      "name": "Geländespiel: Unbekanntes Territorium",
+      "typ": "spiel",
+      "dauerMin": 60,
+      "dauerMax": 120,
+      "wbTags": [
+        { "bereich": "koerperlich", "gewicht": 0.5 },
+        { "bereich": "gesellschaftlich", "gewicht": 0.5 }
+      ],
+      "themenTags": ["neue-horizonte", "aufbruch"]
+    },
+    {
+      "name": "Blindenparcours",
+      "typ": "spiel",
+      "dauerMin": 20,
+      "dauerMax": 35,
+      "wbTags": [
+        { "bereich": "gesellschaftlich", "gewicht": 0.7 },
+        { "bereich": "geistlich", "gewicht": 0.3 }
+      ],
+      "themenTags": ["neue-horizonte", "vertrauen"]
+    },
+    {
+      "name": "Kompass selbst bauen",
+      "typ": "sonstiges",
+      "dauerMin": 20,
+      "dauerMax": 35,
+      "wbTags": [
+        { "bereich": "geistig", "gewicht": 1.0 }
+      ],
+      "themenTags": ["neue-horizonte", "orientierung"]
+    },
+    {
+      "name": "Mit (selbstgemachtem) Kompass navigieren",
+      "typ": "sonstiges",
+      "dauerMin": 30,
+      "dauerMax": 45,
+      "wbTags": [
+        { "bereich": "koerperlich", "gewicht": 0.5 },
+        { "bereich": "geistig", "gewicht": 0.5 }
+      ],
+      "themenTags": ["neue-horizonte", "orientierung"]
+    },
+    {
+      "name": "Artikel/Reportage für den Horizont",
+      "typ": "sonstiges",
+      "dauerMin": 30,
+      "dauerMax": 60,
+      "wbTags": [
+        { "bereich": "geistig", "gewicht": 1.0 }
+      ],
+      "themenTags": ["neue-horizonte"]
+    },
+    {
+      "name": "Bibelarbeit: Abraham-Reihe",
+      "typ": "andacht",
+      "dauerMin": 15,
+      "dauerMax": 25,
+      "wbTags": [
+        { "bereich": "geistlich", "gewicht": 1.0 }
+      ],
+      "themenTags": ["neue-horizonte", "bibel", "aufbruch"]
+    },
+    {
+      "name": "Gesprächsrunde: Vertraut vs. Fernweh",
+      "typ": "andacht",
+      "dauerMin": 20,
+      "dauerMax": 30,
+      "wbTags": [
+        { "bereich": "geistlich", "gewicht": 0.5 },
+        { "bereich": "gesellschaftlich", "gewicht": 0.5 }
+      ],
+      "themenTags": ["neue-horizonte"]
+    },
+    {
+      "name": "Andacht: Kompass fürs Leben",
+      "typ": "andacht",
+      "dauerMin": 10,
+      "dauerMax": 20,
+      "wbTags": [
+        { "bereich": "geistlich", "gewicht": 1.0 }
+      ],
+      "themenTags": ["neue-horizonte", "glaube"]
+    }
+  ]
+}

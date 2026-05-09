@@ -51,11 +51,20 @@ export function StammImportDialog({
     return results
   }, [kontexte, kontext])
 
-  // Date range from treffen + aktionen
+  type AktionBereich = 'Stamm' | 'Distrikt' | 'Regional'
+  type AktionMitBereich = (typeof kontext.stammaktionen)[number] & { bereich: AktionBereich }
+
+  const alleAktionen: AktionMitBereich[] = useMemo(() => [
+    ...kontext.stammaktionen.map((a) => ({ ...a, bereich: 'Stamm' as const })),
+    ...(kontext.distriktAktionen ?? []).map((a) => ({ ...a, bereich: 'Distrikt' as const })),
+    ...(kontext.regionalAktionen ?? []).map((a) => ({ ...a, bereich: 'Regional' as const })),
+  ].sort((a, b) => a.beginn.localeCompare(b.beginn)), [kontext])
+
+  // Date range from treffen + all aktionen
   const allDates = [
     ...kontext.treffen.map((t) => t.datum),
-    ...kontext.stammaktionen.map((a) => a.beginn),
-    ...kontext.stammaktionen.map((a) => a.ende),
+    ...alleAktionen.map((a) => a.beginn),
+    ...alleAktionen.map((a) => a.ende),
   ].sort()
   const rangeStart = allDates[0]
   const rangeEnd = allDates[allDates.length - 1]
@@ -81,9 +90,9 @@ export function StammImportDialog({
           <span className={styles.metaItem}>
             {kontext.treffen.length} Treffen
           </span>
-          {kontext.stammaktionen.length > 0 && (
+          {alleAktionen.length > 0 && (
             <span className={styles.metaItem}>
-              {kontext.stammaktionen.length} Stammaktion{kontext.stammaktionen.length !== 1 ? 'en' : ''}
+              {alleAktionen.length} Aktion{alleAktionen.length !== 1 ? 'en' : ''}
             </span>
           )}
           {aktivitaeten.length > 0 && (
@@ -93,18 +102,23 @@ export function StammImportDialog({
           )}
         </section>
 
-        {/* Stammaktionen list */}
-        {kontext.stammaktionen.length > 0 && (
+        {/* Aktionen list */}
+        {alleAktionen.length > 0 && (
           <section className={styles.section}>
-            <h4 className={styles.sectionTitle}>Stammaktionen</h4>
+            <h4 className={styles.sectionTitle}>Aktionen</h4>
             <ul className={styles.itemList}>
-              {kontext.stammaktionen.map((a) => (
-                <li key={a.id} className={styles.item}>
-                  <strong>{a.titel}</strong>
-                  <span className={styles.itemMeta}>
-                    {formatDate(a.beginn)}
-                    {a.beginn !== a.ende && ` – ${formatDate(a.ende)}`}
-                    {a.ort && ` · ${a.ort}`}
+              {alleAktionen.map((a) => (
+                <li key={a.id} className={`${styles.item} ${a.bereich === 'Stamm' ? styles.itemStamm : styles.itemExtern}`}>
+                  <div className={styles.itemContent}>
+                    <strong>{a.titel}</strong>
+                    <span className={styles.itemMeta}>
+                      {formatDate(a.beginn)}
+                      {a.beginn !== a.ende && ` – ${formatDate(a.ende)}`}
+                      {a.ort && ` · ${a.ort}`}
+                    </span>
+                  </div>
+                  <span className={`${styles.bereichChip} ${a.bereich !== 'Stamm' ? styles.bereichChipExtern : ''}`}>
+                    {a.bereich}
                   </span>
                 </li>
               ))}

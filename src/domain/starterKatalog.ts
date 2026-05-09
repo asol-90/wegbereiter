@@ -44,10 +44,6 @@ const SPECS: AktSpec[] = [
   { name: 'Stockbrot backen', typ: 'kochen-essen', zeitMin: 20, zeitMax: 40 },
   { name: 'Gemeinsames Abendessen kochen', typ: 'kochen-essen', zeitMin: 30, zeitMax: 60 },
 
-  // ─── Wachstumspfad ──────────────────────────────
-  { name: 'Treffenbericht schreiben', typ: 'wachstumspfad', untertyp: 'logbuch', zeitMin: 10, zeitMax: 20 },
-  { name: 'Tagesrückblick zeichnen', typ: 'wachstumspfad', untertyp: 'logbuch', zeitMin: 10, zeitMax: 15 },
-
   // ─── Pfadfindertechnik ─────────────────────────
   { name: 'Feuer machen lernen', typ: 'pfadfindertechnik', untertyp: 'feuer', zeitMin: 15, zeitMax: 30 },
   { name: 'Kreuzknoten & Palstek', typ: 'pfadfindertechnik', untertyp: 'knoten-buende', zeitMin: 15, zeitMax: 30 },
@@ -62,14 +58,9 @@ const SPECS: AktSpec[] = [
   { name: 'Müllsammelaktion im Quartier', typ: 'dienst-naechstenliebe', zeitMin: 30, zeitMax: 60 },
   { name: 'Besuch im Seniorenheim', typ: 'dienst-naechstenliebe', zeitMin: 30, zeitMax: 60 },
 
-  // ─── Gebet/Stille ──────────────────────────────
-  { name: 'Gebetsweg im Freien', typ: 'gebet-stille', untertyp: 'gebetsweg', zeitMin: 10, zeitMax: 20 },
-  { name: 'Stille Zeit mit Impuls', typ: 'gebet-stille', untertyp: 'stille-zeit', zeitMin: 5, zeitMax: 15 },
-  { name: 'Popcorn-Gebet', typ: 'gebet-stille', untertyp: 'popcorn-gebet', zeitMin: 5, zeitMax: 10 },
-
-  // ─── Stammformat ───────────────────────────────
-  { name: 'Großes Geländespiel', typ: 'stammformat', untertyp: 'gelaendespiel', zeitMin: 30, zeitMax: 60 },
-  { name: 'Stationenlauf: 5 Herausforderungen', typ: 'stammformat', untertyp: 'stationenlauf', zeitMin: 30, zeitMax: 45 },
+  // ─── Wachstumspfad (Untertyp Pfadfindertechnik) ─
+  { name: 'Treffenbericht schreiben', typ: 'pfadfindertechnik', untertyp: 'logbuch', zeitMin: 10, zeitMax: 20 },
+  { name: 'Tagesrückblick zeichnen', typ: 'pfadfindertechnik', untertyp: 'logbuch', zeitMin: 10, zeitMax: 15 },
 ]
 
 /**

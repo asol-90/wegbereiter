@@ -278,8 +278,12 @@ export type StammKontext = {
 
   /** All regular meetings for this season. */
   treffen: StammTreffen[]
-  /** Blocked dates (camps, assemblies, etc.). */
+  /** Blocked dates organised by the Stamm (e.g. camps, assemblies). */
   stammaktionen: StammAktion[]
+  /** Blocked dates organised by the district. */
+  distriktAktionen: StammAktion[]
+  /** Blocked dates organised at regional/Verband level. */
+  regionalAktionen: StammAktion[]
 
   /** Default opening block for all meetings (overridable per meeting). */
   defaultAnfangsBlock: StammBlock[]

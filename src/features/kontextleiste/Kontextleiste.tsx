@@ -24,6 +24,7 @@ import {
 import { wbZielverteilung } from '@/domain/wbZielverteilung'
 import { parseIso } from '@/domain/dateUtils'
 import type {
+  Aktivitaet,
   Planung,
   Programmpunkt,
   Andachtsreihe,
@@ -34,6 +35,7 @@ import { WBDonut } from '@/ui/domain/WBDonut'
 import { WBGoalBars, type WBGoalBarDatum } from '@/ui/domain/WBGoalBars'
 import { Icon, AccordionGroup, type AccordionGroupItem } from '@/ui/primitives'
 import { useStammKontext } from '@/features/stammKontext'
+import { useRepertoire } from '@/features/repertoire/useRepertoire'
 import { useKontextDaten } from './useKontextDaten'
 import {
   KONTEXT_DRAG_MIME,
@@ -70,6 +72,7 @@ export function Kontextleiste({ planung }: KontextleisteProps) {
     abzeichenIds,
   )
   const { kontexte } = useStammKontext()
+  const { aktivitaeten } = useRepertoire()
   const stammKontext = useMemo(
     () =>
       planung.stammKontextId
@@ -130,10 +133,8 @@ export function Kontextleiste({ planung }: KontextleisteProps) {
     }
 
     if (stammKontext) {
-      const relevantAktionen = stammKontext.stammaktionen.filter(
-        (a) =>
-          a.beginn <= planung.zeitraum.ende &&
-          a.ende >= planung.zeitraum.start,
+      const stammAktivitaeten = aktivitaeten.filter(
+        (a) => a.stammImportId === stammKontext.stammImportId && !a.deaktiviert,
       )
       items.push({
         id: `stamm-${stammKontext.id}`,
@@ -141,14 +142,15 @@ export function Kontextleiste({ planung }: KontextleisteProps) {
         children: (
           <StammKontextInner
             kontext={stammKontext}
-            relevantAktionen={relevantAktionen}
+            aktivitaeten={stammAktivitaeten}
+            planung={planung}
           />
         ),
       })
     }
 
     return items
-  }, [andachtsreihen, abzeichen, stammKontext, planung])
+  }, [andachtsreihen, abzeichen, stammKontext, aktivitaeten, planung])
 
   return (
     <div className={styles.root}>
@@ -315,11 +317,28 @@ function AbzeichenInner({
 
 function StammKontextInner({
   kontext,
-  relevantAktionen,
+  aktivitaeten,
+  planung,
 }: {
   kontext: StammKontext
-  relevantAktionen: StammKontext['stammaktionen']
+  aktivitaeten: Aktivitaet[]
+  planung: Planung
 }) {
+  const usageDates = useMemo(() => {
+    const map = new Map<string, string[]>()
+    for (const t of planung.treffen) {
+      for (const pp of t.programm) {
+        if (pp.kind === 'konkret') {
+          const key = pp.aktivitaetId as string
+          const existing = map.get(key) ?? []
+          existing.push(t.datum)
+          map.set(key, existing)
+        }
+      }
+    }
+    return map
+  }, [planung.treffen])
+
   return (
     <>
       <div className={styles.stammThema}>{kontext.thema}</div>
@@ -328,19 +347,23 @@ function StammKontextInner({
           {kontext.themaBeschreibung}
         </div>
       )}
-      {relevantAktionen.map((aktion) => {
+      {aktivitaeten.map((akt) => {
+        const dates = usageDates.get(akt.id as string) ?? []
         const payload: KontextDragPayload = {
-          kind: 'stammaktion',
-          aktionId: aktion.id,
-          label: aktion.titel,
+          kind: 'aktivitaet',
+          aktivitaetId: akt.id,
+          label: akt.name,
+          typ: akt.typ,
+          untertyp: akt.untertyp,
+          dauerMin: Math.round((akt.zeitMin + akt.zeitMax) / 2),
+          wbTags: akt.wbTags,
         }
         return (
           <CheckRow
-            key={aktion.id}
-            label={aktion.titel}
-            count={0}
-            dates={[]}
-            subtitle={formatRange(aktion.beginn, aktion.ende)}
+            key={akt.id}
+            label={akt.name}
+            count={dates.length}
+            dates={dates}
             payload={payload}
           />
         )
@@ -452,11 +475,3 @@ function countAbzeichenZuweisungen(
   return map
 }
 
-function formatRange(start: string, ende: string): string {
-  const s = parseIso(start)
-  const e = parseIso(ende)
-  if (start === ende) {
-    return format(s, 'd. MMM yyyy', { locale: de })
-  }
-  return `${format(s, 'd. MMM', { locale: de })} – ${format(e, 'd. MMM yyyy', { locale: de })}`
-}

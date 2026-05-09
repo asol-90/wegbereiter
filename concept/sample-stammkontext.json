@@ -59,6 +59,26 @@
       "beschreibung": "Rückblick Halbjahr, Planung Frühjahr, Elternabend im Anschluss."
     }
   ],
+  "distriktAktionen": [
+    {
+      "id": "da-1",
+      "titel": "Distrikts-Geländespiel",
+      "beginn": "2026-11-14",
+      "ende": "2026-11-14",
+      "ort": "Stadtwald",
+      "beschreibung": "Gemeinsames Geländespiel aller Gruppen im Distrikt."
+    }
+  ],
+  "regionalAktionen": [
+    {
+      "id": "ra-1",
+      "titel": "Regionalkonferenz",
+      "beginn": "2027-01-30",
+      "ende": "2027-01-30",
+      "ort": "Tagungszentrum",
+      "beschreibung": "Jährliche Konferenz aller Stammführer der Region."
+    }
+  ],
   "aktivitaeten": [
     {
       "name": "Bibelarbeit",

@@ -307,9 +307,11 @@ function CheckSmallIcon() {
 
 // ─── Unified preview item type ──────────────────────────────────────────────
 
+type AktionBereich = 'Stamm' | 'Distrikt' | 'Regional'
+
 type PreviewItem =
   | { kind: 'treffen'; iso: IsoDate; source: 'kontext' | 'generated' }
-  | { kind: 'aktion'; aktion: StammAktion }
+  | { kind: 'aktion'; aktion: StammAktion; bereich: AktionBereich }
 
 function previewSortKey(item: PreviewItem): IsoDate {
   return item.kind === 'treffen' ? item.iso : item.aktion.beginn
@@ -614,6 +616,20 @@ export function NewPlanungWizard({ open, onClose, onCreated, initialZeitraum }: 
       .sort((a, b) => a.beginn.localeCompare(b.beginn))
   }, [hasKontext, activeKontext, start, ende])
 
+  const alleAktionenInRange = useMemo<Array<StammAktion & { bereich: AktionBereich }>>(() => {
+    if (!hasKontext || !start || !ende) return []
+    const stamm = activeKontext.stammaktionen
+      .filter((a) => a.beginn <= ende && a.ende >= start)
+      .map((a) => ({ ...a, bereich: 'Stamm' as const }))
+    const distrikt = (activeKontext.distriktAktionen ?? [])
+      .filter((a) => a.beginn <= ende && a.ende >= start)
+      .map((a) => ({ ...a, bereich: 'Distrikt' as const }))
+    const regional = (activeKontext.regionalAktionen ?? [])
+      .filter((a) => a.beginn <= ende && a.ende >= start)
+      .map((a) => ({ ...a, bereich: 'Regional' as const }))
+    return [...stamm, ...distrikt, ...regional].sort((a, b) => a.beginn.localeCompare(b.beginn))
+  }, [hasKontext, activeKontext, start, ende])
+
   /** The Kontext's own date range (earliest treffen/aktion to latest). */
   const kontextRange = useMemo<{ von: IsoDate; bis: IsoDate } | null>(() => {
     if (!hasKontext) return null
@@ -640,7 +656,7 @@ export function NewPlanungWizard({ open, onClose, onCreated, initialZeitraum }: 
     return iso < kontextRange.von || iso > kontextRange.bis
   }
 
-  // Merged list: treffen + stammaktionen, sorted chronologically
+  // Merged list: treffen + alle aktionen, sorted chronologically
   const mergedItems = useMemo<PreviewItem[]>(() => {
     const items: PreviewItem[] = [
       ...kontextTreffenInRange.map((t) => ({
@@ -653,13 +669,14 @@ export function NewPlanungWizard({ open, onClose, onCreated, initialZeitraum }: 
         iso,
         source: 'generated' as const,
       })),
-      ...stammaktionenInRange.map((a) => ({
+      ...alleAktionenInRange.map((a) => ({
         kind: 'aktion' as const,
         aktion: a,
+        bereich: a.bereich,
       })),
     ]
     return items.sort((a, b) => previewSortKey(a).localeCompare(previewSortKey(b)))
-  }, [kontextTreffenInRange, generatedForGaps, stammaktionenInRange])
+  }, [kontextTreffenInRange, generatedForGaps, alleAktionenInRange])
 
   function classifyDate(iso: IsoDate) {
     const y = Number.parseInt(iso.slice(0, 4), 10)
@@ -1042,8 +1059,9 @@ export function NewPlanungWizard({ open, onClose, onCreated, initialZeitraum }: 
       if (item.kind === 'aktion') {
         const a = item.aktion
         const isMultiDay = a.beginn !== a.ende
+        const isExtern = item.bereich !== 'Stamm'
         return (
-          <div key={a.id} className={`${styles.terminRow} ${styles.terminRowAktion}`}>
+          <div key={a.id} className={`${styles.terminRow} ${styles.terminRowAktion} ${isExtern ? styles.terminRowExtern : ''}`}>
             <span className={`${styles.terminDate} ${styles.terminDateKontext}`}>
               {isMultiDay ? formatDateRange(a.beginn, a.ende) : formatTerminDate(a.beginn)}
             </span>
@@ -1052,7 +1070,9 @@ export function NewPlanungWizard({ open, onClose, onCreated, initialZeitraum }: 
               {a.ort && <span className={styles.terminOrt}> · {a.ort}</span>}
             </span>
             <span className={styles.terminRight}>
-              <Badge tone="neutral">Stamm</Badge>
+              <span className={`${styles.aktionChip} ${isExtern ? styles.aktionChipExtern : styles.aktionChipStamm}`}>
+                {item.bereich}
+              </span>
             </span>
           </div>
         )
@@ -1393,19 +1413,25 @@ export function NewPlanungWizard({ open, onClose, onCreated, initialZeitraum }: 
           {/* Vorgeschlagene Aktivitäten */}
           {renderKontextAktivitaeten()}
 
-          {/* Stammaktionen */}
-          {stammaktionenInRange.length > 0 && (
+          {/* Aktionen (Stamm + Distrikt + Regional) */}
+          {alleAktionenInRange.length > 0 && (
             <div className={styles.kontextAktionen}>
-              <span className={styles.kontextSectionLabel}>Stammaktionen</span>
-              {stammaktionenInRange.map((a) => (
-                <div key={a.id} className={styles.kontextAktionRow}>
-                  <span className={styles.kontextAktionDate}>
-                    {a.beginn !== a.ende ? formatDateRange(a.beginn, a.ende) : formatTerminDate(a.beginn)}
-                  </span>
-                  <span className={styles.kontextAktionName}>{a.titel}</span>
-                  {a.ort && <span className={styles.kontextAktionOrt}>{a.ort}</span>}
-                </div>
-              ))}
+              <span className={styles.kontextSectionLabel}>Aktionen</span>
+              {alleAktionenInRange.map((a) => {
+                const isExtern = a.bereich !== 'Stamm'
+                return (
+                  <div key={a.id} className={`${styles.kontextAktionRow} ${isExtern ? styles.kontextAktionRowExtern : ''}`}>
+                    <span className={styles.kontextAktionDate}>
+                      {a.beginn !== a.ende ? formatDateRange(a.beginn, a.ende) : formatTerminDate(a.beginn)}
+                    </span>
+                    <span className={styles.kontextAktionName}>{a.titel}</span>
+                    {a.ort && <span className={styles.kontextAktionOrt}>{a.ort}</span>}
+                    <span className={`${styles.aktionChip} ${isExtern ? styles.aktionChipExtern : styles.aktionChipStamm}`}>
+                      {a.bereich}
+                    </span>
+                  </div>
+                )
+              })}
             </div>
           )}
 
@@ -1794,9 +1820,9 @@ export function NewPlanungWizard({ open, onClose, onCreated, initialZeitraum }: 
               {activeKontext.themaBeschreibung && (
                 <p className={styles.summarySectionText}>{activeKontext.themaBeschreibung}</p>
               )}
-              {stammaktionenInRange.length > 0 && (
+              {alleAktionenInRange.length > 0 && (
                 <p className={styles.summarySectionText}>
-                  {stammaktionenInRange.length} Stammaktion{stammaktionenInRange.length !== 1 ? 'en' : ''}
+                  {alleAktionenInRange.length} Aktion{alleAktionenInRange.length !== 1 ? 'en' : ''}
                 </p>
               )}
             </div>

@@ -30,9 +30,11 @@ import styles from './MiniMonth.module.css'
 
 const BAND_FERIEN = '#faeeda'
 const BAND_STAMM = '#b8ddd1'
+const BAND_EXTERN = '#bfd9f2'
 const TEXT_FERIEN = '#854f0b'
 const TEXT_FERIEN_WE = '#633806'
 const TEXT_STAMM = '#0f6e56'
+const TEXT_EXTERN = '#1a6fb5'
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -65,6 +67,8 @@ export type MiniMonthProps = {
   stammDates?: IsoDate[]
   /** Stammaktionen that overlap this month. */
   stammAktionen?: StammAktion[]
+  /** Distrikt- and Regionaltaktionen that overlap this month (rendered blue). */
+  externAktionen?: StammAktion[]
 }
 
 // ─── Color helpers ──────────────────────────────────────────────────────────
@@ -114,6 +118,7 @@ export function MiniMonth({
   stammCovered: _stammCovered,
   stammDates,
   stammAktionen,
+  externAktionen,
 }: MiniMonthProps) {
   const grid = buildMonthGrid(year, monthIndex)
   const today = isoToday()
@@ -130,6 +135,7 @@ export function MiniMonth({
 
   const stammSet = new Set(stammDates ?? [])
   const aktionen = stammAktionen ?? []
+  const externAkt = externAktionen ?? []
 
   const highlightedInMonth =
     highlightedPlanungId !== null &&
@@ -166,8 +172,10 @@ export function MiniMonth({
             const isToday = cell.iso === today
             const isFerienOrFeiertag = !!(cls.ferien || cls.feiertag)
             const stammAkt = aktionen.find((a) => cell.iso >= a.beginn && cell.iso <= a.ende)
+            const externAktHere = externAkt.find((a) => cell.iso >= a.beginn && cell.iso <= a.ende)
             const isStammDate = stammSet.has(cell.iso)
             const hasStammLayer = isStammDate || !!stammAkt
+            const hasExternLayer = !!externAktHere
 
             // ── Build bands (bottom → top) ──
             const bands: Band[] = []
@@ -196,6 +204,15 @@ export function MiniMonth({
               })
             }
 
+            if (externAktHere) {
+              bands.push({
+                bg: BAND_EXTERN,
+                isFirst: cell.iso === externAktHere.beginn,
+                isLast: cell.iso === externAktHere.ende,
+                hoverLabel: externAktHere.titel,
+              })
+            }
+
             // ── Text color (topmost layer wins) ──
             let textColor: string | undefined
             if (cellMarkers.length > 0) {
@@ -209,6 +226,8 @@ export function MiniMonth({
               if (resolved) {
                 textColor = textForBg(blendWithWhite(resolved, ratio))
               }
+            } else if (hasExternLayer) {
+              textColor = TEXT_EXTERN
             } else if (hasStammLayer) {
               textColor = TEXT_STAMM
             } else if (isFerienOrFeiertag) {

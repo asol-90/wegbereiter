@@ -411,12 +411,37 @@
   justify-content: flex-end;
 }
 
-/* Stammaktion row — green background like before */
+/* Stammaktion row — green */
 .terminRowAktion {
   background: rgba(15, 110, 86, 0.06);
 }
 .terminRowAktion .terminLabel strong {
   color: var(--t-ok);
+}
+
+/* Distrikt/Regional row — blue */
+.terminRowExtern {
+  background: rgba(26, 111, 181, 0.06);
+}
+.terminRowExtern .terminLabel strong {
+  color: #1a6fb5;
+}
+
+/* Bereich-Chip */
+.aktionChip {
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 2px 7px;
+  border-radius: 99px;
+}
+.aktionChipStamm {
+  background: rgba(15, 110, 86, 0.12);
+  color: #0f6e56;
+}
+.aktionChipExtern {
+  background: #dceefb;
+  color: #1a6fb5;
 }
 
 /* Skipped row (Ferien/Feiertag, default) */
@@ -688,6 +713,14 @@
   border-radius: var(--r-md);
   background: rgba(15, 110, 86, 0.06);
   font-size: 12px;
+}
+
+.kontextAktionRowExtern {
+  background: rgba(26, 111, 181, 0.06);
+}
+
+.kontextAktionRowExtern .kontextAktionDate {
+  color: #1a6fb5;
 }
 
 .kontextAktionDate {

@@ -28,9 +28,11 @@ import styles from './PlanungsKalender.module.css'
 
 const BAND_FERIEN = '#faeeda'
 const BAND_STAMM = '#b8ddd1'
+const BAND_EXTERN = '#bfd9f2'
 const TEXT_FERIEN = '#854f0b'
 const TEXT_FERIEN_WE = '#633806'
 const TEXT_STAMM = '#0f6e56'
+const TEXT_EXTERN = '#1a6fb5'
 
 type Band = { bg: string; isFirst: boolean; isLast: boolean }
 
@@ -40,6 +42,7 @@ export type PlanungsKalenderProps = {
   planung: Planung
   ferien: FerienCacheEntry | null | undefined
   stammAktionen?: StammAktion[]
+  externAktionen?: StammAktion[]
   stammTreffen?: StammTreffen[]
   optedOutStammIds?: Set<string>
   onTreffenClick?: (treffenId: string) => void
@@ -69,6 +72,7 @@ function buildBands(
   ferienLast: boolean,
   stammAkt: StammAktion | undefined,
   isStammDate: boolean,
+  externAkt?: StammAktion,
 ): Band[] {
   const bands: Band[] = []
   if (isFerienOrFeiertag) {
@@ -79,12 +83,16 @@ function buildBands(
   } else if (isStammDate) {
     bands.push({ bg: BAND_STAMM, isFirst: true, isLast: true })
   }
+  if (externAkt) {
+    bands.push({ bg: BAND_EXTERN, isFirst: iso === externAkt.beginn, isLast: iso === externAkt.ende })
+  }
   return bands
 }
 
 function textColorForBands(bands: Band[], isWeekend: boolean): string | undefined {
   if (bands.length === 0) return undefined
   const top = bands[bands.length - 1]
+  if (top.bg === BAND_EXTERN) return TEXT_EXTERN
   if (top.bg === BAND_STAMM) return TEXT_STAMM
   return isWeekend ? TEXT_FERIEN_WE : TEXT_FERIEN
 }
@@ -255,6 +263,7 @@ function DayCell({
   ferien,
   treffenLookup,
   allStammAktionen,
+  allExternAktionen,
   today,
   stammTreffenHere,
   anyStammTreffenHere,
@@ -276,6 +285,7 @@ function DayCell({
   ferien: FerienCacheEntry | null | undefined
   treffenLookup: TreffenLookup
   allStammAktionen: StammAktion[]
+  allExternAktionen: StammAktion[]
   today: string
   stammTreffenHere?: StammTreffen
   anyStammTreffenHere?: StammTreffen
@@ -300,6 +310,7 @@ function DayCell({
   const isFerienOrFeiertag = !!(cls.ferien || cls.feiertag)
   // For band rendering use ALL stammAktionen and ALL stammTreffen (including opted-out)
   const anyStammAktHere = allStammAktionen.find((a) => cell.iso >= a.beginn && cell.iso <= a.ende)
+  const externAktHere = allExternAktionen.find((a) => cell.iso >= a.beginn && cell.iso <= a.ende)
   const isAnyStammDate = !!anyStammTreffenHere && !stammAktionHere
 
   const bands = buildBands(
@@ -309,6 +320,7 @@ function DayCell({
     !!cls.ferienLast,
     anyStammAktHere,
     isAnyStammDate,
+    externAktHere,
   )
   const bandTextColor = textColorForBands(bands, isWeekend)
 
@@ -459,6 +471,7 @@ export function PlanungsKalender({
   planung,
   ferien,
   stammAktionen: allStammAktionen = [],
+  externAktionen: allExternAktionen = [],
   stammTreffen: allStammTreffen = [],
   optedOutStammIds = new Set(),
   onTreffenClick,
@@ -602,6 +615,7 @@ export function PlanungsKalender({
                   ferien={ferien}
                   treffenLookup={treffenLookup}
                   allStammAktionen={allStammAktionen}
+                  allExternAktionen={allExternAktionen}
                   today={today}
                   stammTreffenHere={stammTreffenHere}
                   anyStammTreffenHere={anyStammTreffenHere}

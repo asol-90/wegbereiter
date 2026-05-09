@@ -121,7 +121,7 @@ describe('parseStammDatei', () => {
     )
     expect(aktivitaeten[0].typ).toBe('andacht-gespraech')
     expect(aktivitaeten[1].typ).toBe('spiel-sport')
-    expect(aktivitaeten[2].typ).toBe('gebet-stille')
+    expect(aktivitaeten[2].typ).toBe('andacht-gespraech')
     // StammBlock in default anfangs/endBlock also migrated
     expect(kontext.defaultAnfangsBlock[0].typ).toBe('sonstiges')
   })

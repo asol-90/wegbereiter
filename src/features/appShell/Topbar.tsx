@@ -13,13 +13,15 @@ export function Topbar() {
 
   return (
     <div className={styles.root}>
-      <span className={styles.appTitle}>RR642 Wegbereiter</span>
+      <div className={styles.appTitle}>
+        <span className={styles.stammCode}>RR642</span>
+        <span className={styles.stammName}>Wegbereiter</span>
+      </div>
       <div className={styles.navGroup}>
         <JahresplanungToggle position={nav.position} />
         <NavToggle position={nav.position} planungId={nav.planungId} />
         <RepertoireToggle active={nav.repertoireActive} />
       </div>
-      <span />
     </div>
   )
 }

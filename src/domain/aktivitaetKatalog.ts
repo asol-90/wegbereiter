@@ -10,13 +10,11 @@ import type { WBKey } from './wb'
 
 export const AKTIVITAET_TYPEN = [
   'andacht-gespraech',
-  'gebet-stille',
   'musik-lobpreis',
   'spiel-sport',
   'basteln-bauen',
   'kochen-essen',
   'pfadfindertechnik',
-  'wachstumspfad',
   'wandern-exkursion',
   'dienst-naechstenliebe',
   'stammformat',
@@ -34,26 +32,20 @@ export const AKTIVITAET_UNTERTYPEN = [
   'bibelarbeit',
   'austausch',
   'zeugnis-runde',
-  // gebet-stille
-  'popcorn-gebet',
-  'hoerendes-gebet',
-  'segnen',
-  'gebetsweg',
-  'stille-zeit',
   // spiel-sport
   'kooperation',
   'wettbewerb',
   'teambuilding',
   'kraft-ausdauer',
   'geschick',
-  // pfadfindertechnik
+  // pfadfindertechnik (inkl. Wachstumspfad)
   'camp',
   'knoten-buende',
   'feuer',
   'orientierung',
   'erste-hilfe-sicherheit',
   'naturkunde',
-  // wachstumspfad
+  'wachstumspfad',
   'entdeckerheft',
   'forscherheft',
   'logbuch',
@@ -72,10 +64,11 @@ export type AktivitaetUntertyp = (typeof AKTIVITAET_UNTERTYPEN)[number]
 
 export const UNTERTYPEN_FUER_TYP: Partial<Record<AktivitaetTyp, readonly AktivitaetUntertyp[]>> = {
   'andacht-gespraech': ['andacht', 'bibelarbeit', 'austausch', 'zeugnis-runde'],
-  'gebet-stille': ['popcorn-gebet', 'hoerendes-gebet', 'segnen', 'gebetsweg', 'stille-zeit'],
   'spiel-sport': ['kooperation', 'wettbewerb', 'teambuilding', 'kraft-ausdauer', 'geschick'],
-  'pfadfindertechnik': ['camp', 'knoten-buende', 'feuer', 'orientierung', 'erste-hilfe-sicherheit', 'naturkunde'],
-  'wachstumspfad': ['entdeckerheft', 'forscherheft', 'logbuch'],
+  'pfadfindertechnik': [
+    'camp', 'knoten-buende', 'feuer', 'orientierung', 'erste-hilfe-sicherheit', 'naturkunde',
+    'wachstumspfad', 'entdeckerheft', 'forscherheft', 'logbuch',
+  ],
   'wandern-exkursion': ['wanderung', 'ausflug'],
   'stammformat': ['stammrunde', 'gelaendespiel', 'stationenlauf'],
 }
@@ -96,13 +89,11 @@ export function istGueltigerUntertyp(typ: AktivitaetTyp, untertyp: string): bool
 
 export const TYP_LABELS: Record<AktivitaetTyp, string> = {
   'andacht-gespraech': 'Andacht/Gespräch',
-  'gebet-stille': 'Gebet/Stille',
   'musik-lobpreis': 'Musik/Lobpreis',
   'spiel-sport': 'Spiel/Sport',
   'basteln-bauen': 'Basteln/Bauen',
   'kochen-essen': 'Kochen/Essen',
   'pfadfindertechnik': 'Pfadfindertechnik',
-  'wachstumspfad': 'Wachstumspfad',
   'wandern-exkursion': 'Wandern/Exkursion',
   'dienst-naechstenliebe': 'Dienst/Nächstenliebe',
   'stammformat': 'Stammformat',
@@ -115,11 +106,6 @@ export const UNTERTYP_LABELS: Record<AktivitaetUntertyp, string> = {
   'bibelarbeit': 'Bibelarbeit',
   'austausch': 'Austausch',
   'zeugnis-runde': 'Zeugnis-Runde',
-  'popcorn-gebet': 'Popcorn-Gebet',
-  'hoerendes-gebet': 'Hörendes Gebet',
-  'segnen': 'Gegenseitiges Segnen',
-  'gebetsweg': 'Gebetsweg',
-  'stille-zeit': 'Stille Zeit',
   'kooperation': 'Kooperation',
   'wettbewerb': 'Wettbewerb',
   'teambuilding': 'Teambuilding',
@@ -131,6 +117,7 @@ export const UNTERTYP_LABELS: Record<AktivitaetUntertyp, string> = {
   'orientierung': 'Orientierung',
   'erste-hilfe-sicherheit': 'Erste Hilfe/Sicherheit',
   'naturkunde': 'Naturkunde',
+  'wachstumspfad': 'Wachstumspfad',
   'entdeckerheft': 'Entdeckerheft',
   'forscherheft': 'Forscherheft',
   'logbuch': 'Logbuch',
@@ -153,13 +140,11 @@ import type { IconName } from '@/ui/primitives/Icon'
 
 export const TYP_ICONS: Record<AktivitaetTyp, IconName> = {
   'andacht-gespraech': 'book',
-  'gebet-stille': 'sun',
   'musik-lobpreis': 'music',
   'spiel-sport': 'zap',
   'basteln-bauen': 'tool',
   'kochen-essen': 'coffee',
   'pfadfindertechnik': 'compass',
-  'wachstumspfad': 'file-text',
   'wandern-exkursion': 'map',
   'dienst-naechstenliebe': 'heart',
   'stammformat': 'users',
@@ -194,7 +179,7 @@ const WB_RAW: Record<string, WBRaw> = {
   'musik-lobpreis': [0, 1, 1, 3],
   // kochen-essen (kein Untertyp)
   'kochen-essen':   [1, 2, 1, 0],
-  // pfadfindertechnik (Default + Untertypen)
+  // pfadfindertechnik (Default + Untertypen inkl. Wachstumspfad)
   'pfadfindertechnik': [2, 0, 2, 0],
   'camp':           [2, 0, 2, 0],
   'knoten-buende':  [2, 0, 2, 0],
@@ -202,7 +187,6 @@ const WB_RAW: Record<string, WBRaw> = {
   'orientierung':   [1, 0, 3, 0],
   'erste-hilfe-sicherheit': [1, 1, 3, 0],
   'naturkunde':     [1, 0, 3, 0],
-  // wachstumspfad (Default + Untertypen)
   'wachstumspfad':  [0, 0, 3, 0],
   'entdeckerheft':  [0, 0, 2, 1],
   'forscherheft':   [0, 0, 3, 0],
@@ -213,13 +197,6 @@ const WB_RAW: Record<string, WBRaw> = {
   'ausflug':        [3, 0, 0, 0],
   // dienst-naechstenliebe (kein Untertyp)
   'dienst-naechstenliebe': [1, 3, 1, 2],
-  // gebet-stille (Default + Untertypen)
-  'gebet-stille':   [0, 0, 0, 3],
-  'popcorn-gebet':  [0, 1, 0, 3],
-  'hoerendes-gebet':[0, 0, 1, 3],
-  'segnen':         [0, 2, 0, 3],
-  'gebetsweg':      [1, 0, 0, 3],
-  'stille-zeit':    [0, 0, 1, 3],
   // stammformat
   'stammformat':    [0, 2, 0, 1],
   'stammrunde':     [0, 2, 0, 1],
@@ -279,16 +256,20 @@ export function getWBDefaultTags(
  * Wird beim Lesen bestehender Daten aus IndexedDB angewendet.
  */
 export const LEGACY_TYP_MAPPING: Record<string, AktivitaetTyp> = {
+  // Phase-8 legacy keys
   'andacht': 'andacht-gespraech',
   'spiel': 'spiel-sport',
   'basteln': 'basteln-bauen',
-  'gebet': 'gebet-stille',
+  'gebet': 'andacht-gespraech',
   'gespraech': 'andacht-gespraech',
   'camptechnik': 'pfadfindertechnik',
   'lagerfeuer': 'pfadfindertechnik',
-  'logbuch': 'wachstumspfad',
+  'logbuch': 'pfadfindertechnik',
   'wegezeit': 'wegezeit',
   'sonstiges': 'sonstiges',
+  // Removed types
+  'gebet-stille': 'andacht-gespraech',
+  'wachstumspfad': 'pfadfindertechnik',
 }
 
 /** Migriert einen alten Typ-Schlüssel. Gibt den Schlüssel unverändert zurück wenn er schon neu ist. */

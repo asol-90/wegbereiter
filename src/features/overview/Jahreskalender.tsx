@@ -90,34 +90,47 @@ function stammDatesPerMonth(
 }
 
 /**
- * Collect Stammaktionen that overlap each month (YYYY-MM key).
- * A multi-month Stammaktion appears in every month it touches.
+ * Collect aktionen (from a flat list) that overlap each month (YYYY-MM key).
  */
-function stammAktionenPerMonth(
-  kontexte: readonly StammKontext[],
+function aktionenPerMonth(
+  aktionen: StammAktion[],
   year: number,
 ): Map<string, StammAktion[]> {
   const result = new Map<string, StammAktion[]>()
   const yStr = String(year)
-  for (const k of kontexte) {
-    for (const a of k.stammaktionen) {
-      // Walk each month of the year and check overlap
-      for (let m = 0; m < 12; m++) {
-        const mKey = `${yStr}-${m < 9 ? '0' : ''}${m + 1}`
-        const monthStart = `${mKey}-01`
-        // Last day of month
-        const lastDay = new Date(year, m + 1, 0).getDate()
-        const monthEnd = `${mKey}-${lastDay}`
-        // Overlap check: aktion.beginn <= monthEnd && aktion.ende >= monthStart
-        if (a.beginn <= monthEnd && a.ende >= monthStart) {
-          const arr = result.get(mKey) ?? []
-          arr.push(a)
-          result.set(mKey, arr)
-        }
+  for (const a of aktionen) {
+    for (let m = 0; m < 12; m++) {
+      const mKey = `${yStr}-${m < 9 ? '0' : ''}${m + 1}`
+      const monthStart = `${mKey}-01`
+      const lastDay = new Date(year, m + 1, 0).getDate()
+      const monthEnd = `${mKey}-${lastDay}`
+      if (a.beginn <= monthEnd && a.ende >= monthStart) {
+        const arr = result.get(mKey) ?? []
+        arr.push(a)
+        result.set(mKey, arr)
       }
     }
   }
   return result
+}
+
+function stammAktionenPerMonth(
+  kontexte: readonly StammKontext[],
+  year: number,
+): Map<string, StammAktion[]> {
+  const all = kontexte.flatMap((k) => k.stammaktionen)
+  return aktionenPerMonth(all, year)
+}
+
+function externAktionenPerMonth(
+  kontexte: readonly StammKontext[],
+  year: number,
+): Map<string, StammAktion[]> {
+  const all = kontexte.flatMap((k) => [
+    ...(k.distriktAktionen ?? []),
+    ...(k.regionalAktionen ?? []),
+  ])
+  return aktionenPerMonth(all, year)
 }
 
 export function Jahreskalender({
@@ -157,6 +170,11 @@ export function Jahreskalender({
 
   const stammAktionenMap = useMemo(
     () => stammAktionenPerMonth(kontexte, year),
+    [kontexte, year],
+  )
+
+  const externAktionenMap = useMemo(
+    () => externAktionenPerMonth(kontexte, year),
     [kontexte, year],
   )
 
@@ -203,6 +221,7 @@ export function Jahreskalender({
               stammCovered={stammCoveredMonths.has(monthKey)}
               stammDates={stammDatesMap.get(monthKey)}
               stammAktionen={stammAktionenMap.get(monthKey)}
+              externAktionen={externAktionenMap.get(monthKey)}
             />
           )
         })}

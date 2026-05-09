@@ -3,6 +3,14 @@
  * Derived verbatim from the wireframes (app-shell-v3.html and friends).
  */
 
+@font-face {
+  font-family: 'Authenia';
+  src: url('/Authenia.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   /* ─── Backgrounds ─── */
   --bg1: #ffffff;
@@ -46,6 +54,7 @@
   --sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue',
     Arial, sans-serif;
   --serif: 'Iowan Old Style', 'Palatino', 'Palatino Linotype', Georgia, serif;
+  --script: 'Authenia', cursive;
 
   /* ─── Radii ─── */
   --r-sm: 4px;

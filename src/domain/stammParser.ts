@@ -92,6 +92,8 @@ type RawStammFile = {
   defaultEndBlock?: unknown
   treffen?: unknown
   stammaktionen?: unknown
+  distriktAktionen?: unknown
+  regionalAktionen?: unknown
   aktivitaeten?: unknown
 }
 
@@ -127,11 +129,13 @@ function assertArray(val: unknown, field: string): asserts val is unknown[] {
     throw new StammParseError(`"${field}" muss ein Array sein.`, field)
 }
 
-/** All accepted typ values: new keys + legacy keys (which get migrated). */
+/** All accepted typ values: new keys + legacy/removed keys (which get migrated). */
 const VALID_TYPEN: readonly string[] = [
   ...AKTIVITAET_TYPEN,
-  // Legacy Phase-8 keys — accepted and migrated
+  // Legacy Phase-8 keys
   'andacht', 'spiel', 'basteln', 'gebet', 'gespraech',
+  // Removed types (now migrated)
+  'gebet-stille', 'wachstumspfad',
 ]
 
 function parseAktivitaetTyp(val: unknown, field: string): AktivitaetTyp {
@@ -360,6 +364,24 @@ export function parseStammDatei(jsonString: string): StammParseResult {
     }
   }
 
+  // ─── DistriktAktionen ───
+  const distriktAktionen: StammAktion[] = []
+  if (raw.distriktAktionen !== undefined) {
+    assertArray(raw.distriktAktionen, 'distriktAktionen')
+    for (let i = 0; i < (raw.distriktAktionen as unknown[]).length; i++) {
+      distriktAktionen.push(parseAktion((raw.distriktAktionen as RawAktion[])[i], i))
+    }
+  }
+
+  // ─── RegionalAktionen ───
+  const regionalAktionen: StammAktion[] = []
+  if (raw.regionalAktionen !== undefined) {
+    assertArray(raw.regionalAktionen, 'regionalAktionen')
+    for (let i = 0; i < (raw.regionalAktionen as unknown[]).length; i++) {
+      regionalAktionen.push(parseAktion((raw.regionalAktionen as RawAktion[])[i], i))
+    }
+  }
+
   if (treffen.length === 0 && stammaktionen.length === 0) {
     throw new StammParseError(
       'Der Stammkontext enthält weder Treffen noch Stammaktionen.',
@@ -392,6 +414,8 @@ export function parseStammDatei(jsonString: string): StammParseResult {
     themenTag,
     treffen,
     stammaktionen,
+    distriktAktionen,
+    regionalAktionen,
     defaultAnfangsBlock,
     defaultEndBlock,
     bearbeitetAm: raw.bearbeitetAm,

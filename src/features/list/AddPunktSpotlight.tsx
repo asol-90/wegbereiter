@@ -113,10 +113,10 @@ export function AddPunktSpotlight({
   )
 
   const addAbstrakt = useCallback(
-    (typ: AktivitaetTyp, untertyp?: AktivitaetUntertyp) => {
+    (typ: AktivitaetTyp, untertyp?: AktivitaetUntertyp, name?: string) => {
       const pp: Omit<ProgrammpunktAbstrakt, 'id'> = {
         kind: 'abstrakt',
-        name: aktivitaetLabel(typ, untertyp),
+        name: name ?? aktivitaetLabel(typ, untertyp),
         typ,
         untertyp,
         wbTags: getWBDefaultTags(typ, untertyp),
@@ -196,7 +196,7 @@ export function AddPunktSpotlight({
             id: `akt-${akt.id}`,
             label: akt.name,
             description: `${akt.zeitMin}–${akt.zeitMax} min`,
-            icon: TYP_ICONS[akt.typ],
+            icon: TYP_ICONS[akt.typ] ?? 'more-horizontal',
             onSelect: () => addKonkret(akt),
           })
         }
@@ -208,7 +208,8 @@ export function AddPunktSpotlight({
     // ─── Top-level type list (no query, no drill) ───────────────────
     if (!q && !activeTyp) {
       for (const typ of AKTIVITAET_TYPEN) {
-        if (typ === 'wegezeit') continue
+        // wegezeit is handled separately; sonstiges and stammformat are excluded from the menu
+        if (typ === 'wegezeit' || typ === 'sonstiges' || typ === 'stammformat') continue
         const hasSubtypes = typ in UNTERTYPEN_FUER_TYP
         result.push({
           id: `typ-${typ}`,
@@ -233,9 +234,9 @@ export function AddPunktSpotlight({
 
     // ─── Search mode: types + subtypes + repertoire ─────────────────
     if (q) {
-      // Types & subtypes
+      // Types & subtypes (sonstiges and stammformat excluded from search results)
       for (const typ of AKTIVITAET_TYPEN) {
-        if (typ === 'wegezeit') continue
+        if (typ === 'wegezeit' || typ === 'sonstiges' || typ === 'stammformat') continue
         const label = TYP_LABELS[typ]
         const typMatches = label.toLowerCase().includes(q)
         const hasSubtypes = typ in UNTERTYPEN_FUER_TYP
@@ -288,20 +289,30 @@ export function AddPunktSpotlight({
       const matched = aktivitaeten.filter((a) => {
         if (a.deaktiviert || a.typ === 'wegezeit') return false
         return a.name.toLowerCase().includes(q) ||
-          TYP_LABELS[a.typ].toLowerCase().includes(q) ||
-          (a.untertyp && UNTERTYP_LABELS[a.untertyp].toLowerCase().includes(q))
+          TYP_LABELS[a.typ]?.toLowerCase().includes(q) ||
+          (a.untertyp && UNTERTYP_LABELS[a.untertyp]?.toLowerCase().includes(q))
       })
 
       for (const akt of matched.slice(0, 15)) {
         const typLabel = akt.untertyp
-          ? `${TYP_LABELS[akt.typ]} · ${UNTERTYP_LABELS[akt.untertyp]}`
-          : TYP_LABELS[akt.typ]
+          ? `${TYP_LABELS[akt.typ] ?? akt.typ} · ${UNTERTYP_LABELS[akt.untertyp] ?? akt.untertyp}`
+          : (TYP_LABELS[akt.typ] ?? akt.typ)
         result.push({
           id: `akt-${akt.id}`,
           label: akt.name,
           description: `${typLabel} · ${akt.zeitMin}–${akt.zeitMax} min`,
-          icon: TYP_ICONS[akt.typ],
+          icon: TYP_ICONS[akt.typ] ?? 'more-horizontal',
           onSelect: () => addKonkret(akt),
+        })
+      }
+
+      // Fallback: offer to add as Sonstiges when nothing matches
+      if (result.length === 0) {
+        result.push({
+          id: 'sonstiges-neu',
+          label: `„${query}" als Sonstiges eintragen`,
+          icon: 'more-horizontal',
+          onSelect: () => addAbstrakt('sonstiges', undefined, query),
         })
       }
     }

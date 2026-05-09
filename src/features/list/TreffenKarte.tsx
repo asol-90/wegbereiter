@@ -420,6 +420,18 @@ export function TreffenKarte({
           })
           break
         }
+        case 'aktivitaet': {
+          mutations.addProgrammpunkt(tid, {
+            kind: 'konkret',
+            name: payload.label,
+            aktivitaetId: payload.aktivitaetId,
+            typ: payload.typ,
+            untertyp: payload.untertyp,
+            wbTags: payload.wbTags,
+            dauerMin: payload.dauerMin,
+          })
+          break
+        }
       }
     },
     [treffen.id, mutations],
