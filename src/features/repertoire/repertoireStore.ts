@@ -109,6 +109,21 @@ export class RepertoireStore {
     await this.reload()
   }
 
+  async importAktivitaeten(items: Aktivitaet[]): Promise<void> {
+    await Promise.all(items.map((a) => saveAktivitaet(a)))
+    await this.reload()
+  }
+
+  async importAndachtsreihen(items: Andachtsreihe[]): Promise<void> {
+    await Promise.all(items.map((r) => saveAndachtsreihe(r)))
+    await this.reload()
+  }
+
+  async importAbzeichen(items: Abzeichen[]): Promise<void> {
+    await Promise.all(items.map((a) => repoSaveAbzeichen(a)))
+    await this.reload()
+  }
+
   // ── Legacy aliases (keep existing call-sites working) ──
 
   async save(a: Aktivitaet): Promise<void> {

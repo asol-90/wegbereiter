@@ -1,0 +1,88 @@
+{
+  "__typ": "abzeichen",
+  "version": 1,
+  "eintraege": [
+    {
+      "name": "Kochbrevet",
+      "altersstufe": "kundschafter",
+      "anforderungen": [
+        {
+          "name": "Lagerfeuer anzünden und unterhalten",
+          "beschreibung": "Ein Lagerfeuer sicher anzünden, kontrolliert brennen lassen und fachgerecht löschen.",
+          "typ": "pfadfindertechnik",
+          "untertyp": "feuer",
+          "zeitMin": 30,
+          "zeitMax": 60
+        },
+        {
+          "name": "Eintopf über dem Feuer kochen",
+          "beschreibung": "Ein vollständiges Gericht mit mind. 4 Zutaten über dem Lagerfeuer zubereiten.",
+          "typ": "kochen-essen",
+          "zeitMin": 60,
+          "zeitMax": 90
+        },
+        {
+          "name": "Brot oder Fladen backen",
+          "beschreibung": "Stockbrot, Chapati oder ähnliches selbst herstellen und backen.",
+          "typ": "kochen-essen",
+          "zeitMin": 30,
+          "zeitMax": 45
+        },
+        {
+          "name": "Hygiene- und Sicherheitsregeln",
+          "beschreibung": "Lebensmittelhygiene und sichere Handhabung von Messern und Feuer erklären.",
+          "typ": "pfadfindertechnik",
+          "untertyp": "erste-hilfe-sicherheit",
+          "zeitMin": 15,
+          "zeitMax": 20
+        }
+      ]
+    },
+    {
+      "name": "Pfadfindertechnik-Stern",
+      "altersstufe": "pfadfinder",
+      "anforderungen": [
+        {
+          "name": "Karte und Kompass: Streckenwanderung",
+          "beschreibung": "Eine mind. 5 km lange Wanderung nur mit Karte und Kompass (ohne GPS) navigieren.",
+          "typ": "pfadfindertechnik",
+          "untertyp": "orientierung",
+          "zeitMin": 120,
+          "zeitMax": 240
+        },
+        {
+          "name": "10 Grundknoten beherrschen",
+          "beschreibung": "Achterknoten, Rettungsknoten, Kreuzknoten, Schauinsland, Pfahlstich u.a. sicher binden und erklären.",
+          "typ": "pfadfindertechnik",
+          "untertyp": "knoten-buende",
+          "zeitMin": 30,
+          "zeitMax": 45
+        },
+        {
+          "name": "Erste-Hilfe-Maßnahmen",
+          "beschreibung": "Stabile Seitenlage, Wundversorgung und einfache Verbände anlegen können.",
+          "typ": "pfadfindertechnik",
+          "untertyp": "erste-hilfe-sicherheit",
+          "zeitMin": 45,
+          "zeitMax": 60
+        },
+        {
+          "name": "Shelter bauen",
+          "beschreibung": "Gemeinsam eine einfache Übernachtungsunterkunft aus natürlichen Materialien bauen.",
+          "typ": "pfadfindertechnik",
+          "untertyp": "camp",
+          "zeitMin": 60,
+          "zeitMax": 120
+        },
+        {
+          "name": "Naturkunde-Quiz",
+          "beschreibung": "20 heimische Pflanzen und Tiere erkennen und benennen können.",
+          "typ": "pfadfindertechnik",
+          "untertyp": "naturkunde",
+          "zeitMin": 30,
+          "zeitMax": 45
+        }
+      ]
+    }
+  ]
+}

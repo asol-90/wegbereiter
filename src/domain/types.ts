@@ -21,10 +21,10 @@ import type {
   TreffenId,
 } from './ids'
 import type { WBKey, WBTag } from './wb'
-import type { AktivitaetTyp, AktivitaetUntertyp } from './aktivitaetKatalog'
+import type { AktivitaetTyp, AktivitaetUntertyp, MinStufe } from './aktivitaetKatalog'
 
 // Re-export so consumers can import from types.ts as before
-export type { AktivitaetTyp, AktivitaetUntertyp } from './aktivitaetKatalog'
+export type { AktivitaetTyp, AktivitaetUntertyp, MinStufe } from './aktivitaetKatalog'
 export { AKTIVITAET_TYPEN } from './aktivitaetKatalog'
 
 /** ISO-Datum 'yyyy-MM-dd'. */
@@ -152,6 +152,8 @@ export type Aktivitaet = {
   zeitMin: number
   zeitMax: number
   stufenbezug?: AbzeichenAnforderungId[]
+  /** Für welche Mindeststufe geeignet. Nicht gesetzt = für alle. */
+  minStufe?: MinStufe
   quelle: AktivitaetQuelle
   notizen?: string
   /**

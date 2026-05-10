@@ -17,6 +17,9 @@ export function useRepertoireActions() {
     remove: repertoireStore.remove.bind(repertoireStore),
     saveAndachtsreihe: repertoireStore.saveAndachtsreihe.bind(repertoireStore),
     removeAndachtsreihe: repertoireStore.removeAndachtsreihe.bind(repertoireStore),
+    importAktivitaeten: repertoireStore.importAktivitaeten.bind(repertoireStore),
+    importAndachtsreihen: repertoireStore.importAndachtsreihen.bind(repertoireStore),
+    importAbzeichen: repertoireStore.importAbzeichen.bind(repertoireStore),
     reload: repertoireStore.reload.bind(repertoireStore),
   }
 }

@@ -284,3 +284,35 @@ export function migrateTyp(raw: string): AktivitaetTyp {
 export function isAktivitaetTyp(val: string): val is AktivitaetTyp {
   return (AKTIVITAET_TYPEN as readonly string[]).includes(val)
 }
+
+// ─── Mindeststufe (Alterseignung) ──────────────────────────────────────────
+
+export const MIN_STUFEN = [
+  'alle',
+  'forscher',
+  'kundschafter',
+  'pfadfinder',
+  'pfadranger',
+] as const
+
+export type MinStufe = (typeof MIN_STUFEN)[number]
+
+export const MIN_STUFE_LABELS: Record<MinStufe, string> = {
+  alle: 'Für alle',
+  forscher: 'Ab Forscher (FS)',
+  kundschafter: 'Ab Kundschafter (KS)',
+  pfadfinder: 'Ab Pfadfinder (PF)',
+  pfadranger: 'Ab Pfadranger (PR)',
+}
+
+export const MIN_STUFE_SHORT: Record<MinStufe, string> = {
+  alle: 'Alle',
+  forscher: 'FS+',
+  kundschafter: 'KS+',
+  pfadfinder: 'PF+',
+  pfadranger: 'PR+',
+}
+
+export function isMinStufe(val: string): val is MinStufe {
+  return (MIN_STUFEN as readonly string[]).includes(val)
+}

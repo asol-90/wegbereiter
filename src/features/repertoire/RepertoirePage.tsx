@@ -6,7 +6,7 @@
  *
  * Layout: Liste links (65 %), Detail/Edit-Panel rechts (35 %).
  */
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import { Panels, Panel } from '@/features/appShell'
 import { useRepertoire, useRepertoireActions } from './useRepertoire'
 import { Icon } from '@/ui/primitives/Icon'
@@ -20,11 +20,15 @@ import {
   TYP_ICONS,
   UNTERTYPEN_FUER_TYP,
   UNTERTYP_LABELS,
-  getWBDefaults,
+  getWBDefaultTags,
   aktivitaetLabel,
+  MIN_STUFEN,
+  MIN_STUFE_LABELS,
   type AktivitaetTyp,
   type AktivitaetUntertyp,
+  type MinStufe,
 } from '@/domain/aktivitaetKatalog'
+import { parseRepertoireImport } from './repertoireImport'
 import { WBAktivitaetEditor } from '@/ui/domain-primitives/WBAktivitaetEditor'
 import { ALTERSSTUFE_LABELS } from '@/domain/abzeichenKatalog'
 import styles from './RepertoirePage.module.css'
@@ -253,8 +257,10 @@ function AktivitaetDetail({
   }
 
   const dirty = JSON.stringify(draft) !== JSON.stringify(aktivitaet)
-  const defaults = getWBDefaults(draft.typ, draft.untertyp)
   const hasWBOverride = draft.wbTags.length > 0
+  const displayWBTags = hasWBOverride
+    ? draft.wbTags
+    : getWBDefaultTags(draft.typ, draft.untertyp) as typeof draft.wbTags
   const typen = typOptions ?? ALL_FILTERABLE_TYPEN
 
   const setField = useCallback(<K extends keyof Aktivitaet>(key: K, val: Aktivitaet[K]) => {
@@ -383,6 +389,22 @@ function AktivitaetDetail({
           </div>
         )}
 
+        <label className={styles.field}>
+          <span className={styles.fieldLabel}>Geeignet ab</span>
+          <select
+            className={styles.fieldInput}
+            value={draft.minStufe ?? 'alle'}
+            onChange={(e) => {
+              const val = e.target.value as MinStufe
+              setField('minStufe', val === 'alle' ? undefined : val)
+            }}
+          >
+            {MIN_STUFEN.map((s) => (
+              <option key={s} value={s}>{MIN_STUFE_LABELS[s]}</option>
+            ))}
+          </select>
+        </label>
+
         {/* WB-Section */}
         <div className={styles.wbSection}>
           <div className={styles.wbHeader}>
@@ -392,7 +414,7 @@ function AktivitaetDetail({
             )}
           </div>
           <WBAktivitaetEditor
-            value={draft.wbTags}
+            value={displayWBTags}
             onChange={(tags) => setField('wbTags', tags)}
           />
         </div>
@@ -1020,8 +1042,42 @@ function AbzeichenDetail({
 
 export function RepertoirePage() {
   const { aktivitaeten, andachtsreihen, abzeichen, loaded } = useRepertoire()
-  const { save, remove, saveAndachtsreihe, removeAndachtsreihe } = useRepertoireActions()
+  const {
+    save, remove, saveAndachtsreihe, removeAndachtsreihe,
+    importAktivitaeten, importAndachtsreihen, importAbzeichen,
+  } = useRepertoireActions()
   const [segment, setSegment] = useState<RepertoireSegment>('aktivitaeten')
+
+  // ── Drag-over detection ──
+  const [isDraggingFile, setIsDraggingFile] = useState(false)
+  const dragCountRef = useRef(0)
+
+  useEffect(() => {
+    function onDragEnter(e: DragEvent) {
+      if (e.dataTransfer?.types.includes('Files')) {
+        dragCountRef.current++
+        setIsDraggingFile(true)
+      }
+    }
+    function onDragLeave(e: DragEvent) {
+      if (!e.relatedTarget) {
+        dragCountRef.current = 0
+        setIsDraggingFile(false)
+      }
+    }
+    function onDrop() {
+      dragCountRef.current = 0
+      setIsDraggingFile(false)
+    }
+    document.addEventListener('dragenter', onDragEnter)
+    document.addEventListener('dragleave', onDragLeave)
+    document.addEventListener('drop', onDrop)
+    return () => {
+      document.removeEventListener('dragenter', onDragEnter)
+      document.removeEventListener('dragleave', onDragLeave)
+      document.removeEventListener('drop', onDrop)
+    }
+  }, [])
 
   // Selection state per segment
   const [selectedAktId, setSelectedAktId] = useState<AktivitaetId | null>(null)
@@ -1132,6 +1188,64 @@ export function RepertoirePage() {
     }
     await save(newAkt)
   }, [save])
+
+  // ── File drop handler ──
+  const [importFeedback, setImportFeedback] = useState<{ type: 'ok' | 'err'; message: string } | null>(null)
+
+  const handleFileDrop = useCallback(async (e: React.DragEvent) => {
+    e.preventDefault()
+    dragCountRef.current = 0
+    setIsDraggingFile(false)
+
+    const file = Array.from(e.dataTransfer.files).find((f) => f.name.endsWith('.json'))
+    if (!file) {
+      setImportFeedback({ type: 'err', message: 'Nur JSON-Dateien werden unterstützt.' })
+      return
+    }
+
+    let data: unknown
+    try {
+      data = JSON.parse(await file.text())
+    } catch {
+      setImportFeedback({ type: 'err', message: 'Datei ist kein gültiges JSON.' })
+      return
+    }
+
+    const outcome = parseRepertoireImport(data)
+    if (outcome.kind === 'unknown') {
+      setImportFeedback({ type: 'err', message: outcome.error })
+      return
+    }
+    if (!outcome.result.ok) {
+      setImportFeedback({ type: 'err', message: outcome.result.error })
+      return
+    }
+
+    const { items, skipped } = outcome.result
+    if (items.length === 0) {
+      setImportFeedback({ type: 'err', message: 'Keine gültigen Einträge in der Datei.' })
+      return
+    }
+
+    if (outcome.kind === 'aktivitaeten') {
+      await importAktivitaeten(items as Aktivitaet[])
+      setSegment(
+        (items as Aktivitaet[]).some((a) => a.typ === 'pfadfindertechnik')
+          ? 'pfadfindertechnik'
+          : 'aktivitaeten',
+      )
+    } else if (outcome.kind === 'andachtsreihen') {
+      await importAndachtsreihen(items as Andachtsreihe[])
+      setSegment('andachtsreihen')
+    } else if (outcome.kind === 'abzeichen') {
+      await importAbzeichen(items as Abzeichen[])
+      setSegment('abzeichen')
+    }
+
+    const skipNote = skipped > 0 ? `, ${skipped} übersprungen` : ''
+    setImportFeedback({ type: 'ok', message: `${items.length} Einträge importiert${skipNote}.` })
+    setTimeout(() => setImportFeedback(null), 4000)
+  }, [importAktivitaeten, importAndachtsreihen, importAbzeichen])
 
   if (!loaded) return null
 
@@ -1250,7 +1364,26 @@ export function RepertoirePage() {
             ariaLabel="Repertoire-Bereich"
           />
         </div>
-        {listContent}
+
+        {importFeedback && (
+          <div className={`${styles.importBanner} ${importFeedback.type === 'ok' ? styles.importBannerOk : styles.importBannerErr}`}>
+            {importFeedback.message}
+          </div>
+        )}
+
+        {isDraggingFile ? (
+          <div
+            className={styles.dropZone}
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={handleFileDrop}
+          >
+            <Icon name="upload" size={36} strokeWidth={1.2} className={styles.dropZoneIcon} />
+            <span className={styles.dropZoneTitle}>JSON-Datei hier ablegen</span>
+            <span className={styles.dropZoneSub}>Aktivitäten · Andachtsreihen · Abzeichen</span>
+          </div>
+        ) : (
+          listContent
+        )}
       </Panel>
       <Panel role="side">
         {detailContent}

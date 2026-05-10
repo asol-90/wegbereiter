@@ -1,0 +1,139 @@
+{
+  "__typ": "andachtsreihen",
+  "version": 1,
+  "eintraege": [
+    {
+      "name": "Früchte des Geistes",
+      "art": "reihe",
+      "buchquelle": {
+        "titel": "Galater 5 – Eine Auslegungsreihe",
+        "autor": "Beispiel Verlag"
+      },
+      "notizen": "Neun Andachten zu den Früchten des Geistes aus Galater 5,22–23.",
+      "einheiten": [
+        {
+          "titel": "Liebe",
+          "bibelstelle": "Gal 5,22a",
+          "thema": "Was bedeutet bedingungslose Liebe?"
+        },
+        {
+          "titel": "Freude",
+          "bibelstelle": "Gal 5,22b",
+          "thema": "Freude als Haltung, nicht als Gefühl"
+        },
+        {
+          "titel": "Friede",
+          "bibelstelle": "Gal 5,22c",
+          "thema": "Frieden mit Gott, sich selbst und anderen"
+        },
+        {
+          "titel": "Geduld",
+          "bibelstelle": "Gal 5,22d",
+          "thema": "Ausharren in schwierigen Situationen"
+        },
+        {
+          "titel": "Freundlichkeit",
+          "bibelstelle": "Gal 5,22e",
+          "thema": "Kleinen Gesten große Wirkung"
+        },
+        {
+          "titel": "Güte",
+          "bibelstelle": "Gal 5,22f",
+          "thema": "Aus dem Herzen heraus handeln"
+        },
+        {
+          "titel": "Treue",
+          "bibelstelle": "Gal 5,22g",
+          "thema": "Verlässlichkeit als Zeugnis"
+        },
+        {
+          "titel": "Sanftmut",
+          "bibelstelle": "Gal 5,23a",
+          "thema": "Stärke durch Sanftheit"
+        },
+        {
+          "titel": "Selbstbeherrschung",
+          "bibelstelle": "Gal 5,23b",
+          "thema": "Der Geist leitet, nicht die Impulse"
+        }
+      ]
+    },
+    {
+      "name": "Psalmen der Klage und des Vertrauens",
+      "art": "sammlung",
+      "notizen": "Pool von Psalmen-Andachten – passend für ruhige Abende im Lager.",
+      "einheiten": [
+        {
+          "titel": "Wo bist du, Gott?",
+          "bibelstelle": "Psalm 22,1–11",
+          "thema": "Klagen darf sein"
+        },
+        {
+          "titel": "Der Herr ist mein Hirte",
+          "bibelstelle": "Psalm 23",
+          "thema": "Führung und Geborgenheit"
+        },
+        {
+          "titel": "Hilfe in der Not",
+          "bibelstelle": "Psalm 46",
+          "thema": "Gott als Zuflucht"
+        },
+        {
+          "titel": "Lob trotz allem",
+          "bibelstelle": "Psalm 103,1–5",
+          "thema": "Dankbarkeit als Übung"
+        },
+        {
+          "titel": "Nachtgedanken",
+          "bibelstelle": "Psalm 139,1–12",
+          "thema": "Gott kennt mich vollständig"
+        }
+      ]
+    },
+    {
+      "name": "Wer ist Jesus?",
+      "art": "reihe",
+      "buchquelle": {
+        "titel": "Ich bin – Sieben Bildreden Jesu"
+      },
+      "notizen": "Reihe über die \"Ich bin\"-Worte im Johannesevangelium.",
+      "einheiten": [
+        {
+          "titel": "Das Brot des Lebens",
+          "bibelstelle": "Joh 6,35",
+          "thema": "Was uns wirklich sattmacht"
+        },
+        {
+          "titel": "Das Licht der Welt",
+          "bibelstelle": "Joh 8,12",
+          "thema": "Orientierung im Dunkeln"
+        },
+        {
+          "titel": "Die Tür",
+          "bibelstelle": "Joh 10,9",
+          "thema": "Eingang und Ausgang in Sicherheit"
+        },
+        {
+          "titel": "Der gute Hirte",
+          "bibelstelle": "Joh 10,11",
+          "thema": "Fürsorge die nichts kostet"
+        },
+        {
+          "titel": "Die Auferstehung und das Leben",
+          "bibelstelle": "Joh 11,25",
+          "thema": "Hoffnung über den Tod hinaus"
+        },
+        {
+          "titel": "Der Weg, die Wahrheit und das Leben",
+          "bibelstelle": "Joh 14,6",
+          "thema": "Orientierung im Leben"
+        },
+        {
+          "titel": "Der wahre Weinstock",
+          "bibelstelle": "Joh 15,1–5",
+          "thema": "Verbunden bleiben"
+        }
+      ]
+    }
+  ]
+}

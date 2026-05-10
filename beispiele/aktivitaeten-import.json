@@ -1,0 +1,94 @@
+{
+  "__typ": "aktivitaeten",
+  "version": 1,
+  "eintraege": [
+    {
+      "name": "Vertrauensübung im Kreis",
+      "typ": "spiel-sport",
+      "untertyp": "teambuilding",
+      "zeitMin": 20,
+      "zeitMax": 35,
+      "minStufe": "kundschafter",
+      "themenTags": ["Vertrauen", "Gemeinschaft"],
+      "notizen": "Gruppe bildet einen engen Kreis, eine Person lässt sich fallen."
+    },
+    {
+      "name": "Lieder lernen und singen",
+      "typ": "musik-lobpreis",
+      "zeitMin": 20,
+      "zeitMax": 40,
+      "themenTags": ["Lobpreis", "Musik"],
+      "wbTags": { "geistlich": 2, "gesellschaftlich": 1 }
+    },
+    {
+      "name": "Kuchenbacken für Nachbarn",
+      "typ": "dienst-naechstenliebe",
+      "zeitMin": 60,
+      "zeitMax": 90,
+      "themenTags": ["Nächstenliebe", "Backen"],
+      "wbTags": { "gesellschaftlich": 3, "geistlich": 2, "koerperlich": 1 },
+      "notizen": "Kuchen backen und an ältere Nachbarn verteilen."
+    },
+    {
+      "name": "Bibelquiz in Teams",
+      "typ": "andacht-gespraech",
+      "untertyp": "bibelarbeit",
+      "zeitMin": 25,
+      "zeitMax": 40,
+      "minStufe": "kundschafter",
+      "themenTags": ["Bibel", "Quiz"],
+      "wbTags": { "geistlich": 3, "geistig": 2, "gesellschaftlich": 2 }
+    },
+    {
+      "name": "Knoten-Staffel",
+      "typ": "pfadfindertechnik",
+      "untertyp": "knoten-buende",
+      "zeitMin": 15,
+      "zeitMax": 25,
+      "minStufe": "forscher",
+      "themenTags": ["Knoten", "Wettbewerb"]
+    },
+    {
+      "name": "Lagerfeuer mit Stockbrot",
+      "typ": "pfadfindertechnik",
+      "untertyp": "feuer",
+      "zeitMin": 45,
+      "zeitMax": 90,
+      "themenTags": ["Lager", "Gemeinschaft", "Essen"]
+    },
+    {
+      "name": "Sternwanderung",
+      "typ": "wandern-exkursion",
+      "untertyp": "wanderung",
+      "zeitMin": 90,
+      "zeitMax": 180,
+      "minStufe": "forscher",
+      "themenTags": ["Natur", "Orientierung"]
+    },
+    {
+      "name": "Kunstobjekt aus Naturmaterialien",
+      "typ": "basteln-bauen",
+      "zeitMin": 30,
+      "zeitMax": 60,
+      "themenTags": ["Kreativität", "Natur"]
+    },
+    {
+      "name": "Internationales Kochevent",
+      "typ": "kochen-essen",
+      "zeitMin": 60,
+      "zeitMax": 90,
+      "minStufe": "pfadfinder",
+      "themenTags": ["Kochen", "Kulturen"],
+      "notizen": "Jede Gruppe kocht ein Gericht aus einem anderen Land."
+    },
+    {
+      "name": "Kartenleseübung mit Kompass",
+      "typ": "pfadfindertechnik",
+      "untertyp": "orientierung",
+      "zeitMin": 30,
+      "zeitMax": 50,
+      "minStufe": "kundschafter",
+      "themenTags": ["Navigation", "Karte", "Kompass"]
+    }
+  ]
+}
