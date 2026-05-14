@@ -7,22 +7,20 @@
  *
  * On completion: creates StammKontext + Aktivitäten, navigates to editor.
  */
-import { useCallback, useEffect, useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { Button, Input, Modal, Select, type SelectOption } from '@/ui/primitives'
-import { Icon } from '@/ui/primitives/Icon'
-import { useGlobalConfig } from '@/features/globalConfig'
-import { useStammKontextActions } from './useStammKontext'
-import { repertoireStore } from '@/features/repertoire/repertoireStore'
-import { generateTermine, parseIso } from '@/domain/dateUtils'
-import { newId } from '@/domain/ids'
-import type { IsoDate, Weekday, Aktivitaet, StammKontext, StammTreffen } from '@/domain/types'
-import type { StammTreffenId, AktivitaetId, StammImportId } from '@/domain/ids'
-import { WEEKDAYS } from '@/domain/types'
-import { AKTIVITAET_TYPEN, type AktivitaetTyp } from '@/domain/aktivitaetKatalog'
-import { classifyDay } from '@/features/overview/monthGrid'
-import { useFerienForYear } from '@/features/overview/useFerienForYear'
+import {AKTIVITAET_TYPEN, type AktivitaetTyp} from '@/domain/aktivitaetKatalog'
+import {generateTermine, parseIso} from '@/domain/dateUtils'
+import {newId, type AktivitaetId, type StammImportId, type StammTreffenId} from '@/domain/ids'
+import {WEEKDAYS, type Aktivitaet, type IsoDate, type StammKontext, type StammTreffen, type Weekday} from '@/domain/types'
+import {useGlobalConfig} from '@/features/globalConfig'
+import {classifyDay} from '@/features/overview/monthGrid'
+import {useFerienForYear} from '@/features/overview/useFerienForYear'
+import {repertoireStore} from '@/features/repertoire/repertoireStore'
+import {Button, Input, Modal, Select, type SelectOption} from '@/ui/primitives'
+import {Icon} from '@/ui/primitives/Icon'
+import {useCallback, useEffect, useMemo, useState} from 'react'
+import {useNavigate} from 'react-router-dom'
 import styles from './NewKontextWizard.module.css'
+import {useStammKontextActions} from './useStammKontext'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -134,6 +132,7 @@ export function NewKontextWizard({ open, onClose, initialZeitraum }: NewKontextW
   const ferienYear2 = useFerienForYear(yearEnde !== yearStart ? yearEnde : yearStart)
 
   // ── Init on open ──
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (!open) return
     setStep(0)
@@ -153,8 +152,10 @@ export function NewKontextWizard({ open, onClose, initialZeitraum }: NewKontextW
       setEnde(defaultEnde(s))
     }
   }, [open, loaded, config.defaultWeekday, initialZeitraum])
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   // ── Regenerate termine when inputs change ──
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (!start || !ende || start >= ende) {
       setTermine([])
@@ -171,6 +172,7 @@ export function NewKontextWizard({ open, onClose, initialZeitraum }: NewKontextW
     setTermine(entries)
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [start, ende, weekday, rhythmusK, ferienYear1, ferienYear2])
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const activeCount = useMemo(() => termine.filter((t) => t.aktiv).length, [termine])
 

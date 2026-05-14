@@ -10,39 +10,22 @@
  * Drag-to-assign: CheckRow items set native HTML DnD dataTransfer with
  * a KontextDragPayload. TreffenKarten act as drop targets.
  */
-import { useMemo, useCallback, type DragEvent } from 'react'
-import { format } from 'date-fns'
-import { de } from 'date-fns/locale'
-import { WB_KEYS, type WBKey } from '@/domain/wb'
-import {
-  contributionOf,
-  combine,
-  normalize,
-  characterize,
-  characterLabel,
-} from '@/domain/wbLogic'
-import { wbZielverteilung } from '@/domain/wbZielverteilung'
-import { parseIso } from '@/domain/dateUtils'
-import type {
-  Aktivitaet,
-  Planung,
-  Programmpunkt,
-  Andachtsreihe,
-  Abzeichen,
-  StammKontext,
-} from '@/domain/types'
-import { WBDonut } from '@/ui/domain/WBDonut'
-import { WBGoalBars, type WBGoalBarDatum } from '@/ui/domain/WBGoalBars'
-import { Icon, AccordionGroup, type AccordionGroupItem } from '@/ui/primitives'
-import { useStammKontext } from '@/features/stammKontext'
-import { useRepertoire } from '@/features/repertoire/useRepertoire'
-import { useKontextDaten } from './useKontextDaten'
-import {
-  KONTEXT_DRAG_MIME,
-  encodePayload,
-  type KontextDragPayload,
-} from './dragPayload'
+import {parseIso} from '@/domain/dateUtils'
+import type {Abzeichen, Aktivitaet, Andachtsreihe, Planung, Programmpunkt, StammKontext,} from '@/domain/types'
+import {WB_KEYS, type WBKey} from '@/domain/wb'
+import {characterize, characterLabel, combine, contributionOf, normalize,} from '@/domain/wbLogic'
+import {wbZielverteilung} from '@/domain/wbZielverteilung'
+import {useRepertoire} from '@/features/repertoire/useRepertoire'
+import {useStammKontext} from '@/features/stammKontext'
+import {WBDonut} from '@/ui/domain/WBDonut'
+import {type WBGoalBarDatum, WBGoalBars} from '@/ui/domain/WBGoalBars'
+import {AccordionGroup, type AccordionGroupItem, Icon} from '@/ui/primitives'
+import {format} from 'date-fns'
+import {de} from 'date-fns/locale'
+import {type DragEvent, useCallback, useMemo} from 'react'
+import {encodePayload, KONTEXT_DRAG_MIME, type KontextDragPayload,} from './dragPayload'
 import styles from './Kontextleiste.module.css'
+import {useKontextDaten} from './useKontextDaten'
 
 // ─── Props ──────────────────────────────────────────────────────────────────
 
@@ -61,7 +44,7 @@ export function Kontextleiste({ planung }: KontextleisteProps) {
   const zuordnungen = useMemo(() => {
     if (planung.andachtsreihenZuordnung) return planung.andachtsreihenZuordnung
     // Fallback für Legacy-Daten
-    const legacy = (planung as any).andachtsreiheIds as string[] | undefined
+    const legacy = (planung as { andachtsreiheIds?: string[] }).andachtsreiheIds
     if (legacy && legacy.length > 0) {
       return legacy.map((id: string) => ({ reiheId: id }))
     }
@@ -224,7 +207,7 @@ function WBSektion({ planung }: { planung: Planung }) {
 
 function AndachtsreiheInner({
   reihe,
-  planung,
+  planung: _planung,
   zuweisungen,
 }: {
   reihe: Andachtsreihe

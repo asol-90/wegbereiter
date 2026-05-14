@@ -8,48 +8,27 @@
  *   3. Unsere Ziele  — Platzhalter.
  *   4. Vorschau      — Name + Zusammenfassung.
  */
-import { useEffect, useMemo, useRef, useState } from 'react'
-import { format, parseISO } from 'date-fns'
-import { de } from 'date-fns/locale'
-import {
-  AccordionGroup,
-  Badge,
-  Button,
-  Input,
-  Modal,
-  Select,
-  type SelectOption,
-} from '@/ui/primitives'
-import { Icon } from '@/ui/primitives/Icon'
-import { useGlobalConfig } from '@/features/globalConfig'
-import { usePlanungenActions, usePlanungen } from '@/features/planungen'
-import { useStammKontext } from '@/features/stammKontext'
-import type {
-  Altersstufe,
-  Ferien,
-  IsoDate,
-  Mitarbeiter,
-  Planung,
-  Rhythmus,
-  StammAktion,
-  StammKontext,
-  Weekday,
-  WbSchwerpunktModus,
-} from '@/domain/types'
-import type { AbzeichenId, AndachtsEinheitId, AndachtsreiheId, MitarbeiterId } from '@/domain/ids'
-import { newId } from '@/domain/ids'
-import { WEEKDAYS } from '@/domain/types'
-import { generateTermine, parseIso } from '@/domain/dateUtils'
-import { generatePlanungsName } from '@/domain/planungFactory'
-import { stammAbzugFuerTreffen } from '@/domain/zeitbudget'
-import { aktivitaetLabel } from '@/domain/aktivitaetKatalog'
-import { WB_KEYS, WB_LABELS, WB_CSS_VAR, type WBKey } from '@/domain/wb'
-import { ALTERSSTUFE_LABELS, abzeichenFuerStufe, ABZEICHEN_KATALOG } from '@/domain/abzeichenKatalog'
-import { useRepertoire } from '@/features/repertoire/useRepertoire'
-import { saveAndachtsreihe } from '@/storage/repertoireRepo'
-import { classifyDay } from './monthGrid'
-import { useFerienForYear } from './useFerienForYear'
+import {ABZEICHEN_KATALOG, abzeichenFuerStufe, ALTERSSTUFE_LABELS} from '@/domain/abzeichenKatalog'
+import {aktivitaetLabel} from '@/domain/aktivitaetKatalog'
+import {generateTermine, parseIso} from '@/domain/dateUtils'
+import {newId, type AbzeichenId, type AndachtsEinheitId, type AndachtsreiheId, type MitarbeiterId} from '@/domain/ids'
+import {generatePlanungsName} from '@/domain/planungFactory'
+import {WEEKDAYS, type Altersstufe, type Ferien, type IsoDate, type Mitarbeiter, type Planung, type Rhythmus, type StammAktion, type StammKontext, type WbSchwerpunktModus, type Weekday,} from '@/domain/types'
+import {WB_CSS_VAR, WB_KEYS, WB_LABELS, type WBKey} from '@/domain/wb'
+import {stammAbzugFuerTreffen} from '@/domain/zeitbudget'
+import {useGlobalConfig} from '@/features/globalConfig'
+import {usePlanungen, usePlanungenActions} from '@/features/planungen'
+import {useRepertoire} from '@/features/repertoire/useRepertoire'
+import {useStammKontext} from '@/features/stammKontext'
+import {saveAndachtsreihe} from '@/storage/repertoireRepo'
+import {AccordionGroup, Badge, Button, Input, Modal, Select, type SelectOption,} from '@/ui/primitives'
+import {Icon} from '@/ui/primitives/Icon'
+import {format, parseISO} from 'date-fns'
+import {de} from 'date-fns/locale'
+import {useEffect, useMemo, useRef, useState} from 'react'
+import {classifyDay} from './monthGrid'
 import styles from './NewPlanungWizard.module.css'
+import {useFerienForYear} from './useFerienForYear'
 
 // ─── Types & constants ──────────────────────────────────────────────────────
 
@@ -78,10 +57,6 @@ function buildStepSequence(hasKontext: boolean): LogicalStep[] {
   if (hasKontext) steps.push('stammkontext')
   steps.push('ziele', 'vorschau')
   return steps
-}
-
-function stepLabels(steps: LogicalStep[]): string[] {
-  return steps.map((s, i) => `${i + 1} · ${STEP_META[s]}`)
 }
 
 const WEEKDAY_LABELS: Record<Weekday, string> = {
@@ -439,7 +414,7 @@ export function NewPlanungWizard({ open, onClose, onCreated, initialZeitraum }: 
   const andachtFocusRef = useRef<string | null>(null)
 
   // Abzeichen
-  const [abzeichenEnabled, setAbzeichenEnabled] = useState(false)
+  const [_abzeichenEnabled, setAbzeichenEnabled] = useState(false)
   const [selectedAltersstufe, setSelectedAltersstufe] = useState<Altersstufe | null>(null)
   const [selectedAbzeichenId, setSelectedAbzeichenId] = useState<AbzeichenId | null>(null)
 
@@ -459,6 +434,7 @@ export function NewPlanungWizard({ open, onClose, onCreated, initialZeitraum }: 
 
   // ─── Initialise on open ───────────────────────────────────────────────
 
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (!open) return
     setStepIndex(0)
@@ -553,9 +529,11 @@ export function NewPlanungWizard({ open, onClose, onCreated, initialZeitraum }: 
       }
     }
   }, [open, loaded, config.defaultWeekday, config.defaultRhythmus, config.defaultDauerMinuten, planungen, kontexte, initialZeitraum])
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   // Smart default end date: once Ferien are loaded and user hasn't changed ende manually
   const [endeWasAutoSet, setEndeWasAutoSet] = useState(true)
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (!open || !endeWasAutoSet || hasKontext) return
     const smart = smartDefaultEnd(
@@ -568,6 +546,7 @@ export function NewPlanungWizard({ open, onClose, onCreated, initialZeitraum }: 
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [ferienYear1, ferienYear2])
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   // Close preset dropdown on outside click
   useEffect(() => {
@@ -590,7 +569,7 @@ export function NewPlanungWizard({ open, onClose, onCreated, initialZeitraum }: 
     return generatePlanungsName(start, ende)
   }, [start, ende])
 
-  const effectiveName = nameOverride.trim() || autoName
+  const _effectiveName = nameOverride.trim() || autoName
 
   const generated = useMemo<IsoDate[]>(() => {
     if (!start || !ende || start >= ende) return []

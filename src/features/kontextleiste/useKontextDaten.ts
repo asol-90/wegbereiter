@@ -4,14 +4,11 @@
  * Abzeichen: looked up from the in-memory ABZEICHEN_KATALOG first, then IDB.
  * Andachtsreihen: loaded from IndexedDB by ID.
  */
-import { useState, useEffect, useMemo } from 'react'
-import type { Andachtsreihe, Abzeichen, AndachtsreiheZuordnung } from '@/domain/types'
-import type { AbzeichenId } from '@/domain/ids'
-import { ABZEICHEN_KATALOG } from '@/domain/abzeichenKatalog'
-import {
-  getAndachtsreihe,
-  listAbzeichen,
-} from '@/storage/repertoireRepo'
+import {ABZEICHEN_KATALOG} from '@/domain/abzeichenKatalog'
+import type {AbzeichenId} from '@/domain/ids'
+import type {Abzeichen, Andachtsreihe, AndachtsreiheZuordnung} from '@/domain/types'
+import {getAndachtsreihe} from '@/storage/repertoireRepo'
+import {useEffect, useMemo, useState} from 'react'
 
 export type KontextDaten = {
   loaded: boolean
@@ -42,6 +39,7 @@ export function useKontextDaten(
   const [reihen, setReihen] = useState<Andachtsreihe[]>([])
   const [loaded, setLoaded] = useState(safeZuordnungen.length === 0)
 
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     if (safeZuordnungen.length === 0) {
       setReihen([])
@@ -63,6 +61,7 @@ export function useKontextDaten(
     load()
     return () => { cancelled = true }
   }, [safeZuordnungen])
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   return { loaded, andachtsreihen: reihen, abzeichen }
 }

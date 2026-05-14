@@ -4,16 +4,10 @@
  * Dumb/controlled: consumer owns `open`, `query`, and the currently-filtered
  * `items`. The component handles rendering, keyboard navigation, and selection.
  */
-import {
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-  type ReactNode,
-} from 'react'
+import {type ReactNode, useCallback, useEffect, useRef, useState,} from 'react'
 import clsx from '../utils/clsx'
-import { Icon, type IconName } from './Icon'
-import { Kbd } from './Kbd'
+import {Icon, type IconName} from './Icon'
+import {Kbd} from './Kbd'
 import styles from './Spotlight.module.css'
 
 export type SpotlightItem = {
@@ -55,6 +49,7 @@ export function Spotlight({
   }, [open])
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setActiveIdx(0)
   }, [query, items.length])
 

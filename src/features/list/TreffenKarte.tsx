@@ -21,63 +21,24 @@ import {
 import {
   SortableContext,
   verticalListSortingStrategy,
-  useSortable,
   arrayMove,
 } from '@dnd-kit/sortable'
-import { CSS } from '@dnd-kit/utilities'
-import type { Treffen, Mitarbeiter, Programmpunkt, StammBlock, AktivitaetTyp, AktivitaetUntertyp } from '@/domain/types'
-import type { TreffenId, ProgrammpunktId, MitarbeiterId } from '@/domain/ids'
 import {
   KONTEXT_DRAG_MIME,
   decodePayload,
 } from '@/features/kontextleiste'
-import { TYP_ICONS, TYP_LABELS, UNTERTYP_LABELS } from '@/domain/aktivitaetKatalog'
-import { WB_KEYS, type WBKey } from '@/domain/wb'
+import { WB_KEYS } from '@/domain/wb'
 import { DurationBar } from '@/ui/domain/DurationBar'
 import { WBDot } from '@/ui/domain/WBDot'
-import { TypeIcon } from '@/ui/domain/TypeIcon'
 import { Icon } from '@/ui/primitives/Icon'
 import { Avatar } from '@/ui/domain/Avatar'
 import clsx from '@/ui/utils/clsx'
 import styles from './TreffenKarte.module.css'
+import type { TreffenMutations, StammBlocksForTreffen, TreffenKarteProps } from './treffenKarteTypes'
+import { SortableProgrammpunktRow, StammBlockRow } from './SortableProgrammpunktRow'
+import type { TreffenId, ProgrammpunktId } from '@/domain/ids'
 
-export type TreffenMutations = {
-  setTitel: (treffenId: TreffenId, titel: string) => void
-  setNotiz: (treffenId: TreffenId, notiz: string) => void
-  toggleFixiert: (treffenId: TreffenId) => void
-  toggleSollWB: (treffenId: TreffenId, key: WBKey) => void
-  addProgrammpunkt: (treffenId: TreffenId, pp: Omit<Programmpunkt, 'id'>) => void
-  removeProgrammpunkt: (treffenId: TreffenId, ppId: ProgrammpunktId) => void
-  updateProgrammpunkt: (
-    treffenId: TreffenId,
-    ppId: ProgrammpunktId,
-    patch: Partial<Pick<Programmpunkt, 'name' | 'dauerMin' | 'verantwortlicherId' | 'gastName'>>,
-  ) => void
-  reorderProgrammpunkte: (treffenId: TreffenId, orderedIds: ProgrammpunktId[]) => void
-  replaceProgrammpunkt: (treffenId: TreffenId, oldPpId: ProgrammpunktId, pp: Omit<Programmpunkt, 'id'>) => void
-}
-
-export type StammBlocksForTreffen = {
-  anfangsBlock: StammBlock[]
-  endBlock: StammBlock[]
-  /** Total Stamm minutes (sum of both blocks). */
-  stammMin: number
-}
-
-export type TreffenKarteProps = {
-  treffen: Treffen
-  dauerMinuten: number
-  team: Mitarbeiter[]
-  zeitbalkenSchwelle: number
-  mutations: TreffenMutations
-  onAddClick: (treffenId: TreffenId) => void
-  /** Opens the Command-Menu pre-filtered to the given type for "Konkretisieren". */
-  onKonkretisieren?: (treffenId: TreffenId, ppId: ProgrammpunktId, typ: AktivitaetTyp, untertyp?: AktivitaetUntertyp) => void
-  /** Resolved Stamm blocks for this meeting (undefined = no context). */
-  stammBlocks?: StammBlocksForTreffen
-  /** IDs of team members absent on this Treffen's date. */
-  abwesendeIds?: Set<MitarbeiterId>
-}
+export type { TreffenMutations, StammBlocksForTreffen, TreffenKarteProps }
 
 // ─── Date formatting ────────────────────────────────────────────────────────
 
@@ -93,6 +54,8 @@ function formatDate(iso: string) {
 }
 
 // ─── WB aggregation ─────────────────────────────────────────────────────────
+
+import type { Treffen } from '@/domain/types'
 
 function aggregateWB(treffen: Treffen): Map<string, number> {
   const map = new Map<string, number>()
@@ -127,226 +90,7 @@ function LockClosed() {
   )
 }
 
-// ─── Sortable Programmpunkt row ─────────────────────────────────────────────
-
-function SortableProgrammpunktRow({
-  pp,
-  team,
-  treffenId,
-  mutations,
-  onKonkretisieren,
-}: {
-  pp: Programmpunkt
-  team: Mitarbeiter[]
-  treffenId: TreffenId
-  mutations: TreffenMutations
-  onKonkretisieren?: (treffenId: TreffenId, ppId: ProgrammpunktId, typ: AktivitaetTyp, untertyp?: AktivitaetUntertyp) => void
-}) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id: pp.id })
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    zIndex: isDragging ? 10 : undefined,
-    position: isDragging ? 'relative' as const : undefined,
-  }
-
-  const [editingName, setEditingName] = useState(false)
-  const [editingDur, setEditingDur] = useState(false)
-  const [localName, setLocalName] = useState(pp.name)
-  const [localDur, setLocalDur] = useState(String(pp.dauerMin))
-
-  const nameRef = useRef<HTMLInputElement>(null)
-  const durRef = useRef<HTMLInputElement>(null)
-
-  const commitName = () => {
-    setEditingName(false)
-    const trimmed = localName.trim()
-    if (trimmed && trimmed !== pp.name) {
-      mutations.updateProgrammpunkt(treffenId, pp.id, { name: trimmed })
-    } else {
-      setLocalName(pp.name)
-    }
-  }
-
-  const commitDur = () => {
-    setEditingDur(false)
-    const parsed = parseInt(localDur, 10)
-    if (!isNaN(parsed) && parsed > 0 && parsed !== pp.dauerMin) {
-      mutations.updateProgrammpunkt(treffenId, pp.id, { dauerMin: parsed })
-    } else {
-      setLocalDur(String(pp.dauerMin))
-    }
-  }
-
-  return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className={clsx(styles.point, isDragging && styles.pointDragging)}
-    >
-      {/* Drag handle — only this element triggers dragging */}
-      <span
-        className={styles.pointHandle}
-        {...attributes}
-        {...listeners}
-        style={{ cursor: 'grab', touchAction: 'none' }}
-      >
-        <Icon name="drag-handle" size={11} />
-      </span>
-
-      {pp.kind === 'abstrakt' ? (
-        <Icon name={TYP_ICONS[(pp as { typ: AktivitaetTyp }).typ]} size={13} className={styles.pointTypeIcon} />
-      ) : (
-        <TypeIcon
-          type={{ kind: 'programmpunkt', value: pp.kind }}
-          size={13}
-          hideLabel
-        />
-      )}
-
-      {/* Name — click to edit */}
-      {editingName ? (
-        <input
-          ref={nameRef}
-          className={styles.pointNameInput}
-          value={localName}
-          onChange={(e) => setLocalName(e.target.value)}
-          onBlur={commitName}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') nameRef.current?.blur()
-            if (e.key === 'Escape') {
-              setLocalName(pp.name)
-              setEditingName(false)
-            }
-          }}
-          autoFocus
-        />
-      ) : (
-        <span
-          className={styles.pointName}
-          onClick={() => {
-            setLocalName(pp.name)
-            setEditingName(true)
-          }}
-        >
-          {pp.name}
-        </span>
-      )}
-
-      {/* Responsible */}
-      <select
-        className={styles.pointRespSelect}
-        value={pp.verantwortlicherId ?? ''}
-        onChange={(e) => {
-          const val = e.target.value
-          if (val) {
-            mutations.updateProgrammpunkt(treffenId, pp.id, {
-              verantwortlicherId: val as MitarbeiterId,
-              gastName: undefined,
-            })
-          } else {
-            mutations.updateProgrammpunkt(treffenId, pp.id, {
-              verantwortlicherId: undefined,
-            })
-          }
-        }}
-        title="Verantwortlich"
-      >
-        <option value="">—</option>
-        {team.map((m) => (
-          <option key={m.id} value={m.id}>{m.name}</option>
-        ))}
-      </select>
-
-      {/* Duration — click to edit */}
-      {editingDur ? (
-        <input
-          ref={durRef}
-          className={styles.pointDurInput}
-          type="number"
-          min={1}
-          value={localDur}
-          onChange={(e) => setLocalDur(e.target.value)}
-          onBlur={commitDur}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') durRef.current?.blur()
-            if (e.key === 'Escape') {
-              setLocalDur(String(pp.dauerMin))
-              setEditingDur(false)
-            }
-          }}
-          autoFocus
-        />
-      ) : (
-        <span
-          className={styles.pointDur}
-          onClick={() => {
-            setLocalDur(String(pp.dauerMin))
-            setEditingDur(true)
-          }}
-        >
-          {pp.dauerMin} min
-        </span>
-      )}
-
-      {/* Konkretisieren — always occupies col 6; hidden placeholder when not needed */}
-      {pp.kind === 'abstrakt' && onKonkretisieren ? (
-        <button
-          className={styles.pointKonkretIcon}
-          onClick={() => {
-            const a = pp as { typ: AktivitaetTyp; untertyp?: AktivitaetUntertyp }
-            onKonkretisieren(treffenId, pp.id, a.typ, a.untertyp)
-          }}
-          title="Konkretisieren"
-        >
-          <Icon name="crosshair" size={13} />
-        </button>
-      ) : (
-        <span />
-      )}
-
-      {/* Delete */}
-      <button
-        className={styles.pointDelete}
-        onClick={() => mutations.removeProgrammpunkt(treffenId, pp.id)}
-        title="Entfernen"
-      >
-        <Icon name="x" size={13} />
-      </button>
-    </div>
-  )
-}
-
 // ─── Main component ─────────────────────────────────────────────────────────
-
-// ─── Stamm block row (non-sortable, green) ─────────────────────────────────
-
-function StammBlockRow({ block }: { block: StammBlock }) {
-  return (
-    <div className={styles.pointStamm}>
-      <span /> {/* handle placeholder */}
-      <TypeIcon
-        type={{ kind: 'stamm' }}
-        size={13}
-        hideLabel
-        className={styles.pointStammIcon}
-      />
-      <span className={styles.pointName}>{block.name}</span>
-      <span className={styles.pointStammResp}>Stamm</span>
-      <span className={styles.pointStammDur}>{block.dauerMin} min</span>
-      <span /> {/* crosshair placeholder */}
-      <span /> {/* delete placeholder */}
-    </div>
-  )
-}
 
 export function TreffenKarte({
   treffen,

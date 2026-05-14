@@ -4,18 +4,11 @@
  * Keeps a draft copy in React state and debounces saves to the store so the
  * UI stays snappy while the DB write happens in the background.
  */
-import { useCallback, useEffect, useRef, useState } from 'react'
-import type {
-  StammKontext,
-  StammBlock,
-  StammTreffen,
-  StammAktion,
-  IsoDate,
-} from '@/domain/types'
-import type { StammKontextId, StammTreffenId, StammAktionId, AktivitaetId } from '@/domain/ids'
-import { newId } from '@/domain/ids'
-import { stammKontextStore } from './stammKontextStore'
-import { useStammKontext } from './useStammKontext'
+import {newId, type AktivitaetId, type StammAktionId, type StammKontextId, type StammTreffenId} from '@/domain/ids'
+import type {IsoDate, StammAktion, StammBlock, StammKontext, StammTreffen,} from '@/domain/types'
+import {useCallback, useEffect, useRef, useState} from 'react'
+import {stammKontextStore} from './stammKontextStore'
+import {useStammKontext} from './useStammKontext'
 
 const DEBOUNCE_MS = 500
 
@@ -28,6 +21,7 @@ export function useStammKontextEditorState(kontextId: StammKontextId) {
 
   // Keep draft in sync when the store pushes an update from outside
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (stored && !draft) setDraftRaw(stored)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [stored?.id])

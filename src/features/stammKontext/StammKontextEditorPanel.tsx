@@ -9,35 +9,30 @@
  *   5. Aktivitäten (Cards)
  */
 import { useState } from 'react'
-import { useId } from 'react'
 import { format } from 'date-fns'
 import { de } from 'date-fns/locale'
 import { parseIso } from '@/domain/dateUtils'
-import { newId } from '@/domain/ids'
 import type {
   StammBlock,
   StammTreffen,
   StammAktion,
   Aktivitaet,
-  AktivitaetTyp,
   IsoDate,
 } from '@/domain/types'
 import type { StammAktionId, AktivitaetId } from '@/domain/ids'
 import {
-  AKTIVITAET_TYPEN,
   TYP_LABELS,
-  UNTERTYPEN_FUER_TYP,
   UNTERTYP_LABELS,
-  type AktivitaetUntertyp,
 } from '@/domain/aktivitaetKatalog'
-import { Button, Modal } from '@/ui/primitives'
 import { AccordionGroup } from '@/ui/primitives/AccordionGroup'
 import { IconButton } from '@/ui/primitives/IconButton'
 import { Icon } from '@/ui/primitives/Icon'
-import { WBAktivitaetEditor } from '@/ui/domain-primitives/WBAktivitaetEditor'
 import { useRepertoire } from '@/features/repertoire/useRepertoire'
 import { repertoireStore } from '@/features/repertoire/repertoireStore'
 import type { useStammKontextEditorState } from './useStammKontextEditorState'
+import { ThemaBearbeitenModal } from './ThemaBearbeitenModal'
+import { StammzeitBearbeitenModal } from './StammzeitBearbeitenModal'
+import { AktivitaetBearbeitenModal } from './AktivitaetBearbeitenModal'
 import styles from './StammKontextEditorPanel.module.css'
 
 type EditorState = ReturnType<typeof useStammKontextEditorState>
@@ -71,100 +66,6 @@ function sumDauer(blocks: StammBlock[]): number {
   return blocks.reduce((sum, b) => sum + b.dauerMin, 0)
 }
 
-// ─── ThemaBearbeitenModal ────────────────────────────────────────────────────
-
-function ThemaBearbeitenModal({
-  initialThema,
-  initialBeschreibung,
-  initialNotiz,
-  initialTag,
-  onSave,
-  onClose,
-}: {
-  initialThema: string
-  initialBeschreibung?: string
-  initialNotiz?: string
-  initialTag?: string
-  onSave: (thema: string, beschreibung?: string, notiz?: string, tag?: string) => void
-  onClose: () => void
-}) {
-  const uid = useId()
-  const [thema, setThema] = useState(initialThema)
-  const [beschreibung, setBeschreibung] = useState(initialBeschreibung ?? '')
-  const [notiz, setNotiz] = useState(initialNotiz ?? '')
-  const [tag, setTag] = useState(initialTag ?? '')
-
-  return (
-    <Modal
-      open
-      onClose={onClose}
-      title="Thema bearbeiten"
-      size="sm"
-      footer={
-        <div className={styles.modalFooter}>
-          <Button variant="ghost" onClick={onClose}>Abbrechen</Button>
-          <Button
-            variant="primary"
-            disabled={!thema.trim()}
-            onClick={() =>
-              onSave(thema, beschreibung || undefined, notiz || undefined, tag || undefined)
-            }
-          >
-            Speichern
-          </Button>
-        </div>
-      }
-    >
-      <div className={styles.modalBody}>
-        <div className={styles.field}>
-          <label className={styles.fieldLabel} htmlFor={`${uid}-thema`}>Thema *</label>
-          <input
-            id={`${uid}-thema`}
-            type="text"
-            className={styles.fieldInput}
-            autoFocus
-            value={thema}
-            placeholder="Saison-Thema"
-            onChange={(e) => setThema(e.target.value)}
-          />
-        </div>
-        <div className={styles.field}>
-          <label className={styles.fieldLabel} htmlFor={`${uid}-beschreibung`}>Beschreibung</label>
-          <textarea
-            id={`${uid}-beschreibung`}
-            className={styles.fieldTextarea}
-            value={beschreibung}
-            rows={3}
-            onChange={(e) => setBeschreibung(e.target.value)}
-          />
-        </div>
-        <div className={styles.field}>
-          <label className={styles.fieldLabel} htmlFor={`${uid}-notiz`}>Bearbeitungsnotiz</label>
-          <textarea
-            id={`${uid}-notiz`}
-            className={styles.fieldTextarea}
-            value={notiz}
-            placeholder="Änderungshinweis für Gruppenleiter"
-            rows={2}
-            onChange={(e) => setNotiz(e.target.value)}
-          />
-        </div>
-        <div className={styles.field}>
-          <label className={styles.fieldLabel} htmlFor={`${uid}-tag`}>Themen-Tag</label>
-          <input
-            id={`${uid}-tag`}
-            type="text"
-            className={styles.fieldInput}
-            value={tag}
-            placeholder="Wird Aktivitäten beim Import zugewiesen"
-            onChange={(e) => setTag(e.target.value)}
-          />
-        </div>
-      </div>
-    </Modal>
-  )
-}
-
 // ─── ThemaDisplay ────────────────────────────────────────────────────────────
 
 function ThemaDisplay({
@@ -196,43 +97,6 @@ function ThemaDisplay({
       </div>
       <IconButton icon="edit" label="Thema bearbeiten" onClick={onEdit} />
     </div>
-  )
-}
-
-// ─── StammzeitBearbeitenModal ─────────────────────────────────────────────────
-
-function StammzeitBearbeitenModal({
-  initialAnfang,
-  initialEnde,
-  onSave,
-  onClose,
-}: {
-  initialAnfang: StammBlock[]
-  initialEnde: StammBlock[]
-  onSave: (anfang: StammBlock[], ende: StammBlock[]) => void
-  onClose: () => void
-}) {
-  const [anfang, setAnfang] = useState<StammBlock[]>(initialAnfang)
-  const [ende, setEnde] = useState<StammBlock[]>(initialEnde)
-
-  return (
-    <Modal
-      open
-      onClose={onClose}
-      title="Stammzeit bearbeiten"
-      size="sm"
-      footer={
-        <div className={styles.modalFooter}>
-          <Button variant="ghost" onClick={onClose}>Abbrechen</Button>
-          <Button variant="primary" onClick={() => onSave(anfang, ende)}>Speichern</Button>
-        </div>
-      }
-    >
-      <div className={styles.modalBody}>
-        <BlockListEditor label="Anfangsblock" blocks={anfang} onChange={setAnfang} />
-        <BlockListEditor label="Endblock" blocks={ende} onChange={setEnde} />
-      </div>
-    </Modal>
   )
 }
 
@@ -274,115 +138,6 @@ function StammzeitDisplay({
         </div>
       </div>
       <IconButton icon="edit" label="Stammzeit bearbeiten" onClick={onEdit} />
-    </div>
-  )
-}
-
-// ─── BlockRow / BlockListEditor ───────────────────────────────────────────────
-
-function BlockRow({
-  block,
-  onChange,
-  onRemove,
-  dragIndex,
-  onDragStart,
-  onDragOver,
-  onDrop,
-}: {
-  block: StammBlock
-  onChange: (b: StammBlock) => void
-  onRemove: () => void
-  dragIndex: number
-  onDragStart: (i: number) => void
-  onDragOver: (i: number) => void
-  onDrop: () => void
-}) {
-  return (
-    <div
-      className={styles.blockRow}
-      draggable
-      onDragStart={() => onDragStart(dragIndex)}
-      onDragOver={(e) => { e.preventDefault(); onDragOver(dragIndex) }}
-      onDrop={onDrop}
-    >
-      <span className={styles.dragHandle} title="Verschieben">
-        <Icon name="drag-handle" size={14} />
-      </span>
-      <input
-        type="text"
-        className={styles.blockName}
-        value={block.name}
-        placeholder="Name"
-        onChange={(e) => onChange({ ...block, name: e.target.value })}
-      />
-      <input
-        type="number"
-        className={styles.blockDauer}
-        value={block.dauerMin}
-        min={1}
-        max={120}
-        onChange={(e) => onChange({ ...block, dauerMin: Math.max(1, Number(e.target.value) || 1) })}
-        title="Minuten"
-      />
-      <span className={styles.blockDauerUnit}>Min</span>
-      <IconButton icon="trash" label="Entfernen" tone="danger" size={12} onClick={onRemove} />
-    </div>
-  )
-}
-
-function BlockListEditor({
-  label,
-  blocks,
-  onChange,
-}: {
-  label: string
-  blocks: StammBlock[]
-  onChange: (b: StammBlock[]) => void
-}) {
-  const [draggingIdx, setDraggingIdx] = useState<number | null>(null)
-  const [overIdx, setOverIdx] = useState<number | null>(null)
-
-  function handleDrop() {
-    if (draggingIdx === null || overIdx === null || draggingIdx === overIdx) {
-      setDraggingIdx(null)
-      setOverIdx(null)
-      return
-    }
-    const next = [...blocks]
-    const [item] = next.splice(draggingIdx, 1)
-    next.splice(overIdx, 0, item!)
-    onChange(next)
-    setDraggingIdx(null)
-    setOverIdx(null)
-  }
-
-  function addBlock() {
-    onChange([...blocks, { name: '', typ: 'stammformat' as AktivitaetTyp, dauerMin: 10 }])
-  }
-
-  return (
-    <div className={styles.blockListSection}>
-      <span className={styles.blockListLabel}>{label}</span>
-      {blocks.map((b, i) => (
-        <BlockRow
-          key={i}
-          block={b}
-          dragIndex={i}
-          onChange={(updated) => {
-            const next = [...blocks]
-            next[i] = updated
-            onChange(next)
-          }}
-          onRemove={() => onChange(blocks.filter((_, j) => j !== i))}
-          onDragStart={setDraggingIdx}
-          onDragOver={setOverIdx}
-          onDrop={handleDrop}
-        />
-      ))}
-      <button type="button" className={styles.addRowBtn} onClick={addBlock}>
-        <Icon name="plus" size={12} />
-        <span>Programmpunkt hinzufügen</span>
-      </button>
     </div>
   )
 }
@@ -544,148 +299,6 @@ function AktivitaetCard({
         {' · '}{aktivitaet.zeitMin}–{aktivitaet.zeitMax} Min
       </span>
     </div>
-  )
-}
-
-// ─── AktivitaetBearbeitenModal ────────────────────────────────────────────────
-
-function AktivitaetBearbeitenModal({
-  isNew,
-  initialAktivitaet,
-  stammImportId,
-  onSave,
-  onClose,
-}: {
-  isNew: boolean
-  initialAktivitaet?: Aktivitaet
-  stammImportId: Aktivitaet['stammImportId']
-  onSave: (a: Aktivitaet) => void
-  onClose: () => void
-}) {
-  const [draft, setDraft] = useState<Aktivitaet>(() =>
-    initialAktivitaet ?? {
-      id: newId<AktivitaetId>(),
-      name: '',
-      typ: 'sonstiges' as AktivitaetTyp,
-      wbTags: [],
-      themenTags: [],
-      zeitMin: 15,
-      zeitMax: 30,
-      quelle: 'stamm-import',
-      stammImportId,
-    },
-  )
-
-  const untertypen = UNTERTYPEN_FUER_TYP[draft.typ]
-  const canSave = draft.name.trim().length > 0
-
-  function handleTypChange(newTyp: AktivitaetTyp) {
-    setDraft((d) => ({ ...d, typ: newTyp, untertyp: undefined }))
-  }
-
-  return (
-    <Modal
-      open
-      onClose={onClose}
-      title={isNew ? 'Aktivität hinzufügen' : 'Aktivität bearbeiten'}
-      size="sm"
-      footer={
-        <div className={styles.modalFooter}>
-          <Button variant="ghost" onClick={onClose}>Abbrechen</Button>
-          <Button variant="primary" disabled={!canSave} onClick={() => onSave(draft)}>
-            {isNew ? 'Hinzufügen' : 'Speichern'}
-          </Button>
-        </div>
-      }
-    >
-      <div className={styles.modalBody}>
-        <div className={styles.field}>
-          <label className={styles.fieldLabel}>Name *</label>
-          <input
-            type="text"
-            className={styles.fieldInput}
-            autoFocus
-            value={draft.name}
-            placeholder="Aktivitätsname"
-            onChange={(e) => setDraft((d) => ({ ...d, name: e.target.value }))}
-          />
-        </div>
-
-        <div className={styles.fieldRow}>
-          <div className={styles.field}>
-            <label className={styles.fieldLabel}>Typ</label>
-            <select
-              className={styles.fieldInput}
-              value={draft.typ}
-              onChange={(e) => handleTypChange(e.target.value as AktivitaetTyp)}
-            >
-              {AKTIVITAET_TYPEN.filter((t) => t !== 'wegezeit').map((t) => (
-                <option key={t} value={t}>{TYP_LABELS[t]}</option>
-              ))}
-            </select>
-          </div>
-          {untertypen && (
-            <div className={styles.field}>
-              <label className={styles.fieldLabel}>Untertyp</label>
-              <select
-                className={styles.fieldInput}
-                value={draft.untertyp ?? ''}
-                onChange={(e) =>
-                  setDraft((d) => ({
-                    ...d,
-                    untertyp: (e.target.value || undefined) as AktivitaetUntertyp | undefined,
-                  }))
-                }
-              >
-                <option value="">–</option>
-                {untertypen.map((ut) => (
-                  <option key={ut} value={ut}>{UNTERTYP_LABELS[ut]}</option>
-                ))}
-              </select>
-            </div>
-          )}
-        </div>
-
-        <div className={styles.fieldRow}>
-          <div className={styles.field}>
-            <label className={styles.fieldLabel}>Dauer min (Min)</label>
-            <input
-              type="number"
-              className={styles.dauerInput}
-              value={draft.zeitMin}
-              min={1}
-              onChange={(e) =>
-                setDraft((d) => ({ ...d, zeitMin: Math.max(1, +e.target.value || 1) }))
-              }
-            />
-          </div>
-          <span className={styles.dauerSep}>–</span>
-          <div className={styles.field}>
-            <label className={styles.fieldLabel}>Dauer max (Min)</label>
-            <input
-              type="number"
-              className={styles.dauerInput}
-              value={draft.zeitMax}
-              min={draft.zeitMin}
-              onChange={(e) =>
-                setDraft((d) => ({
-                  ...d,
-                  zeitMax: Math.max(d.zeitMin, +e.target.value || d.zeitMin),
-                }))
-              }
-            />
-          </div>
-        </div>
-
-        <div className={styles.field}>
-          <label className={styles.fieldLabel}>Wachstumsbereiche</label>
-          <WBAktivitaetEditor
-            value={draft.wbTags}
-            onChange={(tags) => setDraft((d) => ({ ...d, wbTags: tags }))}
-          />
-        </div>
-      </div>
-    </Modal>
   )
 }
 

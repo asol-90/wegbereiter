@@ -12,10 +12,10 @@
  * GlobalConfig changes, so toggling the Bundesland in the Settings-Modal
  * updates the Jahreskalender instantly.
  */
-import { useEffect, useState } from 'react'
-import { FerienService } from '@/services/ferienService'
-import { useGlobalConfig } from '@/features/globalConfig'
-import type { FerienCacheEntry } from '@/domain/types'
+import type {FerienCacheEntry} from '@/domain/types'
+import {useGlobalConfig} from '@/features/globalConfig'
+import {FerienService} from '@/services/ferienService'
+import {useEffect, useState} from 'react'
 
 const service = new FerienService()
 
@@ -26,6 +26,7 @@ export function useFerienForYear(year: number): FerienState {
   const bundesland = config.bundesland
   const [state, setState] = useState<FerienState>(undefined)
 
+  /* eslint-disable react-hooks/set-state-in-effect */
   useEffect(() => {
     // Wait for the store's first snapshot before deciding.
     if (!loaded) {
@@ -52,6 +53,7 @@ export function useFerienForYear(year: number): FerienState {
       cancelled = true
     }
   }, [year, bundesland, loaded])
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   return state
 }
