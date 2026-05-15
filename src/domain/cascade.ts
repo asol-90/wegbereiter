@@ -10,13 +10,8 @@
  * their contents stay put. Contents that cannot find a landing spot end up
  * in the Überhang.
  */
-import type {
-  Planung,
-  Programmpunkt,
-  Treffen,
-  UeberhangEintrag,
-} from './types'
-import type { TreffenId } from './ids'
+import type {TreffenId} from './ids';
+import type {Planung, Programmpunkt, Treffen, UeberhangEintrag,} from './types';
 
 export type CascadeInput =
   | { kind: 'remove'; treffenId: TreffenId; mode: 'cascade' | 'delete' }

@@ -2,11 +2,11 @@
  * NavToggle — 2-icon segmented control for Kalender and Terminliste.
  * Labels are rendered below the pill track, not inside the buttons.
  */
-import { useNavigate } from 'react-router-dom'
+import {Icon, type IconName} from '@/ui/primitives'
 import clsx from '@/ui/utils/clsx'
-import { Icon, type IconName } from '@/ui/primitives'
+import {useNavigate} from 'react-router-dom'
 import styles from './NavToggle.module.css'
-import type { NavPosition } from './useNavPosition'
+import type {NavPosition} from './useNavPosition'
 
 type NavItem = {
   globalPos: 1 | 2

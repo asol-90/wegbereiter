@@ -1,5 +1,5 @@
 export * from './db'
+export * from './ferienRepo'
+export * from './globalConfigRepo'
 export * from './planungRepo'
 export * from './repertoireRepo'
-export * from './globalConfigRepo'
-export * from './ferienRepo'

@@ -2,11 +2,11 @@
  * JahresplanungToggle — standalone pill button for the Jahresplanung route.
  * Label is rendered outside/below the button, not inside it.
  */
-import { useNavigate } from 'react-router-dom'
+import {Icon} from '@/ui/primitives'
 import clsx from '@/ui/utils/clsx'
-import { Icon } from '@/ui/primitives'
+import {useNavigate} from 'react-router-dom'
 import styles from './JahresplanungToggle.module.css'
-import type { NavPosition } from './useNavPosition'
+import type {NavPosition} from './useNavPosition'
 
 export type JahresplanungToggleProps = {
   position: NavPosition

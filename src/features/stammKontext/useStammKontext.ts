@@ -3,10 +3,10 @@
  *
  * Returns the current snapshot plus stable action callbacks.
  */
-import { useSyncExternalStore } from 'react'
-import { stammKontextStore, type StammKontextState } from './stammKontextStore'
-import type { StammKontext, IsoDate } from '@/domain/types'
-import type { StammKontextId } from '@/domain/ids'
+import type {StammKontextId} from '@/domain/ids'
+import type {IsoDate, StammKontext} from '@/domain/types'
+import {useSyncExternalStore} from 'react'
+import {type StammKontextState, stammKontextStore} from './stammKontextStore'
 
 export type StammKontextActions = {
   create: (zeitraum?: { start: IsoDate; ende: IsoDate }) => Promise<StammKontext>

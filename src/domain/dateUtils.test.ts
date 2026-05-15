@@ -1,12 +1,5 @@
-import { describe, expect, it } from 'vitest'
-import {
-  daysBetween,
-  generateTermine,
-  parseIso,
-  rhythmusWeekInterval,
-  toIso,
-  weeksBetween,
-} from './dateUtils'
+import {describe, expect, it} from 'vitest'
+import {daysBetween, generateTermine, parseIso, rhythmusWeekInterval, toIso, weeksBetween,} from './dateUtils'
 
 describe('dateUtils', () => {
   describe('rhythmusWeekInterval', () => {

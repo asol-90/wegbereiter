@@ -4,28 +4,28 @@
  * Serialization: Dates are stored as ISO strings ('yyyy-MM-dd') to stay
  * consistent across IndexedDB, JSON export/import, and URL-safe sharing.
  */
+import type {AktivitaetTyp, AktivitaetUntertyp, MinStufe} from './aktivitaetKatalog'
 import type {
-  AbwesenheitId,
-  AbzeichenAnforderungId,
-  AbzeichenId,
-  AktivitaetId,
-  AndachtsEinheitId,
-  AndachtsreiheId,
-  MitarbeiterId,
-  PlanungId,
-  ProgrammpunktId,
-  StammAktionId,
-  StammImportId,
-  StammKontextId,
-  StammTreffenId,
-  TreffenId,
+    AbwesenheitId,
+    AbzeichenAnforderungId,
+    AbzeichenId,
+    AktivitaetId,
+    AndachtsEinheitId,
+    AndachtsreiheId,
+    MitarbeiterId,
+    PlanungId,
+    ProgrammpunktId,
+    StammAktionId,
+    StammImportId,
+    StammKontextId,
+    StammTreffenId,
+    TreffenId,
 } from './ids'
-import type { WBKey, WBTag } from './wb'
-import type { AktivitaetTyp, AktivitaetUntertyp, MinStufe } from './aktivitaetKatalog'
+import type {WBKey, WBTag} from './wb'
 
 // Re-export so consumers can import from types.ts as before
-export type { AktivitaetTyp, AktivitaetUntertyp, MinStufe } from './aktivitaetKatalog'
 export { AKTIVITAET_TYPEN } from './aktivitaetKatalog'
+export type { AktivitaetTyp, AktivitaetUntertyp, MinStufe } from './aktivitaetKatalog'
 
 /** ISO-Datum 'yyyy-MM-dd'. */
 export type IsoDate = string

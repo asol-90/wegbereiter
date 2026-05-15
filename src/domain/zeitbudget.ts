@@ -9,7 +9,7 @@
  * "Verfügbare Zeit" (team time) = brutto − Stamm-Blöcke.
  * Over-budget when ist > verfügbar.
  */
-import type { Planung, StammBlock, StammKontext, StammTreffen, Treffen } from './types'
+import type {Planung, StammBlock, StammKontext, StammTreffen, Treffen} from './types'
 
 export type ZeitbudgetInfo = {
   /** Brutto-Treffen-Dauer (gross). */

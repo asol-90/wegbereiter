@@ -1,9 +1,9 @@
 /**
  * Repository for Planungen. CRUD only — business rules live in domain/.
  */
-import type { Planung } from '../domain/types'
-import type { PlanungId } from '../domain/ids'
-import { getDB } from './db'
+import type {PlanungId} from '../domain/ids'
+import type {Planung} from '../domain/types'
+import {getDB} from './db'
 
 export async function listPlanungen(): Promise<Planung[]> {
   const db = await getDB()

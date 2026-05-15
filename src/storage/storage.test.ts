@@ -1,12 +1,12 @@
-import { beforeEach, describe, expect, it } from 'vitest'
-import { buildPlanung, defaultGlobalConfig } from '../domain/planungFactory'
-import { getGlobalConfig, saveGlobalConfig } from './globalConfigRepo'
-import { deletePlanung, getPlanung, listPlanungen, savePlanung } from './planungRepo'
-import { listAktivitaeten, saveAktivitaet } from './repertoireRepo'
-import type { Aktivitaet } from '../domain/types'
-import type { AktivitaetId } from '../domain/ids'
-import { getFerienCache, saveFerienCache } from './ferienRepo'
-import { clearAllStores } from '../test/dbHelpers'
+import {beforeEach, describe, expect, it} from 'vitest'
+import type {AktivitaetId} from '../domain/ids'
+import {buildPlanung, defaultGlobalConfig} from '../domain/planungFactory'
+import type {Aktivitaet} from '../domain/types'
+import {clearAllStores} from '../test/dbHelpers'
+import {getFerienCache, saveFerienCache} from './ferienRepo'
+import {getGlobalConfig, saveGlobalConfig} from './globalConfigRepo'
+import {deletePlanung, getPlanung, listPlanungen, savePlanung} from './planungRepo'
+import {listAktivitaeten, saveAktivitaet} from './repertoireRepo'
 
 beforeEach(async () => {
   await clearAllStores()

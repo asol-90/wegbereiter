@@ -7,13 +7,8 @@
  * Results are cached per (bundesland, jahr) in IndexedDB. The cache is
  * returned even on network failure so the app remains functional offline.
  */
-import type {
-  BundeslandKey,
-  Feiertag,
-  Ferien,
-  FerienCacheEntry,
-} from '../domain/types'
-import { getFerienCache, saveFerienCache } from '../storage/ferienRepo'
+import type {BundeslandKey, Feiertag, Ferien, FerienCacheEntry,} from '../domain/types';
+import {getFerienCache, saveFerienCache} from '../storage/ferienRepo';
 
 export type FerienFetcher = (
   bundesland: BundeslandKey,
@@ -110,8 +105,8 @@ const defaultFetcher: FerienFetcher = async (bundesland, jahr) => {
 }
 
 export class FerienService {
-  private fetcher: FerienFetcher
-  private ttlMs: number
+  private readonly fetcher: FerienFetcher
+  private readonly ttlMs: number
 
   constructor(opts: FerienServiceOptions = {}) {
     this.fetcher = opts.fetch ?? defaultFetcher

@@ -9,33 +9,26 @@
  * - Suche: Durchsucht Typen, Untertypen und konkrete Aktivitäten.
  * - Konkretisieren (filterTyp): Vorgefiltert, zeigt Repertoire + Untertypen.
  */
-import { useState, useCallback, useMemo } from 'react'
-import type { TreffenId, AktivitaetId } from '@/domain/ids'
-import { newId } from '@/domain/ids'
-import type {
-  Programmpunkt,
-  ProgrammpunktAbstrakt,
-  ProgrammpunktKonkret,
-  ProgrammpunktWegezeit,
-  Aktivitaet,
-} from '@/domain/types'
-import type { TreffenMutations } from './TreffenKarte'
-import { Spotlight, type SpotlightItem } from '@/ui/primitives/Spotlight'
-import { useRepertoire } from '@/features/repertoire/useRepertoire'
-import { Icon } from '@/ui/primitives/Icon'
 import {
-  AKTIVITAET_TYPEN,
-  TYP_LABELS,
-  TYP_ICONS,
-  UNTERTYPEN_FUER_TYP,
-  UNTERTYP_LABELS,
-  getWBDefaultTags,
-  getWBDefaults,
-  aktivitaetLabel,
-  type AktivitaetTyp,
-  type AktivitaetUntertyp,
+    AKTIVITAET_TYPEN,
+    aktivitaetLabel,
+    type AktivitaetTyp,
+    type AktivitaetUntertyp,
+    getWBDefaults,
+    getWBDefaultTags,
+    TYP_ICONS,
+    TYP_LABELS,
+    UNTERTYP_LABELS,
+    UNTERTYPEN_FUER_TYP,
 } from '@/domain/aktivitaetKatalog'
-import type { WBKey } from '@/domain/wb'
+import type {TreffenId} from '@/domain/ids'
+import type {Aktivitaet, ProgrammpunktAbstrakt, ProgrammpunktKonkret, ProgrammpunktWegezeit} from '@/domain/types'
+import type {WBKey} from '@/domain/wb'
+import {useRepertoire} from '@/features/repertoire/useRepertoire'
+import {Icon} from '@/ui/primitives/Icon'
+import {Spotlight, type SpotlightItem} from '@/ui/primitives/Spotlight'
+import {useCallback, useMemo, useState} from 'react'
+import type {TreffenMutations} from './TreffenKarte'
 
 export type AddPunktSpotlightProps = {
   treffenId: TreffenId

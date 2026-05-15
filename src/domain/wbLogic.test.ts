@@ -1,16 +1,16 @@
-import { describe, expect, it } from 'vitest'
+import {describe, expect, it} from 'vitest'
+import type {ProgrammpunktId} from './ids'
+import type {Programmpunkt} from './types'
 import {
-  characterize,
-  combine,
-  contributionOf,
-  emptyDistribution,
-  evaluateAgainstGoal,
-  normalize,
-  sumWBTags,
-  total,
+    characterize,
+    combine,
+    contributionOf,
+    emptyDistribution,
+    evaluateAgainstGoal,
+    normalize,
+    sumWBTags,
+    total,
 } from './wbLogic'
-import type { Programmpunkt } from './types'
-import type { ProgrammpunktId } from './ids'
 
 const pp = (partial: Partial<Programmpunkt> & { kind?: string }): Programmpunkt => ({
   id: 'p' as ProgrammpunktId,

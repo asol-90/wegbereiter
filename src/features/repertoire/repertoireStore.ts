@@ -5,19 +5,19 @@
  * Minimal store: load all, save one, delete one, notify listeners.
  * Follows the same pattern as planungenStore and globalConfigStore.
  */
-import type { Aktivitaet, Andachtsreihe, Abzeichen } from '@/domain/types'
-import type { AktivitaetId, AndachtsreiheId } from '@/domain/ids'
+import {ABZEICHEN_KATALOG} from '@/domain/abzeichenKatalog'
+import type {AktivitaetId, AndachtsreiheId} from '@/domain/ids'
+import type {Abzeichen, Aktivitaet, Andachtsreihe} from '@/domain/types'
 import {
-  listAktivitaeten,
-  saveAktivitaet,
-  deleteAktivitaet as repoDeleteAkt,
-  listAndachtsreihen,
-  saveAndachtsreihe,
-  deleteAndachtsreihe as repoDeleteReihe,
-  listAbzeichen,
-  saveAbzeichen as repoSaveAbzeichen,
+    deleteAktivitaet as repoDeleteAkt,
+    deleteAndachtsreihe as repoDeleteReihe,
+    listAbzeichen,
+    listAktivitaeten,
+    listAndachtsreihen,
+    saveAbzeichen as repoSaveAbzeichen,
+    saveAktivitaet,
+    saveAndachtsreihe,
 } from '@/storage/repertoireRepo'
-import { ABZEICHEN_KATALOG } from '@/domain/abzeichenKatalog'
 
 type Listener = () => void
 

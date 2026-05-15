@@ -1,3 +1,6 @@
+# .gitignore
+.claude/worktrees/
+
 # Logs
 logs
 *.log

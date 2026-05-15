@@ -5,12 +5,9 @@
  * only need to mutate (no re-render on change) can use
  * `useGlobalConfigActions`.
  */
-import { useSyncExternalStore } from 'react'
-import type { GlobalConfig } from '@/domain/types'
-import {
-  globalConfigStore,
-  type GlobalConfigState,
-} from './globalConfigStore'
+import type {GlobalConfig} from '@/domain/types'
+import {useSyncExternalStore} from 'react'
+import {type GlobalConfigState, globalConfigStore,} from './globalConfigStore'
 
 export type GlobalConfigActions = {
   save: (next: GlobalConfig) => Promise<GlobalConfig>

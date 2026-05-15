@@ -4,23 +4,9 @@
  * All imported items receive fresh IDs and quelle='eigene'.
  * Discriminator field: __typ = 'aktivitaeten' | 'andachtsreihen' | 'abzeichen'
  */
-import { newId } from '@/domain/ids'
-import type {
-  AbzeichenAnforderungId,
-  AbzeichenId,
-  AktivitaetId,
-  AndachtsEinheitId,
-  AndachtsreiheId,
-} from '@/domain/ids'
-import type {
-  Abzeichen,
-  AbzeichenAnforderung,
-  Aktivitaet,
-  AndachtsEinheit,
-  Andachtsreihe,
-} from '@/domain/types'
-import { isAktivitaetTyp, isMinStufe } from '@/domain/aktivitaetKatalog'
-import type { AktivitaetUntertyp } from '@/domain/aktivitaetKatalog'
+import {isAktivitaetTyp, isMinStufe, type AktivitaetUntertyp} from '@/domain/aktivitaetKatalog'
+import {newId, type AbzeichenAnforderungId, type AbzeichenId, type AktivitaetId, type AndachtsEinheitId, type AndachtsreiheId,} from '@/domain/ids'
+import type {Abzeichen, AbzeichenAnforderung, Aktivitaet, AndachtsEinheit, Andachtsreihe,} from '@/domain/types'
 
 // ─── Result type ────────────────────────────────────────────────────────────
 

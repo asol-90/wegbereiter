@@ -10,10 +10,10 @@
  *
  * sizes: sm, md (default), lg
  */
-import type { ButtonHTMLAttributes, ReactNode } from 'react'
+import type {ButtonHTMLAttributes, ReactNode} from 'react'
 import clsx from '../utils/clsx'
-import { Icon, type IconName } from './Icon'
 import styles from './Button.module.css'
+import {Icon, type IconName} from './Icon'
 
 export type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger' | 'dashed'
 export type ButtonSize = 'sm' | 'md' | 'lg'

@@ -1,8 +1,8 @@
 /**
  * useRepertoire — React hook to read from the RepertoireStore.
  */
-import { useSyncExternalStore } from 'react'
-import { repertoireStore, type RepertoireState } from './repertoireStore'
+import {useSyncExternalStore} from 'react'
+import {type RepertoireState, repertoireStore} from './repertoireStore'
 
 export function useRepertoire(): RepertoireState {
   return useSyncExternalStore(

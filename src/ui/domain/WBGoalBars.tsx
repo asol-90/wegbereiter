@@ -6,7 +6,7 @@
  * renders labels, ist-fill, Zielintervall-Band (mit gestrichelten
  * Begrenzungen), und optional die ist-Prozentzahl als Annotation.
  */
-import { WB_KEYS, WB_LABELS, WB_CSS_VAR, type WBKey } from '@/domain/wb'
+import {WB_CSS_VAR, WB_KEYS, WB_LABELS, type WBKey} from '@/domain/wb'
 import clsx from '../utils/clsx'
 import styles from './WBGoalBars.module.css'
 

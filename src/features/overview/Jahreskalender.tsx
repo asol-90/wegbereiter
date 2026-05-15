@@ -6,15 +6,14 @@
  * `onPlanungHover` callback, controlled by the parent (OverviewPage) so that
  * both sides stay in sync.
  */
-import { useMemo } from 'react'
-import type { PlanungId } from '@/domain/ids'
-import type { IsoDate, Planung, StammKontext, StammAktion } from '@/domain/types'
-import type { PlanungMarker } from './MiniMonth'
-import { IconButton } from '@/ui/primitives/IconButton'
-import { MiniMonth } from './MiniMonth'
-import { useFerienForYear } from './useFerienForYear'
-import { useStammKontext } from '@/features/stammKontext'
+import type {PlanungId} from '@/domain/ids'
+import type {IsoDate, Planung, StammAktion, StammKontext} from '@/domain/types'
+import {useStammKontext} from '@/features/stammKontext'
+import {IconButton} from '@/ui/primitives/IconButton'
+import {useMemo} from 'react'
 import styles from './Jahreskalender.module.css'
+import {MiniMonth, type PlanungMarker} from './MiniMonth'
+import {useFerienForYear} from './useFerienForYear'
 
 export type JahreskalenderProps = {
   year: number

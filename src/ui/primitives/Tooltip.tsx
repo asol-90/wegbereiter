@@ -2,14 +2,7 @@
  * Tooltip — lightweight CSS-only hover/focus tooltip.
  * Wraps a single child and positions a small floating label above it.
  */
-import {
-  cloneElement,
-  isValidElement,
-  useId,
-  useState,
-  type ReactElement,
-  type ReactNode,
-} from 'react'
+import {cloneElement, isValidElement, type ReactElement, type ReactNode, useId, useState,} from 'react'
 import clsx from '../utils/clsx'
 import styles from './Tooltip.module.css'
 

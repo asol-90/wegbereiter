@@ -8,13 +8,12 @@
  * Returns state + handlers. The caller is responsible for rendering the
  * <StammImportDialog> and the hidden <input type="file">.
  */
-import { useCallback, useRef, useState } from 'react'
-import type { ChangeEvent } from 'react'
-import type { Aktivitaet, StammKontext } from '@/domain/types'
-import { parseStammDatei, StammParseError, detectFileType } from '@/domain/stammParser'
-import { checkOverlap, clipKontext } from '@/domain/stammOverlap'
-import { repertoireStore } from '@/features/repertoire/repertoireStore'
-import { useStammKontext, useStammKontextActions } from './useStammKontext'
+import {checkOverlap, clipKontext} from '@/domain/stammOverlap'
+import {detectFileType, parseStammDatei, StammParseError} from '@/domain/stammParser'
+import type {Aktivitaet, StammKontext} from '@/domain/types'
+import {repertoireStore} from '@/features/repertoire/repertoireStore'
+import {useCallback, useRef, useState, type ChangeEvent} from 'react'
+import {useStammKontext, useStammKontextActions} from './useStammKontext'
 
 export type PendingImport = {
   kontext: StammKontext

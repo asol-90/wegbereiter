@@ -3,7 +3,7 @@
  * Avoids deleteDatabase() (which blocks while connections stay open)
  * by clearing each store instead.
  */
-import { getDB } from '../storage/db'
+import {getDB} from '../storage/db'
 
 export async function clearAllStores(): Promise<void> {
   const db = await getDB()

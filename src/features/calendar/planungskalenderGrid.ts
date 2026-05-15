@@ -10,8 +10,7 @@
  *
  * All dates are ISO 'yyyy-MM-dd'.  Week starts on Monday (Mo–So).
  */
-import type { IsoDate, Treffen } from '@/domain/types'
-import type { TreffenId } from '@/domain/ids'
+import type {IsoDate, Treffen} from '@/domain/types';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 

@@ -3,7 +3,7 @@
  * options. Used e.g. to switch kalender view (Monat/Woche/Liste).
  */
 import clsx from '../utils/clsx'
-import { Icon, type IconName } from './Icon'
+import {Icon, type IconName} from './Icon'
 import styles from './SegmentedControl.module.css'
 
 export type SegmentedOption<T extends string> = {

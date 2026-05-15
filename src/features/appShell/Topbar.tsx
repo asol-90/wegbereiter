@@ -2,12 +2,12 @@
  * Topbar — app title left, nav controls centered, right side balanced.
  * Grid layout (1fr auto 1fr) keeps nav perfectly centered regardless of title width.
  */
+import {JahresplanungToggle} from './JahresplanungToggle'
+import {KontextToggle} from './KontextToggle'
+import {NavToggle} from './NavToggle'
+import {RepertoireToggle} from './RepertoireToggle'
 import styles from './Topbar.module.css'
-import { NavToggle } from './NavToggle'
-import { RepertoireToggle } from './RepertoireToggle'
-import { JahresplanungToggle } from './JahresplanungToggle'
-import { KontextToggle } from './KontextToggle'
-import { useNavPosition } from './useNavPosition'
+import {useNavPosition} from './useNavPosition'
 
 export function Topbar() {
   const nav = useNavPosition()

@@ -1,7 +1,7 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { getFerienCache, saveFerienCache } from '../storage/ferienRepo'
-import { clearAllStores } from '../test/dbHelpers'
-import { FerienService, isFeiertag, isInFerien } from './ferienService'
+import {beforeEach, describe, expect, it, vi} from 'vitest'
+import {getFerienCache, saveFerienCache} from '../storage/ferienRepo'
+import {clearAllStores} from '../test/dbHelpers'
+import {FerienService, isFeiertag, isInFerien} from './ferienService'
 
 beforeEach(async () => {
   await clearAllStores()

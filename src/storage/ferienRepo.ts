@@ -1,8 +1,8 @@
 /**
  * Cache store for Ferien/Feiertage per (bundesland, jahr).
  */
-import type { BundeslandKey, FerienCacheEntry } from '../domain/types'
-import { ferienCacheKey, getDB } from './db'
+import type {BundeslandKey, FerienCacheEntry} from '../domain/types'
+import {ferienCacheKey, getDB} from './db'
 
 export async function getFerienCache(
   bundesland: BundeslandKey,

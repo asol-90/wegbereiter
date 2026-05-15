@@ -5,7 +5,7 @@
  * To add a new icon: extend IconName union + PATHS map below. Prefer short
  * internal names (no 'icon-' prefix) since usage looks like `<Icon name="grid" />`.
  */
-import type { SVGProps } from 'react'
+import type {SVGProps} from 'react'
 
 export type IconName =
   | 'grid'

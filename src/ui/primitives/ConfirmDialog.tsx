@@ -2,9 +2,9 @@
  * ConfirmDialog — Modal convenience with confirm/cancel buttons and
  * optional destructive tone. Used for Kaskaden-Dialog, delete confirms, etc.
  */
-import type { ReactNode } from 'react'
-import { Button } from './Button'
-import { Modal } from './Modal'
+import type {ReactNode} from 'react'
+import {Button} from './Button'
+import {Modal} from './Modal'
 
 export type ConfirmDialogProps = {
   open: boolean

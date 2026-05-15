@@ -15,20 +15,20 @@
  *
  * Drag on the timeline opens the NewPlanungWizard pre-filled with the selected range.
  */
-import { useCallback, useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { format } from 'date-fns'
-import { de } from 'date-fns/locale'
-import { ConfirmDialog, IconButton, Modal, Input, Button } from '@/ui/primitives'
-import { Icon } from '@/ui/primitives/Icon'
-import { usePlanungen, usePlanungenActions } from '@/features/planungen'
-import { useStammKontext } from '@/features/stammKontext'
-import type { PlanungId, StammKontextId } from '@/domain/ids'
-import type { Planung, StammKontext } from '@/domain/types'
-import { parseIso } from '@/domain/dateUtils'
-import { NewPlanungWizard } from './NewPlanungWizard'
+import {parseIso} from '@/domain/dateUtils'
+import type {PlanungId, StammKontextId} from '@/domain/ids'
+import type {Planung, StammKontext} from '@/domain/types'
+import {usePlanungen, usePlanungenActions} from '@/features/planungen'
+import {useStammKontext} from '@/features/stammKontext'
+import {Button, ConfirmDialog, IconButton, Input, Modal} from '@/ui/primitives'
+import {Icon} from '@/ui/primitives/Icon'
 import clsx from '@/ui/utils/clsx'
+import {format} from 'date-fns'
+import {de} from 'date-fns/locale'
+import {useCallback, useMemo, useState} from 'react'
+import {useNavigate} from 'react-router-dom'
 import styles from './JahresplanerSidebar.module.css'
+import {NewPlanungWizard} from './NewPlanungWizard'
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -349,22 +349,6 @@ export function JahresplanerSidebar({
             {kontextBars.map(({ kontext: k, span }) => {
               const topPct = rowToPercent(span.top)
               const heightPct = rowToPercent(span.bottom) - topPct
-              const isTop = span.top === 0
-              const isBottom = span.bottom === 24
-              const isSingle = span.bottom - span.top <= 2
-
-              let roundClass = styles.middle
-              if (isSingle) roundClass = styles.roundedBoth
-              else if (isTop && isBottom) roundClass = styles.middle
-              else if (isTop) roundClass = '' // no top rounding if starts at very top
-              else if (isBottom) roundClass = styles.roundedBottom
-              else roundClass = styles.roundedBoth
-
-              // Default: both ends rounded unless at boundaries
-              if (!isTop && !isBottom) roundClass = styles.roundedBoth
-              if (!isTop && isBottom) roundClass = styles.roundedTop
-              if (isTop && !isBottom) roundClass = styles.roundedBottom
-              if (isTop && isBottom) roundClass = ''
 
               // Simpler logic: always round both ends
               const topRound = span.top > 0

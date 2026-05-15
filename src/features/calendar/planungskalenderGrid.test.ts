@@ -1,10 +1,7 @@
-import { describe, it, expect } from 'vitest'
-import {
-  buildPlanungskalenderGrid,
-  buildTreffenLookup,
-  WEEKDAY_HEADERS_LONG,
-} from './planungskalenderGrid'
-import type { Treffen } from '@/domain/types'
+import type {TreffenId} from '@/domain/ids'
+import type {Treffen} from '@/domain/types'
+import {describe, expect, it} from 'vitest'
+import {buildPlanungskalenderGrid, buildTreffenLookup, WEEKDAY_HEADERS_LONG,} from './planungskalenderGrid'
 
 describe('planungskalenderGrid', () => {
   describe('buildPlanungskalenderGrid', () => {
@@ -105,7 +102,7 @@ describe('planungskalenderGrid', () => {
     it('maps datum to treffen for O(1) lookup', () => {
       const treffen: Treffen[] = [
         {
-          id: 't1' as any,
+          id: 't1' as TreffenId,
           kind: 'regulaer',
           datum: '2025-09-05',
           programm: [],
@@ -113,7 +110,7 @@ describe('planungskalenderGrid', () => {
           sollWB: [],
         },
         {
-          id: 't2' as any,
+          id: 't2' as TreffenId,
           kind: 'regulaer',
           datum: '2025-09-12',
           programm: [],

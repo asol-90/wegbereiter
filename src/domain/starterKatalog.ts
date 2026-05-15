@@ -4,9 +4,9 @@
  * Leicht löschbar: Alle tragen quelle === 'vorinstalliert'.
  * WB-Tags bleiben leer → Defaults aus Typ/Untertyp greifen.
  */
-import type { Aktivitaet } from './types'
-import type { AktivitaetId } from './ids'
-import type { AktivitaetTyp, AktivitaetUntertyp } from './aktivitaetKatalog'
+import type {AktivitaetTyp, AktivitaetUntertyp} from './aktivitaetKatalog'
+import type {AktivitaetId} from './ids'
+import type {Aktivitaet} from './types'
 
 let counter = 0
 function vorId(): AktivitaetId {

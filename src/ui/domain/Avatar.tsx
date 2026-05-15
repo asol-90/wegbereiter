@@ -2,7 +2,7 @@
  * Avatar — circular initials badge for team members. Color is derived
  * deterministically from the name so the same person always gets the same tint.
  */
-import type { HTMLAttributes } from 'react'
+import type {HTMLAttributes} from 'react'
 import clsx from '../utils/clsx'
 import styles from './Avatar.module.css'
 

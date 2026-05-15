@@ -2,7 +2,7 @@
  * WBDonut — compact donut/pie chart for WB distribution. Drawn as a conic
  * gradient via CSS (no SVG dependency).
  */
-import { WB_KEYS, WB_CSS_VAR, type WBKey } from '@/domain/wb'
+import {WB_CSS_VAR, WB_KEYS, type WBKey} from '@/domain/wb'
 import clsx from '../utils/clsx'
 import styles from './WBDonut.module.css'
 

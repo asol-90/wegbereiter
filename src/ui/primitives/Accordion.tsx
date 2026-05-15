@@ -8,16 +8,10 @@
  * we drive the element's `open` property in an effect whenever the prop
  * changes, so React never competes with the user inside the same frame.
  */
-import {
-  useCallback,
-  useEffect,
-  useRef,
-  type DetailsHTMLAttributes,
-  type ReactNode,
-} from 'react'
+import {type DetailsHTMLAttributes, type ReactNode, useCallback, useEffect, useRef,} from 'react'
 import clsx from '../utils/clsx'
-import { Icon } from './Icon'
 import styles from './Accordion.module.css'
+import {Icon} from './Icon'
 
 export type AccordionProps = {
   title: ReactNode

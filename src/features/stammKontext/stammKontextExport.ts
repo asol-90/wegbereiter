@@ -2,7 +2,7 @@
  * stammKontextExport — serialise a StammKontext back to the JSON import format
  * (the inverse of parseStammDatei in stammParser.ts).
  */
-import type { StammKontext, StammBlock, StammTreffen, StammAktion, Aktivitaet } from '@/domain/types'
+import type {Aktivitaet, StammAktion, StammBlock, StammKontext, StammTreffen} from '@/domain/types'
 
 type RawBlock = {
   name: string

@@ -6,25 +6,24 @@
  * - Top-Button öffnet den Neue-Planung-Dialog oder Kontext-Import.
  * - DropZone um die gesamte Spalte für JSON-Import.
  */
-import { useCallback, useMemo, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { ContextMenu, type MenuItem } from '@/ui/primitives'
-import { Icon } from '@/ui/primitives/Icon'
-import { usePlanungen } from '@/features/planungen'
-import { useStammKontext, useStammKontextActions } from '@/features/stammKontext'
-import type { PlanungId } from '@/domain/ids'
-import type { Planung } from '@/domain/types'
-import { parseStammDatei, StammParseError, detectFileType } from '@/domain/stammParser'
-import { checkOverlap, clipKontext } from '@/domain/stammOverlap'
-import type { StammKontext, Aktivitaet } from '@/domain/types'
-import { isoToday } from '@/domain/dateUtils'
-import { repertoireStore } from '@/features/repertoire/repertoireStore'
-import { NewPlanungWizard } from './NewPlanungWizard'
-import { PlanungsCard } from './PlanungsCard'
-import { StammKontextCard } from './StammKontextCard'
-import { StammImportDialog } from './StammImportDialog'
-import { DropZone } from './DropZone'
+import {isoToday} from '@/domain/dateUtils'
+import type {PlanungId} from '@/domain/ids'
+import {checkOverlap, clipKontext} from '@/domain/stammOverlap'
+import {detectFileType, parseStammDatei, StammParseError} from '@/domain/stammParser'
+import type {Aktivitaet, Planung, StammKontext} from '@/domain/types'
+import {usePlanungen} from '@/features/planungen'
+import {repertoireStore} from '@/features/repertoire/repertoireStore'
+import {useStammKontext, useStammKontextActions} from '@/features/stammKontext'
+import {ContextMenu, type MenuItem} from '@/ui/primitives'
+import {Icon} from '@/ui/primitives/Icon'
+import {useCallback, useMemo, useRef, useState} from 'react'
+import {useNavigate} from 'react-router-dom'
+import {DropZone} from './DropZone'
+import {NewPlanungWizard} from './NewPlanungWizard'
+import {PlanungsCard} from './PlanungsCard'
 import styles from './Planungsliste.module.css'
+import {StammImportDialog} from './StammImportDialog'
+import {StammKontextCard} from './StammKontextCard'
 
 export type PlanungslisteProps = {
   /** Year currently displayed in the Jahreskalender. */
@@ -117,7 +116,7 @@ export function Planungsliste({
     } else {
       setParseError('Unbekanntes Dateiformat. Erwartet: Stammkontext-JSON.')
     }
-  }, [])
+  }, [setParseError, setPendingImport])
 
   const handleFileInput = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -159,7 +158,7 @@ export function Planungsliste({
     }
 
     setPendingImport(null)
-  }, [pendingImport, kontexte, stammActions])
+  }, [pendingImport, kontexte, stammActions, setPendingImport])
 
   const menuItems: MenuItem[] = [
     {

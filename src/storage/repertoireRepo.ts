@@ -1,17 +1,9 @@
 /**
  * Repository for the Repertoire: Aktivitäten, Andachtsreihen, Abzeichen.
  */
-import type {
-  Abzeichen,
-  Aktivitaet,
-  Andachtsreihe,
-} from '../domain/types'
-import type {
-  AbzeichenId,
-  AktivitaetId,
-  AndachtsreiheId,
-} from '../domain/ids'
-import { getDB } from './db'
+import type {AbzeichenId, AktivitaetId, AndachtsreiheId,} from '../domain/ids'
+import type {Abzeichen, Aktivitaet, Andachtsreihe,} from '../domain/types'
+import {getDB} from './db'
 
 // ─── Aktivitäten ─────────────────────────────────────────────────────────────
 

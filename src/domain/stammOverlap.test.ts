@@ -1,7 +1,7 @@
-import { describe, expect, it } from 'vitest'
-import { checkOverlap, clipKontext, earliestDate, latestDate } from './stammOverlap'
-import type { StammKontext } from './types'
-import type { StammAktionId, StammImportId, StammKontextId, StammTreffenId } from './ids'
+import {describe, expect, it} from 'vitest';
+import type {StammAktionId, StammImportId, StammKontextId, StammTreffenId} from './ids';
+import {checkOverlap, clipKontext, earliestDate, latestDate} from './stammOverlap';
+import type {StammKontext} from './types';
 
 function makeKontext(
   treffen: Array<{ id: string; datum: string; dauerMin: number }>,

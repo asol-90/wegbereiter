@@ -5,18 +5,18 @@
  * and outlets the current route into its content area. The Kit-Showcase
  * remains reachable at /dev/kit for ongoing reference.
  */
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
-import { AppShell } from '@/features/appShell'
-import { PlanungenProvider } from '@/features/planungen'
-import { GlobalConfigProvider } from '@/features/globalConfig'
-import { StammKontextProvider } from '@/features/stammKontext'
-import { RepertoireProvider } from '@/features/repertoire/RepertoireProvider'
-import { OverviewPage } from '@/features/overview/OverviewPage'
-import { CalendarPage } from '@/features/calendar/CalendarPage'
-import { ListPage } from '@/features/list/ListPage'
-import { RepertoirePage } from '@/features/repertoire/RepertoirePage'
-import { StammKontextPage } from '@/features/stammKontext/StammKontextPage'
-import { KitShowcase } from '../dev/KitShowcase'
+import {AppShell} from '@/features/appShell'
+import {CalendarPage} from '@/features/calendar/CalendarPage'
+import {GlobalConfigProvider} from '@/features/globalConfig'
+import {ListPage} from '@/features/list/ListPage'
+import {OverviewPage} from '@/features/overview/OverviewPage'
+import {PlanungenProvider} from '@/features/planungen'
+import {RepertoirePage} from '@/features/repertoire/RepertoirePage'
+import {RepertoireProvider} from '@/features/repertoire/RepertoireProvider'
+import {StammKontextProvider} from '@/features/stammKontext'
+import {StammKontextPage} from '@/features/stammKontext/StammKontextPage'
+import {BrowserRouter, Navigate, Route, Routes} from 'react-router-dom'
+import {KitShowcase} from '../dev/KitShowcase'
 
 export function App() {
   return (

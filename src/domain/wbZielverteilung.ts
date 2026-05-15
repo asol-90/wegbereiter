@@ -4,8 +4,8 @@
  * Based on konzept-planungsziele-kontextleiste.md §1.3.
  * All values are shares (0..1), intervals are ±5 pp around the target.
  */
-import { WB_KEYS, type WBKey } from './wb'
-import type { WBSchwerpunkt } from './types'
+import type {WBSchwerpunkt} from './types'
+import {WB_KEYS, type WBKey} from './wb'
 
 export type WBZielIntervall = {
   ziel: number

@@ -4,20 +4,20 @@
  * Shows existing Kontexte as clickable blocks. Drag to create a new Kontext.
  * A DropZone at the bottom accepts JSON import files.
  */
-import { useCallback, useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { format } from 'date-fns'
-import { de } from 'date-fns/locale'
-import { Icon } from '@/ui/primitives/Icon'
-import { useStammKontext } from './useStammKontext'
-import { useStammImport } from './useStammImport'
-import { StammImportDialog } from '@/features/overview/StammImportDialog'
-import { DropZone } from '@/features/overview/DropZone'
-import type { StammKontextId } from '@/domain/ids'
-import type { StammKontext } from '@/domain/types'
-import { parseIso } from '@/domain/dateUtils'
+import {parseIso} from '@/domain/dateUtils'
+import type {StammKontextId} from '@/domain/ids'
+import type {StammKontext} from '@/domain/types'
+import {DropZone} from '@/features/overview/DropZone'
+import {StammImportDialog} from '@/features/overview/StammImportDialog'
+import {Icon} from '@/ui/primitives/Icon'
 import clsx from '@/ui/utils/clsx'
+import {format} from 'date-fns'
+import {de} from 'date-fns/locale'
+import {useCallback, useMemo, useState} from 'react'
+import {useNavigate} from 'react-router-dom'
 import styles from './KontextSidebar.module.css'
+import {useStammImport} from './useStammImport'
+import {useStammKontext} from './useStammKontext'
 
 const MONTH_SHORT = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'] as const
 

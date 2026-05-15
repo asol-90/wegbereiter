@@ -4,14 +4,13 @@
  * Shows the parsed context (thema, dates, meetings, actions) and warns
  * about overlaps with existing contexts. "Übernehmen" persists the import.
  */
-import { useMemo } from 'react'
-import { format, parseISO } from 'date-fns'
-import { de } from 'date-fns/locale'
-import { Modal, Button, Badge, ConfirmDialog } from '@/ui/primitives'
-import type { StammKontext } from '@/domain/types'
-import type { Aktivitaet } from '@/domain/types'
-import { checkOverlap, type OverlapResult } from '@/domain/stammOverlap'
-import { useStammKontext } from '@/features/stammKontext'
+import {checkOverlap, type OverlapResult} from '@/domain/stammOverlap'
+import type {Aktivitaet, StammKontext} from '@/domain/types'
+import {useStammKontext} from '@/features/stammKontext'
+import {Badge, Button, Modal} from '@/ui/primitives'
+import {format, parseISO} from 'date-fns'
+import {de} from 'date-fns/locale'
+import {useMemo} from 'react'
 import styles from './StammImportDialog.module.css'
 
 export type StammImportDialogProps = {

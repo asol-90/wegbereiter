@@ -3,16 +3,10 @@
  * The consumer controls open state and anchor position. Closes on outside
  * click, Escape, or item selection.
  */
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  type ReactNode,
-} from 'react'
+import {type ReactNode, useCallback, useEffect, useMemo, useRef,} from 'react'
 import clsx from '../utils/clsx'
-import { Icon, type IconName } from './Icon'
 import styles from './ContextMenu.module.css'
+import {Icon, type IconName} from './Icon'
 
 export type MenuItem = {
   id: string

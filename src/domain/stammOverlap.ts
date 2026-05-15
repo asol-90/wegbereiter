@@ -7,7 +7,7 @@
  * Clipping: remove all treffen/stammaktionen from the old Kontext that
  * fall on or after the first date of the new Kontext.
  */
-import type { StammKontext } from './types'
+import type {StammKontext} from './types'
 
 /** All relevant dates (treffen + stammaktionen) sorted ascending. */
 function allDates(k: StammKontext): string[] {

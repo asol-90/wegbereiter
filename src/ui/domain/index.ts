@@ -1,18 +1,16 @@
-export { WBDot, type WBDotProps } from './WBDot'
-export { WBDotGrid, type WBDotGridProps } from './WBDotGrid'
+export { Avatar, type AvatarProps } from './Avatar'
+export { AvatarGroup, type AvatarGroupProps } from './AvatarGroup'
+export { DragHandle, type DragHandleProps } from './DragHandle'
+export { DurationBar, type DurationBarProps } from './DurationBar'
+export { TypeIcon, type TypeIconKind, type TypeIconProps } from './TypeIcon'
 export { WBBar, type WBBarProps } from './WBBar'
 export { WBDonut, type WBDonutProps } from './WBDonut'
+export { WBDot, type WBDotProps } from './WBDot'
+export { WBDotGrid, type WBDotGridProps } from './WBDotGrid'
 export {
-  WBGoalBars,
-  type WBGoalBarsProps,
-  type WBGoalBarDatum,
+  WBGoalBars, type WBGoalBarDatum, type WBGoalBarsProps
 } from './WBGoalBars'
 export {
   WBIntensitySegment,
-  type WBIntensitySegmentProps,
+  type WBIntensitySegmentProps
 } from './WBIntensitySegment'
-export { Avatar, type AvatarProps } from './Avatar'
-export { AvatarGroup, type AvatarGroupProps } from './AvatarGroup'
-export { DurationBar, type DurationBarProps } from './DurationBar'
-export { DragHandle, type DragHandleProps } from './DragHandle'
-export { TypeIcon, type TypeIconProps, type TypeIconKind } from './TypeIcon'

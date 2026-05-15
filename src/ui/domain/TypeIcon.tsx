@@ -2,10 +2,10 @@
  * TypeIcon — small badge showing the *type* of a Treffen or Programmpunkt.
  * Purely decorative icon; consumers should still supply a visible label.
  */
-import type { HTMLAttributes } from 'react'
+import type {ProgrammpunktKind, TreffenKind} from '@/domain/types'
+import type {HTMLAttributes} from 'react'
+import {Icon, type IconName} from '../primitives/Icon'
 import clsx from '../utils/clsx'
-import { Icon, type IconName } from '../primitives/Icon'
-import type { ProgrammpunktKind, TreffenKind } from '@/domain/types'
 import styles from './TypeIcon.module.css'
 
 export type TypeIconKind =

@@ -4,7 +4,8 @@
  *
  * Phase 9: Ersetzt das bisherige flache AKTIVITAET_TYPEN-Array.
  */
-import type { WBKey } from './wb'
+import type {WBKey} from './wb'
+import type {IconName} from '@/ui/primitives/Icon'
 
 // ─── Typ-Schlüssel ─────────────────────────────────────────────────────────
 
@@ -135,8 +136,6 @@ export function aktivitaetLabel(typ: AktivitaetTyp, untertyp?: AktivitaetUnterty
 }
 
 // ─── Icons ─────────────────────────────────────────────────────────────────
-
-import type { IconName } from '@/ui/primitives/Icon'
 
 export const TYP_ICONS: Record<AktivitaetTyp, IconName> = {
   'andacht-gespraech': 'book',

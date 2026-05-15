@@ -1,7 +1,7 @@
 /**
  * Input — labeled text/number/date input. Use `size="sm"` for inline contexts.
  */
-import type { InputHTMLAttributes, ReactNode } from 'react'
+import type {InputHTMLAttributes, ReactNode} from 'react'
 import clsx from '../utils/clsx'
 import styles from './Input.module.css'
 

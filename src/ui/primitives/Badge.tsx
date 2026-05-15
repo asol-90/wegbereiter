@@ -2,7 +2,7 @@
  * Badge — small, non-interactive status label. Used for counts, statuses
  * ("Entwurf"/"Aktiv"/"Archiviert"), and contextual flags.
  */
-import type { HTMLAttributes, ReactNode } from 'react'
+import type {HTMLAttributes, ReactNode} from 'react'
 import clsx from '../utils/clsx'
 import styles from './Badge.module.css'
 

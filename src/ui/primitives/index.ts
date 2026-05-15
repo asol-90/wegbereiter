@@ -1,35 +1,33 @@
 // Base primitives
-export { Icon, type IconName } from './Icon'
+export { Badge, type BadgeProps } from './Badge'
 export { Button, type ButtonProps } from './Button'
+export { Chip, type ChipProps } from './Chip'
+export { Icon, type IconName } from './Icon'
 export { IconButton, type IconButtonProps } from './IconButton'
 export { Input, type InputProps } from './Input'
-export { Select, type SelectProps, type SelectOption } from './Select'
-export { Chip, type ChipProps } from './Chip'
-export { Badge, type BadgeProps } from './Badge'
-export { Tooltip, type TooltipProps } from './Tooltip'
 export { Kbd, type KbdProps } from './Kbd'
+export { Select, type SelectOption, type SelectProps } from './Select'
+export { Tooltip, type TooltipProps } from './Tooltip'
 
 // Interactive primitives
-export { Toggle, type ToggleProps } from './Toggle'
-export { IconToggle, type IconToggleProps } from './IconToggle'
-export {
-  SegmentedControl,
-  type SegmentedControlProps,
-  type SegmentedOption,
-} from './SegmentedControl'
-export { Tabs, type TabsProps, type TabItem } from './Tabs'
 export { Accordion, type AccordionProps } from './Accordion'
 export {
-  AccordionGroup,
-  type AccordionGroupProps,
-  type AccordionGroupItem,
+  AccordionGroup, type AccordionGroupItem, type AccordionGroupProps
 } from './AccordionGroup'
-export { Modal, type ModalProps } from './Modal'
 export { ConfirmDialog, type ConfirmDialogProps } from './ConfirmDialog'
 export {
   ContextMenu,
   type ContextMenuProps,
   type MenuItem,
-  type MenuSection,
+  type MenuSection
 } from './ContextMenu'
-export { Spotlight, type SpotlightProps, type SpotlightItem } from './Spotlight'
+export { IconToggle, type IconToggleProps } from './IconToggle'
+export { Modal, type ModalProps } from './Modal'
+export {
+  SegmentedControl,
+  type SegmentedControlProps,
+  type SegmentedOption
+} from './SegmentedControl'
+export { Spotlight, type SpotlightItem, type SpotlightProps } from './Spotlight'
+export { Tabs, type TabItem, type TabsProps } from './Tabs'
+export { Toggle, type ToggleProps } from './Toggle'

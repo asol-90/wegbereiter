@@ -9,16 +9,16 @@
  * - globalConfig:   key = 'singleton'
  * - ferienCache:    key = `${bundesland}-${jahr}`
  */
-import { openDB, type DBSchema, type IDBPDatabase } from 'idb'
+import {type DBSchema, type IDBPDatabase, openDB} from 'idb'
 import type {
-  Abzeichen,
-  Aktivitaet,
-  Andachtsreihe,
-  BundeslandKey,
-  FerienCacheEntry,
-  GlobalConfig,
-  Planung,
-  StammKontext,
+    Abzeichen,
+    Aktivitaet,
+    Andachtsreihe,
+    BundeslandKey,
+    FerienCacheEntry,
+    GlobalConfig,
+    Planung,
+    StammKontext,
 } from '../domain/types'
 
 export const DB_NAME = 'stammtreff-planer'

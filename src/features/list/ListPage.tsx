@@ -7,15 +7,15 @@
  * Loads the Planung by :planungId from PlanungenStore — mirrors CalendarPage's
  * data loading pattern.
  */
-import { useMemo, useEffect } from 'react'
-import { useParams, useLocation } from 'react-router-dom'
-import { format } from 'date-fns'
-import { de } from 'date-fns/locale'
-import { parseIso } from '@/domain/dateUtils'
-import { usePlanungen } from '@/features/planungen'
-import { Panels, Panel, PanelGhost } from '@/features/appShell'
-import { Kontextleiste } from '@/features/kontextleiste'
-import { TreffenListe } from './TreffenListe'
+import {parseIso} from '@/domain/dateUtils'
+import {Panel, PanelGhost, Panels} from '@/features/appShell'
+import {Kontextleiste} from '@/features/kontextleiste'
+import {usePlanungen} from '@/features/planungen'
+import {format} from 'date-fns'
+import {de} from 'date-fns/locale'
+import {useEffect, useMemo} from 'react'
+import {useLocation, useParams} from 'react-router-dom'
+import {TreffenListe} from './TreffenListe'
 
 function formatTitle(start: string, ende: string): string {
   const s = parseIso(start)

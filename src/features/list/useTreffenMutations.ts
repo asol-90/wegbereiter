@@ -5,12 +5,11 @@
  * Every mutation produces a new Planung snapshot with the target Treffen
  * replaced, then persists via PlanungenStore.update().
  */
-import { useCallback } from 'react'
-import type { Planung, Treffen, Programmpunkt } from '@/domain/types'
-import type { WBKey } from '@/domain/wb'
-import type { TreffenId, ProgrammpunktId } from '@/domain/ids'
-import { newId } from '@/domain/ids'
-import { usePlanungenActions } from '@/features/planungen'
+import {newId, type ProgrammpunktId, type TreffenId} from '@/domain/ids'
+import type {Planung, Programmpunkt, Treffen} from '@/domain/types'
+import type {WBKey} from '@/domain/wb'
+import {usePlanungenActions} from '@/features/planungen'
+import {useCallback} from 'react'
 
 export type TreffenPatch = Partial<
   Pick<Treffen, 'titel' | 'notiz' | 'fixiert' | 'sollWB' | 'programm'>

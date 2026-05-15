@@ -7,22 +7,22 @@
  *
  * Wireframe reference: `planungsansicht-wireframe.html`, Case 05.
  */
-import { useMemo, useState, useCallback, useEffect, useRef } from 'react'
-import type { FerienCacheEntry, IsoDate, Planung, StammAktion, StammTreffen, Treffen } from '@/domain/types'
-import type { StammAktionId, StammTreffenId, TreffenId } from '@/domain/ids'
-import { WB_KEYS, WB_CSS_VAR } from '@/domain/wb'
-import { isoToday } from '@/domain/dateUtils'
-import { classifyDay } from '@/features/overview/monthGrid'
-import { Button, IconButton, Modal } from '@/ui/primitives'
+import {isoToday} from '@/domain/dateUtils'
+import type {StammAktionId, StammTreffenId, TreffenId} from '@/domain/ids'
+import type {FerienCacheEntry, IsoDate, Planung, StammAktion, StammTreffen, Treffen} from '@/domain/types'
+import {WB_CSS_VAR, WB_KEYS} from '@/domain/wb'
+import {classifyDay} from '@/features/overview/monthGrid'
+import {Button, IconButton, Modal} from '@/ui/primitives'
 import clsx from '@/ui/utils/clsx'
-import {
-  buildPlanungskalenderGrid,
-  buildTreffenLookup,
-  WEEKDAY_HEADERS_LONG,
-  type CalendarCell,
-  type TreffenLookup,
-} from './planungskalenderGrid'
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react'
 import styles from './PlanungsKalender.module.css'
+import {
+    buildPlanungskalenderGrid,
+    buildTreffenLookup,
+    type CalendarCell,
+    type TreffenLookup,
+    WEEKDAY_HEADERS_LONG,
+} from './planungskalenderGrid'
 
 // ─── Band colors ────────────────────────────────────────────────────────────
 

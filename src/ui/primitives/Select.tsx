@@ -1,9 +1,9 @@
 /**
  * Select — native <select> with custom styling that matches Input.
  */
-import type { SelectHTMLAttributes } from 'react'
+import type {SelectHTMLAttributes} from 'react'
 import clsx from '../utils/clsx'
-import { Icon } from './Icon'
+import {Icon} from './Icon'
 import styles from './Select.module.css'
 
 export type SelectOption<T extends string> = {

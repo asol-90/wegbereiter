@@ -13,8 +13,8 @@
  * passing two children (<Panel role="main"> and <Panel role="side">) in
  * the desired visual order; the CSS handles the sizing and separator.
  */
-import type { ReactNode } from 'react'
 import clsx from '@/ui/utils/clsx'
+import type {ReactNode} from 'react'
 import styles from './Panels.module.css'
 
 export type PanelsSplit = 'main-side' | 'side-main'

@@ -7,12 +7,9 @@
  * recomputed and listeners are notified so dependent UI (Ferien-Bänder,
  * Settings-Modal, Initiierungs-Defaults, …) updates instantly.
  */
-import type { GlobalConfig } from '@/domain/types'
-import { defaultGlobalConfig } from '@/domain/planungFactory'
-import {
-  getGlobalConfig as repoGet,
-  saveGlobalConfig as repoSave,
-} from '@/storage/globalConfigRepo'
+import {defaultGlobalConfig} from '@/domain/planungFactory'
+import type {GlobalConfig} from '@/domain/types'
+import {getGlobalConfig as repoGet, saveGlobalConfig as repoSave,} from '@/storage/globalConfigRepo'
 
 export type GlobalConfigState = {
   /** `true` once `init()` has resolved at least once. */

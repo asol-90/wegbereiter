@@ -5,7 +5,7 @@
  *
  * All dates in ISO 'yyyy-MM-dd'. Week starts on Monday to match the wireframe.
  */
-import type { Feiertag, Ferien, FerienCacheEntry, IsoDate } from '@/domain/types'
+import type {Feiertag, Ferien, FerienCacheEntry, IsoDate} from '@/domain/types';
 
 export type MonthCell =
   | { kind: 'empty' }

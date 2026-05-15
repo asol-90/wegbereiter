@@ -13,18 +13,13 @@
  *   - Hover on a marker reports `onPlanungHover(planungId)`.
  *   - The month gets a border when any of its Planungen is highlighted.
  */
-import { useState } from 'react'
-import type { PlanungId } from '@/domain/ids'
-import type { FerienCacheEntry, IsoDate, StammAktion } from '@/domain/types'
-import { isoToday } from '@/domain/dateUtils'
+import {isoToday} from '@/domain/dateUtils'
+import type {PlanungId} from '@/domain/ids'
+import type {FerienCacheEntry, IsoDate, StammAktion} from '@/domain/types'
 import clsx from '@/ui/utils/clsx'
-import {
-  buildMonthGrid,
-  classifyDay,
-  MONTH_NAMES_DE,
-  WEEKDAY_HEADERS,
-} from './monthGrid'
+import {useState} from 'react'
 import styles from './MiniMonth.module.css'
+import {buildMonthGrid, classifyDay, MONTH_NAMES_DE, WEEKDAY_HEADERS,} from './monthGrid'
 
 // ─── Band colors (single source of truth) ──────────────────────────────────
 

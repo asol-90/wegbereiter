@@ -3,9 +3,9 @@
  * In 'exclusive' mode only one item can be open at a time (for the right-hand
  * Kontextleiste below the WB area). In 'multi' mode all items are independent.
  */
-import { useCallback, useState, type ReactNode } from 'react'
+import {type ReactNode, useCallback, useState} from 'react'
 import clsx from '../utils/clsx'
-import { Accordion } from './Accordion'
+import {Accordion} from './Accordion'
 import styles from './AccordionGroup.module.css'
 
 export type AccordionGroupItem = {

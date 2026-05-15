@@ -2,8 +2,8 @@
  * WBDot — single colored circle representing one Wachstumsbereich.
  * Intensity drives the color mix: 0 = muted (bg2), 1 = full brand color.
  */
-import type { HTMLAttributes } from 'react'
-import { WB_CSS_VAR, type WBKey } from '@/domain/wb'
+import {WB_CSS_VAR, type WBKey} from '@/domain/wb'
+import type {HTMLAttributes} from 'react'
 import clsx from '../utils/clsx'
 import styles from './WBDot.module.css'
 

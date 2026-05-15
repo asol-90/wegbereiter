@@ -10,18 +10,18 @@
  * Bundesland-Wechsel propagiert über `useFerienForYear` reaktiv in den
  * Jahreskalender.
  */
-import { Input, Modal, Select, type SelectOption } from '@/ui/primitives'
 import {
-  BUNDESLAND_KEYS,
-  BUNDESLAND_LABELS,
-  WEEKDAYS,
-  type BundeslandKey,
-  type Rhythmus,
-  type Teilstamm,
-  type Weekday,
+    BUNDESLAND_KEYS,
+    BUNDESLAND_LABELS,
+    type BundeslandKey,
+    type Rhythmus,
+    type Teilstamm,
+    type Weekday,
+    WEEKDAYS,
 } from '@/domain/types'
-import { useGlobalConfig } from '@/features/globalConfig'
-import { clearFerienCache } from '@/storage/ferienRepo'
+import {useGlobalConfig} from '@/features/globalConfig'
+import {clearFerienCache} from '@/storage/ferienRepo'
+import {Input, Modal, Select, type SelectOption} from '@/ui/primitives'
 import styles from './SettingsModal.module.css'
 
 export type SettingsModalProps = {

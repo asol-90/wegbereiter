@@ -1,9 +1,9 @@
 /**
  * Repository for StammKontexte. CRUD only — business rules live in domain/.
  */
-import type { StammKontext } from '../domain/types'
-import type { StammKontextId } from '../domain/ids'
-import { getDB } from './db'
+import type {StammKontextId} from '../domain/ids'
+import type {StammKontext} from '../domain/types'
+import {getDB} from './db'
 
 export async function listStammKontexte(): Promise<StammKontext[]> {
   const db = await getDB()

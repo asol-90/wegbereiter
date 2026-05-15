@@ -5,8 +5,8 @@
  * exists only so the app can declare "load the StammKontext cache now" in one
  * place at the top of the tree.
  */
-import { useEffect, type ReactNode } from 'react'
-import { stammKontextStore } from './stammKontextStore'
+import {type ReactNode, useEffect} from 'react'
+import {stammKontextStore} from './stammKontextStore'
 
 export type StammKontextProviderProps = {
   children: ReactNode

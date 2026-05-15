@@ -2,8 +2,8 @@
  * WB distribution + characterization — pure functions used by the donut chart,
  * the meeting card (Ist-WB-Icons), and the Kontext-Panel legend.
  */
-import type { Programmpunkt } from './types'
-import { WB_KEYS, type WBCharacter, type WBKey, type WBTag } from './wb'
+import type {Programmpunkt} from './types'
+import {WB_KEYS, type WBCharacter, type WBKey, type WBTag} from './wb'
 
 export type WBDistribution = Record<WBKey, number>
 

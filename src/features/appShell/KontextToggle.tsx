@@ -2,9 +2,9 @@
  * KontextToggle — standalone pill button for the StammKontext route.
  * Label is rendered outside/below the button, not inside it.
  */
-import { useNavigate } from 'react-router-dom'
+import {Icon} from '@/ui/primitives'
 import clsx from '@/ui/utils/clsx'
-import { Icon } from '@/ui/primitives'
+import {useNavigate} from 'react-router-dom'
 import styles from './JahresplanungToggle.module.css'
 
 export type KontextToggleProps = {

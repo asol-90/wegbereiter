@@ -6,32 +6,10 @@
  *
  * The JSON schema is defined in PHASE-8-SCOPE.md §8.
  */
-import { newId } from './ids'
-import type {
-  AktivitaetId,
-  StammAktionId,
-  StammImportId,
-  StammKontextId,
-  StammTreffenId,
-} from './ids'
-import type {
-  Aktivitaet,
-  AktivitaetTyp,
-  StammAktion,
-  StammBlock,
-  StammKontext,
-  StammTreffen,
-} from './types'
-import type { AktivitaetUntertyp } from './aktivitaetKatalog'
-import {
-  isAktivitaetTyp,
-  migrateTyp,
-  istGueltigerUntertyp,
-  AKTIVITAET_TYPEN,
-  AKTIVITAET_UNTERTYPEN,
-} from './aktivitaetKatalog'
-import type { WBTag } from './wb'
-import type { WBKey } from './wb'
+import {AKTIVITAET_TYPEN, istGueltigerUntertyp, migrateTyp, type AktivitaetUntertyp} from './aktivitaetKatalog'
+import {newId, type AktivitaetId, type StammAktionId, type StammImportId, type StammKontextId, type StammTreffenId,} from './ids'
+import type {Aktivitaet, AktivitaetTyp, StammAktion, StammBlock, StammKontext, StammTreffen,} from './types'
+import type {WBKey, WBTag} from './wb'
 
 // ─── Error types ────────────────────────────────────────────────────────────
 

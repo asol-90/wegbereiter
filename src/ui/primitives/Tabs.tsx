@@ -3,7 +3,7 @@
  * repertoire categories). For the app-shell's main nav use a Router-aware
  * version; this component controls state locally via `value`/`onValueChange`.
  */
-import type { ReactNode } from 'react'
+import type {ReactNode} from 'react'
 import clsx from '../utils/clsx'
 import styles from './Tabs.module.css'
 

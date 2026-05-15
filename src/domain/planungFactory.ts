@@ -1,23 +1,22 @@
 /**
  * Factory + name generator for Planungen.
  */
-import { format } from 'date-fns'
-import { de } from 'date-fns/locale'
-import { generateTermine, parseIso } from './dateUtils'
-import { newId } from './ids'
+import {format} from 'date-fns'
+import {de} from 'date-fns/locale'
+import {generateTermine, parseIso} from './dateUtils'
+import {newId, type PlanungId, type StammKontextId, type TreffenId} from './ids'
 import type {
-  AbzeichenAuswahl,
-  GlobalConfig,
-  IsoDate,
-  Mitarbeiter,
-  Planung,
-  Rhythmus,
-  Treffen,
-  WBSchwerpunkt,
-  Weekday,
+    AbzeichenAuswahl,
+    AndachtsreiheZuordnung,
+    GlobalConfig,
+    IsoDate,
+    Mitarbeiter,
+    Planung,
+    Rhythmus,
+    Treffen,
+    WBSchwerpunkt,
+    Weekday,
 } from './types'
-import type { PlanungId, StammKontextId, TreffenId } from './ids'
-import type { AndachtsreiheZuordnung } from './types'
 
 export type CreatePlanungInput = {
   zeitraum: { start: IsoDate; ende: IsoDate }

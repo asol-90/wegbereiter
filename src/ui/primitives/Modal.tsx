@@ -2,15 +2,9 @@
  * Modal — centered dialog with optional header/footer slots.
  * Uses native <dialog> for backdrop + focus-trap semantics.
  */
-import {
-  useCallback,
-  useEffect,
-  useRef,
-  type ReactNode,
-  type MouseEvent,
-} from 'react'
+import {type MouseEvent, type ReactNode, useCallback, useEffect, useRef,} from 'react'
 import clsx from '../utils/clsx'
-import { IconButton } from './IconButton'
+import {IconButton} from './IconButton'
 import styles from './Modal.module.css'
 
 export type ModalProps = {

@@ -6,10 +6,10 @@
  * expected to fill the content area with its own two-panel layout
  * (see `Panels`).
  */
-import { Outlet } from 'react-router-dom'
-import { Topbar } from './Topbar'
-import { Footer } from './Footer'
+import {Outlet} from 'react-router-dom'
 import styles from './AppShell.module.css'
+import {Footer} from './Footer'
+import {Topbar} from './Topbar'
 
 export function AppShell() {
   return (

@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest'
-import { buildPlanung, generatePlanungsName } from './planungFactory'
+import {describe, expect, it} from 'vitest'
+import {buildPlanung, generatePlanungsName} from './planungFactory'
 
 describe('generatePlanungsName', () => {
   it('same-year range → Month – Month Year', () => {

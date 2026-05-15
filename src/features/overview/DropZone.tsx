@@ -4,7 +4,7 @@
  * Wraps children and overlays a visual indicator when a file is being dragged
  * over the component. On drop, reads the file as text and calls onFileDrop.
  */
-import { useCallback, useState, type DragEvent, type ReactNode } from 'react'
+import {type DragEvent, type ReactNode, useCallback, useState} from 'react'
 import styles from './DropZone.module.css'
 
 export type DropZoneProps = {

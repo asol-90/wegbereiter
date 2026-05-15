@@ -1,14 +1,14 @@
 /**
  * Public barrel for the Planungen feature slice.
  */
-export { planungenStore, PlanungenStore } from './planungenStore'
-export type { PlanungenState } from './planungenStore'
 export { PlanungenProvider } from './PlanungenProvider'
+export { PlanungenStore, planungenStore } from './planungenStore'
+export type { PlanungenState } from './planungenStore'
 export {
   usePlanungen,
-  usePlanungenActions,
+  usePlanungenActions
 } from './usePlanungen'
 export type {
   PlanungenActions,
-  UsePlanungenResult,
+  UsePlanungenResult
 } from './usePlanungen'

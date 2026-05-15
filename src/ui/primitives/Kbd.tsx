@@ -2,7 +2,7 @@
  * Kbd — renders a keyboard shortcut hint, e.g. ⌘K or "Esc".
  * Accepts either a string of keys separated by "+" or explicit children.
  */
-import type { HTMLAttributes } from 'react'
+import type {HTMLAttributes} from 'react'
 import clsx from '../utils/clsx'
 import styles from './Kbd.module.css'
 

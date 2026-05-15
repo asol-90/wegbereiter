@@ -11,13 +11,13 @@
  * Year-State: Das angezeigte Jahr steuert sowohl den Kalender als auch
  * die Planungsliste (nur Einträge dieses Jahres werden angezeigt).
  */
-import { useMemo, useState, useCallback } from 'react'
-import { Panels, Panel } from '@/features/appShell'
-import { usePlanungen } from '@/features/planungen'
-import { useStammKontext } from '@/features/stammKontext'
-import type { PlanungId } from '@/domain/ids'
-import { Jahreskalender } from './Jahreskalender'
-import { JahresplanerSidebar } from './JahresplanerSidebar'
+import type {PlanungId} from '@/domain/ids'
+import {Panel, Panels} from '@/features/appShell'
+import {usePlanungen} from '@/features/planungen'
+import {useStammKontext} from '@/features/stammKontext'
+import {useCallback, useMemo, useState} from 'react'
+import {Jahreskalender} from './Jahreskalender'
+import {JahresplanerSidebar} from './JahresplanerSidebar'
 
 /** Collect all years that have any data (Planungen treffen + Kontext treffen/aktionen). */
 function collectDataYears(

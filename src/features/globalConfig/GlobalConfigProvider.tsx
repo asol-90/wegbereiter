@@ -4,9 +4,9 @@
  * Mirror of PlanungenProvider. No React Context: children read the store via
  * `useGlobalConfig`.
  */
-import { useEffect, type ReactNode } from 'react'
-import { globalConfigStore } from './globalConfigStore'
-import { seedRepertoireIfEmpty } from '@/domain/seedRepertoire'
+import {seedRepertoireIfEmpty} from '@/domain/seedRepertoire'
+import {type ReactNode, useEffect} from 'react'
+import {globalConfigStore} from './globalConfigStore'
 
 export type GlobalConfigProviderProps = {
   children: ReactNode

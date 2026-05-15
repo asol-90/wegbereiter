@@ -4,8 +4,8 @@
  * Phase 10: Fake-Daten basierend auf CSV-Export (nicht final).
  * Werden später durch echte Daten ersetzt.
  */
-import type { AbzeichenAnforderungId, AbzeichenId } from './ids'
-import type { Abzeichen, Altersstufe } from './types'
+import type {AbzeichenAnforderungId, AbzeichenId} from './ids'
+import type {Abzeichen, Altersstufe} from './types'
 
 // ─── Altersstufen-Labels ──────────────────────────────────────────────────
 

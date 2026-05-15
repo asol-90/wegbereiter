@@ -2,7 +2,7 @@
  * WBBar — horizontal stacked bar visualizing WB distribution (ist vs. soll).
  * Values are normalized so they sum to 1; raw minutes or shares both work.
  */
-import { WB_KEYS, WB_CSS_VAR, type WBKey } from '@/domain/wb'
+import {WB_CSS_VAR, WB_KEYS, type WBKey} from '@/domain/wb'
 import clsx from '../utils/clsx'
 import styles from './WBBar.module.css'
 

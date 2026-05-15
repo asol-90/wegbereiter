@@ -2,10 +2,10 @@
  * Chip — small labeled pill, used for tags, filters, WB-Chips.
  * Supports optional leading icon/dot, trailing remove button, and selected state.
  */
-import type { ButtonHTMLAttributes, HTMLAttributes, ReactNode } from 'react'
+import type {ButtonHTMLAttributes, HTMLAttributes, ReactNode} from 'react'
 import clsx from '../utils/clsx'
-import { Icon, type IconName } from './Icon'
 import styles from './Chip.module.css'
+import {Icon, type IconName} from './Icon'
 
 type CommonProps = {
   children: ReactNode

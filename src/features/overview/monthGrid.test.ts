@@ -1,11 +1,6 @@
-import { describe, expect, it } from 'vitest'
-import {
-  buildMonthGrid,
-  classifyDay,
-  daysInMonth,
-  MONTH_NAMES_DE,
-} from './monthGrid'
-import type { FerienCacheEntry } from '@/domain/types'
+import type {FerienCacheEntry} from '@/domain/types'
+import {describe, expect, it} from 'vitest'
+import {buildMonthGrid, classifyDay, daysInMonth, MONTH_NAMES_DE,} from './monthGrid'
 
 describe('buildMonthGrid', () => {
   it('returns 6 rows × 7 cells', () => {

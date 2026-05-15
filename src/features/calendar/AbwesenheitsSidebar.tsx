@@ -5,15 +5,14 @@
  * one 28px-wide column per member. Horizontal lines: dashed per KW, solid
  * at month boundaries. Avatars as column headers.
  */
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { addDays, differenceInCalendarDays, startOfWeek, endOfWeek } from 'date-fns'
-import type { Abwesenheit, IsoDate, Mitarbeiter, Planung } from '@/domain/types'
-import type { AbwesenheitId, MitarbeiterId } from '@/domain/ids'
-import { newId } from '@/domain/ids'
-import { parseIso, toIso } from '@/domain/dateUtils'
-import { Avatar } from '@/ui/domain'
-import { Button, IconButton } from '@/ui/primitives'
+import {parseIso, toIso} from '@/domain/dateUtils'
+import {newId, type AbwesenheitId, type MitarbeiterId} from '@/domain/ids'
+import type {Abwesenheit, IsoDate, Mitarbeiter, Planung} from '@/domain/types'
+import {Avatar} from '@/ui/domain'
+import {Button, IconButton} from '@/ui/primitives'
 import clsx from '@/ui/utils/clsx'
+import {addDays, differenceInCalendarDays, endOfWeek, startOfWeek} from 'date-fns'
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react'
 import styles from './AbwesenheitsSidebar.module.css'
 
 const ACCENT_HUE_SEQUENCE = [220, 160, 40, 280, 70, 320]
@@ -141,19 +140,33 @@ export function AbwesenheitsSidebar({
   const membersAreaRef = useRef<HTMLDivElement>(null)
 
   // Refs for stable access in document-level listeners
+  // eslint-disable-next-line react-hooks/refs
   const dragRef = useRef(drag)
+  // eslint-disable-next-line react-hooks/refs
   dragRef.current = drag
+  // eslint-disable-next-line react-hooks/refs
   const abwesenheitenRef = useRef(abwesenheiten)
+  // eslint-disable-next-line react-hooks/refs
   abwesenheitenRef.current = abwesenheiten
+  // eslint-disable-next-line react-hooks/refs
   const weekRowsRef = useRef(weekRows)
+  // eslint-disable-next-line react-hooks/refs
   weekRowsRef.current = weekRows
+  // eslint-disable-next-line react-hooks/refs
   const zeitraumRef = useRef(zeitraum)
+  // eslint-disable-next-line react-hooks/refs
   zeitraumRef.current = zeitraum
+  // eslint-disable-next-line react-hooks/refs
   const onUpdateRef = useRef(onUpdate)
+  // eslint-disable-next-line react-hooks/refs
   onUpdateRef.current = onUpdate
+  // eslint-disable-next-line react-hooks/refs
   const totalRowsRef = useRef(totalRows)
+  // eslint-disable-next-line react-hooks/refs
   totalRowsRef.current = totalRows
+  // eslint-disable-next-line react-hooks/refs
   const onAbwesenheitHoverRef = useRef(onAbwesenheitHover)
+  // eslint-disable-next-line react-hooks/refs
   onAbwesenheitHoverRef.current = onAbwesenheitHover
 
   const yToRow = useCallback(

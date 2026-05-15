@@ -1,9 +1,9 @@
 /**
  * Repository for the single GlobalConfig singleton.
  */
-import type { GlobalConfig } from '../domain/types'
-import { defaultGlobalConfig } from '../domain/planungFactory'
-import { getDB } from './db'
+import {defaultGlobalConfig} from '../domain/planungFactory'
+import type {GlobalConfig} from '../domain/types'
+import {getDB} from './db'
 
 const KEY = 'singleton'
 

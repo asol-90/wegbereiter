@@ -2,7 +2,7 @@
  * WBIntensitySegment — 4-step segmented bar for picking intensity (– / etwas /
  * mittel / stark). Values correspond to WB_STEPS in the domain layer.
  */
-import { WB_STEPS, WB_CSS_VAR, type WBKey } from '@/domain/wb'
+import {WB_CSS_VAR, WB_STEPS, type WBKey} from '@/domain/wb'
 import clsx from '../utils/clsx'
 import styles from './WBIntensitySegment.module.css'
 

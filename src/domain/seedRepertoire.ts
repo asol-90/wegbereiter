@@ -4,9 +4,9 @@
  * Idempotent: checks if any 'vorinstalliert' activities exist.
  * If the user deletes all preinstalled activities, they won't come back.
  */
-import { listAktivitaeten, saveAktivitaet } from '@/storage/repertoireRepo'
-import { createStarterKatalog } from './starterKatalog'
-import { repertoireStore } from '@/features/repertoire/repertoireStore'
+import {repertoireStore} from '@/features/repertoire/repertoireStore'
+import {listAktivitaeten, saveAktivitaet} from '@/storage/repertoireRepo'
+import {createStarterKatalog} from './starterKatalog'
 
 let seeded = false
 

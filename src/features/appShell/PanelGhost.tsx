@@ -4,7 +4,7 @@
  * desaturated icon + label + optional subline). Once a real page is
  * built, it simply stops using this component.
  */
-import { Icon, type IconName } from '@/ui/primitives'
+import {Icon, type IconName} from '@/ui/primitives'
 import styles from './PanelGhost.module.css'
 
 export type PanelGhostProps = {

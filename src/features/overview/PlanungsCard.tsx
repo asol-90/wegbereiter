@@ -17,15 +17,15 @@
  * elements; its higher z-index intercepts the click before the Link
  * navigates.
  */
-import { useState, type MouseEvent } from 'react'
-import { format } from 'date-fns'
-import { de } from 'date-fns/locale'
-import { Link } from 'react-router-dom'
-import { parseIso } from '@/domain/dateUtils'
-import type { Planung } from '@/domain/types'
+import {parseIso} from '@/domain/dateUtils'
+import type {Planung} from '@/domain/types'
+import {usePlanungenActions} from '@/features/planungen'
+import {ConfirmDialog, IconButton} from '@/ui/primitives'
 import clsx from '@/ui/utils/clsx'
-import { ConfirmDialog, IconButton } from '@/ui/primitives'
-import { usePlanungenActions } from '@/features/planungen'
+import {format} from 'date-fns'
+import {de} from 'date-fns/locale'
+import {type MouseEvent, useState} from 'react'
+import {Link} from 'react-router-dom'
 import styles from './PlanungsCard.module.css'
 
 export type PlanungsCardProps = {

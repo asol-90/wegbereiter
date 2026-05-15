@@ -5,9 +5,9 @@
  *
  * Primary use: Treffen "Fixieren" mit Kette offen/zu.
  */
-import type { ButtonHTMLAttributes } from 'react'
+import type {ButtonHTMLAttributes} from 'react'
 import clsx from '../utils/clsx'
-import { Icon, type IconName } from './Icon'
+import {Icon, type IconName} from './Icon'
 import styles from './IconToggle.module.css'
 
 export type IconToggleProps = {

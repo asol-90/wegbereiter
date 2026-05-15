@@ -2,9 +2,9 @@
  * WBDotGrid — horizontal row of WB dots. Renders all four Wachstumsbereiche
  * by default; intensities are pulled from the passed `tags` (keyed by WBKey).
  */
+import {WB_KEYS, type WBKey} from '@/domain/wb'
 import clsx from '../utils/clsx'
-import { WB_KEYS, type WBKey } from '@/domain/wb'
-import { WBDot } from './WBDot'
+import {WBDot} from './WBDot'
 import styles from './WBDotGrid.module.css'
 
 export type WBDotGridProps = {

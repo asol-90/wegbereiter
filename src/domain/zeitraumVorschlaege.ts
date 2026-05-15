@@ -7,9 +7,9 @@
  *
  * Always overridable.
  */
-import { addDays, getYear } from 'date-fns'
-import { parseIso, toIso } from './dateUtils'
-import type { Ferien, IsoDate, StammKontext } from './types'
+import {addDays, getYear} from 'date-fns'
+import {parseIso, toIso} from './dateUtils'
+import type {Ferien, IsoDate, StammKontext} from './types'
 
 export type ZeitraumVorschlag = {
   label: string

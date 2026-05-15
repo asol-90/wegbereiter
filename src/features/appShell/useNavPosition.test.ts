@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest'
-import { derive } from './useNavPosition'
+import {describe, expect, it} from 'vitest'
+import {derive} from './useNavPosition'
 
 describe('derive(pathname)', () => {
   it('returns position 0 for the root path', () => {

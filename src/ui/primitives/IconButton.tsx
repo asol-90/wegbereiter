@@ -2,9 +2,9 @@
  * IconButton — circular or square button with only an icon. Used for
  * settings buttons, closing modals, delete × on list items.
  */
-import type { ButtonHTMLAttributes } from 'react'
+import type {ButtonHTMLAttributes} from 'react'
 import clsx from '../utils/clsx'
-import { Icon, type IconName } from './Icon'
+import {Icon, type IconName} from './Icon'
 import styles from './IconButton.module.css'
 
 export type IconButtonProps = {

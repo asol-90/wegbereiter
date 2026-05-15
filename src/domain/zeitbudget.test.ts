@@ -1,7 +1,7 @@
-import { describe, expect, it } from 'vitest'
-import type { Planung, Programmpunkt, StammKontext, StammTreffen, Treffen } from './types'
-import type { PlanungId, ProgrammpunktId, StammKontextId, StammImportId, StammTreffenId, TreffenId } from './ids'
-import { stammAbzugFuerTreffen, zeitbudgetFuerTreffen, zeitbudgetStatus } from './zeitbudget'
+import {describe, expect, it} from 'vitest'
+import type {PlanungId, ProgrammpunktId, StammImportId, StammKontextId, StammTreffenId, TreffenId} from './ids'
+import type {Planung, Programmpunkt, StammKontext, StammTreffen, Treffen} from './types'
+import {stammAbzugFuerTreffen, zeitbudgetFuerTreffen, zeitbudgetStatus} from './zeitbudget'
 
 const makePlanung = (partial: Partial<Planung> = {}): Planung => ({
   id: 'pl-1' as PlanungId,

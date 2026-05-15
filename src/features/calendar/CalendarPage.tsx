@@ -7,21 +7,20 @@
  * Loads the Planung by :planungId from the PlanungenStore and passes the
  * matching FerienCacheEntry from useFerienForYear.
  */
-import { useCallback, useMemo, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
-import { format } from 'date-fns'
-import { de } from 'date-fns/locale'
-import type { Abwesenheit, IsoDate, Mitarbeiter, StammAktion, StammTreffen } from '@/domain/types'
-import { parseIso } from '@/domain/dateUtils'
-import { newId } from '@/domain/ids'
-import type { StammAktionId, StammTreffenId, TreffenId } from '@/domain/ids'
-import { removeTreffen, insertTreffen } from '@/domain/cascade'
-import { usePlanungen, usePlanungenActions } from '@/features/planungen'
-import { useFerienForYear } from '@/features/overview/useFerienForYear'
-import { useStammKontext } from '@/features/stammKontext'
-import { Panels, Panel, PanelGhost } from '@/features/appShell'
-import { PlanungsKalender } from './PlanungsKalender'
-import { AbwesenheitsSidebar } from './AbwesenheitsSidebar'
+import {insertTreffen, removeTreffen} from '@/domain/cascade'
+import {parseIso} from '@/domain/dateUtils'
+import {newId, type StammAktionId, type StammTreffenId, type TreffenId} from '@/domain/ids'
+import type {Abwesenheit, IsoDate, Mitarbeiter, StammAktion, StammTreffen} from '@/domain/types'
+import {Panel, PanelGhost, Panels} from '@/features/appShell'
+import {useFerienForYear} from '@/features/overview/useFerienForYear'
+import {usePlanungen, usePlanungenActions} from '@/features/planungen'
+import {useStammKontext} from '@/features/stammKontext'
+import {format} from 'date-fns'
+import {de} from 'date-fns/locale'
+import {useCallback, useMemo, useState} from 'react'
+import {useNavigate, useParams} from 'react-router-dom'
+import {AbwesenheitsSidebar} from './AbwesenheitsSidebar'
+import {PlanungsKalender} from './PlanungsKalender'
 
 /** Derive the year with the most treffen for Ferien-loading. */
 function primaryYear(planung: { treffen: { datum: string }[] }): number {

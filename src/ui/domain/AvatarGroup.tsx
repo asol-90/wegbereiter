@@ -2,7 +2,7 @@
  * AvatarGroup — overlapping row of Avatars with optional overflow counter.
  */
 import clsx from '../utils/clsx'
-import { Avatar } from './Avatar'
+import {Avatar} from './Avatar'
 import styles from './AvatarGroup.module.css'
 
 export type AvatarGroupProps = {

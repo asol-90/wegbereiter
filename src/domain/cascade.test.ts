@@ -1,7 +1,7 @@
-import { describe, expect, it } from 'vitest'
-import { insertTreffen, redistributeProgramm, removeTreffen } from './cascade'
-import type { PlanungId, ProgrammpunktId, TreffenId } from './ids'
-import type { Planung, Programmpunkt, Treffen } from './types'
+import {describe, expect, it} from 'vitest'
+import {insertTreffen, redistributeProgramm, removeTreffen} from './cascade'
+import type {PlanungId, ProgrammpunktId, TreffenId} from './ids'
+import type {Planung, Programmpunkt, Treffen} from './types'
 
 const pp = (id: string, dauer = 10): Programmpunkt => ({
   id: id as ProgrammpunktId,

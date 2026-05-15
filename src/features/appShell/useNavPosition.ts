@@ -17,7 +17,7 @@
  * the active position and the active Planung id (may be null), so the
  * Topbar can build its links.
  */
-import { matchPath, useLocation } from 'react-router-dom'
+import {matchPath, useLocation} from 'react-router-dom'
 
 export type NavPosition = 0 | 1 | 2 | 'none'
 

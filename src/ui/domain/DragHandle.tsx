@@ -3,9 +3,9 @@
  * Renders only the visual; wire it into @dnd-kit's listeners at the
  * call site.
  */
-import type { HTMLAttributes } from 'react'
+import type {HTMLAttributes} from 'react'
+import {Icon} from '../primitives/Icon'
 import clsx from '../utils/clsx'
-import { Icon } from '../primitives/Icon'
 import styles from './DragHandle.module.css'
 
 export type DragHandleProps = {

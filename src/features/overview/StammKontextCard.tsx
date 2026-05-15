@@ -4,13 +4,13 @@
  * Visually distinct from PlanungsCards: uses a subtle accent background
  * and shows the theme, date range, and meeting/action counts.
  */
-import { useState, type MouseEvent } from 'react'
-import { format, parseISO } from 'date-fns'
-import { de } from 'date-fns/locale'
-import type { StammKontext } from '@/domain/types'
+import type {StammKontext} from '@/domain/types'
+import {useStammKontextActions} from '@/features/stammKontext'
+import {ConfirmDialog, IconButton} from '@/ui/primitives'
 import clsx from '@/ui/utils/clsx'
-import { ConfirmDialog, IconButton } from '@/ui/primitives'
-import { useStammKontextActions } from '@/features/stammKontext'
+import {format, parseISO} from 'date-fns'
+import {de} from 'date-fns/locale'
+import {type MouseEvent, useState} from 'react'
 import styles from './StammKontextCard.module.css'
 
 export type StammKontextCardProps = {

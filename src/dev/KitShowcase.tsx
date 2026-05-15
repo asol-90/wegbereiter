@@ -3,43 +3,43 @@
  * we can visually compare them against the wireframes and click-test the
  * interactive ones. Not shipped to users.
  */
-import { useState, type MouseEvent, type ReactNode } from 'react'
+import {WB_KEYS, WB_LABELS, type WBKey} from '@/domain/wb'
 import {
-  Accordion,
-  AccordionGroup,
-  Badge,
-  Button,
-  Chip,
-  ConfirmDialog,
-  ContextMenu,
-  Icon,
-  IconButton,
-  IconToggle,
-  Input,
-  Kbd,
-  Modal,
-  SegmentedControl,
-  Select,
-  Spotlight,
-  Tabs,
-  Toggle,
-  Tooltip,
-  type SpotlightItem,
-} from '@/ui/primitives'
-import {
-  Avatar,
-  AvatarGroup,
-  DragHandle,
-  DurationBar,
-  TypeIcon,
-  WBBar,
-  WBDonut,
-  WBDot,
-  WBDotGrid,
-  WBGoalBars,
-  WBIntensitySegment,
+    Avatar,
+    AvatarGroup,
+    DragHandle,
+    DurationBar,
+    TypeIcon,
+    WBBar,
+    WBDonut,
+    WBDot,
+    WBDotGrid,
+    WBGoalBars,
+    WBIntensitySegment,
 } from '@/ui/domain'
-import { WB_KEYS, WB_LABELS, type WBKey } from '@/domain/wb'
+import {
+    Accordion,
+    AccordionGroup,
+    Badge,
+    Button,
+    Chip,
+    ConfirmDialog,
+    ContextMenu,
+    Icon,
+    IconButton,
+    IconToggle,
+    Input,
+    Kbd,
+    Modal,
+    SegmentedControl,
+    Select,
+    Spotlight,
+    type SpotlightItem,
+    Tabs,
+    Toggle,
+    Tooltip,
+} from '@/ui/primitives'
+import {type MouseEvent, type ReactNode, useState} from 'react'
 import styles from './KitShowcase.module.css'
 
 type Section = {

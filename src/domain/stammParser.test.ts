@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest'
-import { detectFileType, parseStammDatei, StammParseError } from './stammParser'
+import {describe, expect, it} from 'vitest'
+import {detectFileType, parseStammDatei, StammParseError} from './stammParser'
 
 const MINIMAL_KONTEXT = {
   typ: 'stammkontext',

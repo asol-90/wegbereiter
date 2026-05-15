@@ -1,7 +1,7 @@
-import { afterEach, beforeEach, describe, expect, it } from 'vitest'
-import { GlobalConfigStore } from './globalConfigStore'
-import { clearAllStores } from '@/test/dbHelpers'
-import { getGlobalConfig } from '@/storage/globalConfigRepo'
+import {getGlobalConfig} from '@/storage/globalConfigRepo'
+import {clearAllStores} from '@/test/dbHelpers'
+import {afterEach, beforeEach, describe, expect, it} from 'vitest'
+import {GlobalConfigStore} from './globalConfigStore'
 
 describe('GlobalConfigStore', () => {
   let store: GlobalConfigStore

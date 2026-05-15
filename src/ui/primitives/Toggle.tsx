@@ -1,7 +1,7 @@
 /**
  * Toggle — accessible switch (checkbox semantics) with optional label.
  */
-import type { InputHTMLAttributes, ReactNode } from 'react'
+import type {InputHTMLAttributes, ReactNode} from 'react'
 import clsx from '../utils/clsx'
 import styles from './Toggle.module.css'
 

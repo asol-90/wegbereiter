@@ -6,15 +6,9 @@
  *
  * StammKontexte are sorted by the date of their first treffen/aktion (earliest first).
  */
-import type { StammKontext, IsoDate } from '@/domain/types'
-import type { StammKontextId, StammImportId } from '@/domain/ids'
-import { newId } from '@/domain/ids'
-import {
-  deleteStammKontext,
-  getStammKontext,
-  listStammKontexte,
-  saveStammKontext,
-} from '@/storage/stammKontextRepo'
+import {newId, type StammImportId, type StammKontextId} from '@/domain/ids'
+import type {IsoDate, StammKontext} from '@/domain/types'
+import {deleteStammKontext, getStammKontext, listStammKontexte, saveStammKontext,} from '@/storage/stammKontextRepo'
 
 export type StammKontextState = {
   /** `true` once `init()` has resolved at least once. */

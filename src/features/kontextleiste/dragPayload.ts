@@ -5,8 +5,8 @@
  * The MIME type is used as dataTransfer key to distinguish our drag items
  * from other drag sources (e.g. file drops).
  */
-import type { AktivitaetTyp, AktivitaetUntertyp, WBTag } from '@/domain/types'
-import type { AktivitaetId, AndachtsEinheitId, AbzeichenAnforderungId, StammAktionId } from '@/domain/ids'
+import type {AbzeichenAnforderungId, AktivitaetId, AndachtsEinheitId, StammAktionId} from '@/domain/ids'
+import type {AktivitaetTyp, AktivitaetUntertyp, WBTag} from '@/domain/types'
 
 export const KONTEXT_DRAG_MIME = 'application/x-kontext-drag'
 

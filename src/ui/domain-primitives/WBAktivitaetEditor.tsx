@@ -5,8 +5,7 @@
  * each with four clickable intensity buttons (0 / 0.33 / 0.66 / 1.0).
  * Used in the StammKontext-Editor and (later) in the Repertoire-Ansicht.
  */
-import type { WBKey, WBTag } from '@/domain/wb'
-import { WB_KEYS, WB_LABELS, WB_CSS_VAR, WB_STEPS } from '@/domain/wb'
+import {WB_CSS_VAR, WB_KEYS, WB_LABELS, WB_STEPS, type WBKey, type WBTag} from '@/domain/wb'
 import styles from './WBAktivitaetEditor.module.css'
 
 export type WBAktivitaetEditorProps = {

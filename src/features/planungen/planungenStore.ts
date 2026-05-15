@@ -9,18 +9,10 @@
  * Snapshots are frozen reference-immutable objects so React can detect
  * changes via identity comparison.
  */
-import type { Planung } from '@/domain/types'
-import type { PlanungId } from '@/domain/ids'
-import {
-  buildPlanung,
-  type CreatePlanungInput,
-} from '@/domain/planungFactory'
-import {
-  deletePlanung,
-  getPlanung,
-  listPlanungen,
-  savePlanung,
-} from '@/storage/planungRepo'
+import type {PlanungId} from '@/domain/ids'
+import {buildPlanung, type CreatePlanungInput,} from '@/domain/planungFactory'
+import type {Planung} from '@/domain/types'
+import {deletePlanung, getPlanung, listPlanungen, savePlanung,} from '@/storage/planungRepo'
 
 export type PlanungenState = {
   /** `true` once `init()` has resolved at least once. */

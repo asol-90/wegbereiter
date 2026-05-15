@@ -5,18 +5,18 @@
  * surprises and keeps IndexedDB round-trips lossless.
  */
 import {
-  addDays,
-  addWeeks,
-  differenceInCalendarDays,
-  format,
-  getDay,
-  isAfter,
-  isBefore,
-  isEqual,
-  parseISO,
-  startOfDay,
+    addDays,
+    addWeeks,
+    differenceInCalendarDays,
+    format,
+    getDay,
+    isAfter,
+    isBefore,
+    isEqual,
+    parseISO,
+    startOfDay,
 } from 'date-fns'
-import type { IsoDate, Rhythmus, Weekday } from './types'
+import type {IsoDate, Rhythmus, Weekday} from './types'
 
 export const WEEKDAY_INDEX: Record<Weekday, number> = {
   montag: 1,

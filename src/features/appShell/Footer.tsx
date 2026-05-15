@@ -6,12 +6,12 @@
  * Stamm (forest green), Teilstamm (forest green), Team (planning purple).
  * Distrikt, Region, and Stamm are hard-coded constants for this Stamm.
  */
-import { useState } from 'react'
-import { IconButton } from '@/ui/primitives'
-import { BUNDESLAND_LABELS } from '@/domain/types'
-import { useGlobalConfig } from '@/features/globalConfig'
-import { SettingsModal } from './SettingsModal'
+import {BUNDESLAND_LABELS} from '@/domain/types'
+import {useGlobalConfig} from '@/features/globalConfig'
+import {IconButton} from '@/ui/primitives'
+import {useState} from 'react'
 import styles from './Footer.module.css'
+import {SettingsModal} from './SettingsModal'
 
 const DISTRIKT = 'Distrikt Ost'
 const REGION = 'O3'
