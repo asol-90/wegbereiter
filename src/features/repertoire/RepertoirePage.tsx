@@ -198,6 +198,12 @@ export function RepertoirePage() {
   // ── File drop handler ──
   const [importFeedback, setImportFeedback] = useState<{ type: 'ok' | 'err'; message: string } | null>(null)
 
+  useEffect(() => {
+    if (importFeedback?.type !== 'ok') return
+    const timer = setTimeout(() => setImportFeedback(null), 4000)
+    return () => clearTimeout(timer)
+  }, [importFeedback])
+
   const handleFileDrop = useCallback(async (e: React.DragEvent) => {
     e.preventDefault()
     dragCountRef.current = 0
@@ -250,7 +256,6 @@ export function RepertoirePage() {
 
     const skipNote = skipped > 0 ? `, ${skipped} übersprungen` : ''
     setImportFeedback({ type: 'ok', message: `${items.length} Einträge importiert${skipNote}.` })
-    setTimeout(() => setImportFeedback(null), 4000)
   }, [importAktivitaeten, importAndachtsreihen, importAbzeichen])
 
   if (!loaded) return null

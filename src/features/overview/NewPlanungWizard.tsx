@@ -126,7 +126,6 @@ export function NewPlanungWizard({ open, onClose, onCreated, initialZeitraum }: 
   const [andachtAusgewaehlt, setAndachtAusgewaehlt] = useState<Set<AndachtsEinheitId>>(new Set())
   const [andachtTitel, setAndachtTitel] = useState('')
   const [andachtEinheiten, setAndachtEinheiten] = useState<{ id: AndachtsEinheitId; titel: string }[]>([])
-  const andachtFocusRef = useRef<string | null>(null)
 
   // Abzeichen
   const [_abzeichenEnabled, setAbzeichenEnabled] = useState(false)
@@ -776,7 +775,6 @@ export function NewPlanungWizard({ open, onClose, onCreated, initialZeitraum }: 
           setAndachtTitel={setAndachtTitel}
           andachtEinheiten={andachtEinheiten}
           setAndachtEinheiten={setAndachtEinheiten}
-          andachtFocusRef={andachtFocusRef}
           selectedAltersstufe={selectedAltersstufe}
           setSelectedAltersstufe={setSelectedAltersstufe}
           selectedAbzeichenId={selectedAbzeichenId}

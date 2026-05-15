@@ -1,4 +1,4 @@
-import React from 'react'
+import { useState } from 'react'
 import { AccordionGroup, Input, Select } from '@/ui/primitives'
 import type { Altersstufe, Andachtsreihe, WbSchwerpunktModus } from '@/domain/types'
 import { newId, type AbzeichenId, type AndachtsEinheitId, type AndachtsreiheId } from '@/domain/ids'
@@ -24,7 +24,6 @@ export type WizardStep3ZieleProps = {
   setAndachtTitel: (t: string) => void
   andachtEinheiten: { id: AndachtsEinheitId; titel: string }[]
   setAndachtEinheiten: (e: { id: AndachtsEinheitId; titel: string }[]) => void
-  andachtFocusRef: React.MutableRefObject<string | null>
   selectedAltersstufe: Altersstufe | null
   setSelectedAltersstufe: (s: Altersstufe | null) => void
   selectedAbzeichenId: AbzeichenId | null
@@ -55,7 +54,6 @@ export function WizardStep3Ziele({
   setAndachtTitel,
   andachtEinheiten,
   setAndachtEinheiten,
-  andachtFocusRef,
   selectedAltersstufe,
   setSelectedAltersstufe,
   selectedAbzeichenId,
@@ -68,6 +66,7 @@ export function WizardStep3Ziele({
   activeMeetingCount,
   error,
 }: WizardStep3ZieleProps) {
+  const [andachtFocusId, setAndachtFocusId] = useState<string | null>(null)
   return (
     <div className={styles.section}>
       <AccordionGroup
@@ -287,7 +286,7 @@ export function WizardStep3Ziele({
                           <Input
                             placeholder="Titel der Einheit"
                             value={einheit.titel}
-                            autoFocus={andachtFocusRef.current === (einheit.id as string)}
+                            autoFocus={andachtFocusId === (einheit.id as string)}
                             onChange={(e) => {
                               const updated = [...andachtEinheiten]
                               updated[i] = { ...einheit, titel: e.target.value }
@@ -299,7 +298,7 @@ export function WizardStep3Ziele({
                                 const isLast = i === andachtEinheiten.length - 1
                                 if (isLast && einheit.titel.trim()) {
                                   const next = newId<AndachtsEinheitId>()
-                                  andachtFocusRef.current = next as string
+                                  setAndachtFocusId(next as string)
                                   setAndachtEinheiten([...andachtEinheiten, { id: next, titel: '' }])
                                 }
                               }
@@ -321,7 +320,7 @@ export function WizardStep3Ziele({
                       className={styles.addEinheitBtn}
                       onClick={() => {
                         const next = newId<AndachtsEinheitId>()
-                        andachtFocusRef.current = next as string
+                        setAndachtFocusId(next as string)
                         setAndachtEinheiten([...andachtEinheiten, { id: next, titel: '' }])
                       }}
                     >

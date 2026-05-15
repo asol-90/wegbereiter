@@ -412,10 +412,7 @@ export function AbwesenheitsSidebar({
               icon="plus"
               size={12}
               label="Teammitglied hinzufügen"
-              onClick={() => {
-                setAddingMember(true)
-                setTimeout(() => addInputRef.current?.focus(), 50)
-              }}
+              onClick={() => setAddingMember(true)}
             />
           </div>
         )}
@@ -423,6 +420,7 @@ export function AbwesenheitsSidebar({
           <div className={styles.avatarAddInput}>
             <input
               ref={addInputRef}
+              autoFocus
               className={styles.memberInput}
               value={newMemberName}
               onChange={(e) => setNewMemberName(e.target.value)}
