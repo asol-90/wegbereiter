@@ -204,7 +204,6 @@ export function TreffenKarte({
   const [localNotiz, setLocalNotiz] = useState(treffen.notiz ?? '')
 
   const commitNotiz = useCallback(() => {
-    setNoteOpen(false)
     const trimmed = localNotiz.trim()
     if (trimmed !== (treffen.notiz ?? '')) {
       mutations.setNotiz(tid, trimmed)
@@ -336,7 +335,10 @@ export function TreffenKarte({
                 className={styles.noteTextarea}
                 value={localNotiz}
                 onChange={(e) => setLocalNotiz(e.target.value)}
-                onBlur={commitNotiz}
+                onBlur={() => {
+                  setNoteOpen(false)
+                  commitNotiz()
+                }}
                 onKeyDown={(e) => {
                   if (e.key === 'Escape') {
                     setLocalNotiz(treffen.notiz ?? '')

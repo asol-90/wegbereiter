@@ -33,7 +33,7 @@ import { type WBKey } from '@/domain/wb'
 import { useRepertoire } from '@/features/repertoire/useRepertoire'
 import { saveAndachtsreihe } from '@/storage/repertoireRepo'
 import { classifyDay } from './monthGrid'
-import { useFerienForYear } from './useFerienForYear'
+import { useFerienForYear, type FerienState } from './useFerienForYear'
 import {
   buildBisPresets,
   buildStepSequence,
@@ -75,17 +75,84 @@ export type NewPlanungWizardProps = {
 
 // ─── Main component ─────────────────────────────────────────────────────────
 
-export function NewPlanungWizard({ open, onClose, onCreated, initialZeitraum }: NewPlanungWizardProps) {
+/**
+ * Thin wrapper that unmounts the wizard body when closed. This lets the body
+ * compute all initial state in `useState` initializers on mount instead of via
+ * a large reset-`useEffect` that fired ~20 setState calls (cascading renders).
+ */
+export function NewPlanungWizard(props: NewPlanungWizardProps) {
+  if (!props.open) return null
+  return <NewPlanungWizardBody {...props} />
+}
+
+function NewPlanungWizardBody({ open, onClose, onCreated, initialZeitraum }: NewPlanungWizardProps) {
   const { config, loaded } = useGlobalConfig()
   const { create } = usePlanungenActions()
   const { kontexte } = useStammKontext()
   const { planungen } = usePlanungen()
   const repertoireState = useRepertoire()
 
+  // Compute mount-time defaults from props + stores in one place. Lazy init
+  // ensures this runs only on first render of each body instance.
+  const [initial] = useState(() => {
+    const wd: Weekday = loaded ? config.defaultWeekday : 'freitag'
+    const rk: RhythmusKey = loaded ? rhythmusToKey(config.defaultRhythmus) : 'weekly'
+    const d = loaded ? config.defaultDauerMinuten : 90
+
+    let s: IsoDate
+    let e: IsoDate
+
+    if (initialZeitraum) {
+      s = initialZeitraum.start
+      const preceding = planungen
+        .filter((p) => p.zeitraum.ende < initialZeitraum.ende && p.zeitraum.ende >= isoPrevDay(s))
+        .sort((a, b) => b.zeitraum.ende.localeCompare(a.zeitraum.ende))
+      if (preceding.length > 0) {
+        const afterPrev = isoNextDay(preceding[0].zeitraum.ende)
+        if (afterPrev >= s) s = afterPrev
+      }
+      const overlappingKontext = findKontextForZeitraum(kontexte, s, initialZeitraum.ende)
+      if (overlappingKontext) {
+        const range = kontextDateRange(overlappingKontext)
+        if (range && range.von >= s && range.von <= initialZeitraum.ende) {
+          s = range.von
+        }
+      }
+      let e2 = initialZeitraum.ende
+      if (overlappingKontext) {
+        const range = kontextDateRange(overlappingKontext)
+        if (range) {
+          e2 = range.bis > s ? range.bis : e2
+          e2 = clampEndeBeforeSecondKontext(kontexte, overlappingKontext.id, s, e2)
+        }
+      }
+      e = e2
+    } else {
+      s = firstFreeStartDate(planungen, wd)
+      const futureKontext = findKontextForZeitraum(kontexte, s, isoAddMonths(s, 12))
+      if (futureKontext) {
+        const range = kontextDateRange(futureKontext)
+        if (range && range.bis > s) {
+          e = clampEndeBeforeSecondKontext(kontexte, futureKontext.id, s, range.bis)
+        } else {
+          e = defaultEndIso(s)
+        }
+      } else {
+        e = defaultEndIso(s)
+      }
+    }
+
+    const t: Mitarbeiter[] = planungen.length > 0 && planungen[0].team && planungen[0].team.length > 0
+      ? [...planungen[0].team]
+      : []
+
+    return { weekday: wd, rhythmusK: rk, dauer: d, start: s, ende: e, team: t }
+  })
+
   const [stepIndex, setStepIndex] = useState(0)
   const [nameOverride, setNameOverride] = useState('')
-  const [start, setStart] = useState<IsoDate>('')
-  const [ende, setEnde] = useState<IsoDate>('')
+  const [start, setStart] = useState<IsoDate>(initial.start)
+  const [ende, setEnde] = useState<IsoDate>(initial.ende)
 
   // activeKontext is determined dynamically based on the selected zeitraum,
   // not statically from kontexte[0].
@@ -101,9 +168,9 @@ export function NewPlanungWizard({ open, onClose, onCreated, initialZeitraum }: 
   const stepSequence = useMemo(() => buildStepSequence(hasKontext), [hasKontext])
   const currentStep: LogicalStep = stepSequence[stepIndex] ?? 'teamplanung'
   const isLastStep = stepIndex === stepSequence.length - 1
-  const [weekday, setWeekday] = useState<Weekday>('freitag')
-  const [rhythmusK, setRhythmusK] = useState<RhythmusKey>('weekly')
-  const [dauer, setDauer] = useState(90)
+  const [weekday, setWeekday] = useState<Weekday>(initial.weekday)
+  const [rhythmusK, setRhythmusK] = useState<RhythmusKey>(initial.rhythmusK)
+  const [dauer, setDauer] = useState(initial.dauer)
   const [editingRhythmus, setEditingRhythmus] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
@@ -111,7 +178,7 @@ export function NewPlanungWizard({ open, onClose, onCreated, initialZeitraum }: 
   const [terminListExpanded, setTerminListExpanded] = useState(false)
   const [bisPresetOpen, setBisPresetOpen] = useState(false)
   const bisPresetRef = useRef<HTMLDivElement>(null)
-  const [team, setTeam] = useState<Mitarbeiter[]>([])
+  const [team, setTeam] = useState<Mitarbeiter[]>(initial.team)
   const [newTeamName, setNewTeamName] = useState('')
 
   // ─── Step 2: Ziele (WB-Schwerpunkt, Andachtsreihe, Abzeichen) ──
@@ -128,7 +195,6 @@ export function NewPlanungWizard({ open, onClose, onCreated, initialZeitraum }: 
   const [andachtEinheiten, setAndachtEinheiten] = useState<{ id: AndachtsEinheitId; titel: string }[]>([])
 
   // Abzeichen
-  const [_abzeichenEnabled, setAbzeichenEnabled] = useState(false)
   const [selectedAltersstufe, setSelectedAltersstufe] = useState<Altersstufe | null>(null)
   const [selectedAbzeichenId, setSelectedAbzeichenId] = useState<AbzeichenId | null>(null)
 
@@ -146,117 +212,23 @@ export function NewPlanungWizard({ open, onClose, onCreated, initialZeitraum }: 
   const ferienYear1 = useFerienForYear(yearStart)
   const ferienYear2 = useFerienForYear(yearEnd !== yearStart ? yearEnd : yearStart)
 
-  // ─── Initialise on open ───────────────────────────────────────────────
-
-  useEffect(() => {
-    if (!open) return
-    setStepIndex(0)
-    setNameOverride('')
-    setError(null)
-    setSaving(false)
-    setEditingRhythmus(false)
-    setReinstated(new Set())
-    setTerminListExpanded(false)
-    setBisPresetOpen(false)
-    setNewTeamName('')
-    setAndachtMode('none')
-    setAndachtReiheId(null)
-    setAndachtAusgewaehlt(new Set())
-    setAndachtTitel('')
-    setAndachtEinheiten([])
-    setWbModus('ausgewogen')
-    setWbBereiche([])
-    setAbzeichenEnabled(false)
-    setSelectedAltersstufe(null)
-    setSelectedAbzeichenId(null)
-    const wd = loaded ? config.defaultWeekday : 'freitag'
-    const rk = loaded ? rhythmusToKey(config.defaultRhythmus) : 'weekly'
-    const d = loaded ? config.defaultDauerMinuten : 90
-    setWeekday(wd)
-    setRhythmusK(rk)
-    setDauer(d)
-
-    if (initialZeitraum) {
-      // ── Drag-gesture: smart start ──
-      let s = initialZeitraum.start
-
-      // a) If a Planung ends just before this area, start right after it
-      const preceding = planungen
-        .filter((p) => p.zeitraum.ende < initialZeitraum.ende && p.zeitraum.ende >= isoPrevDay(s))
-        .sort((a, b) => b.zeitraum.ende.localeCompare(a.zeitraum.ende))
-      if (preceding.length > 0) {
-        const afterPrev = isoNextDay(preceding[0].zeitraum.ende)
-        if (afterPrev >= s) s = afterPrev
-      }
-
-      // b) If a StammKontext begins in this area, sync start to it
-      const overlappingKontext = findKontextForZeitraum(kontexte, s, initialZeitraum.ende)
-      if (overlappingKontext) {
-        const range = kontextDateRange(overlappingKontext)
-        if (range && range.von >= s && range.von <= initialZeitraum.ende) {
-          // Kontext starts fresh inside the drag area → align
-          s = range.von
-        }
-      }
-
-      setStart(s)
-
-      // ── Smart end ──
-      let e = initialZeitraum.ende
-      if (overlappingKontext) {
-        const range = kontextDateRange(overlappingKontext)
-        if (range) {
-          // End at StammKontext end
-          e = range.bis > s ? range.bis : e
-          // Clamp before a second kontext
-          e = clampEndeBeforeSecondKontext(kontexte, overlappingKontext.id, s, e)
-        }
-      }
-      setEnde(e)
-    } else {
-      // ── Plus-button: first free future date ──
-      const s = firstFreeStartDate(planungen, wd)
-      setStart(s)
-
-      // Smart end: check if a kontext covers from s
-      const futureKontext = findKontextForZeitraum(kontexte, s, isoAddMonths(s, 12))
-      if (futureKontext) {
-        const range = kontextDateRange(futureKontext)
-        if (range && range.bis > s) {
-          let e = range.bis
-          e = clampEndeBeforeSecondKontext(kontexte, futureKontext.id, s, e)
-          setEnde(e)
-        } else {
-          setEnde(defaultEndIso(s))
-        }
-      } else {
-        setEnde(defaultEndIso(s))
-      }
-    }
-
-    // Pre-populate team from most recent planung if available
-    if (planungen && planungen.length > 0) {
-      const mostRecent = planungen[0]
-      if (mostRecent.team && mostRecent.team.length > 0) {
-        setTeam([...mostRecent.team])
-      }
-    }
-  }, [open, loaded, config.defaultWeekday, config.defaultRhythmus, config.defaultDauerMinuten, planungen, kontexte, initialZeitraum])
-
-  // Smart default end date: once Ferien are loaded and user hasn't changed ende manually
+  // Smart default end date: react to async Ferien-loading. We use the
+  // "store previous value, update during render" pattern instead of an effect
+  // so setState doesn't fire inside useEffect (cascading-render risk).
   const [endeWasAutoSet, setEndeWasAutoSet] = useState(true)
-  useEffect(() => {
-    if (!open || !endeWasAutoSet || hasKontext) return
-    const smart = smartDefaultEnd(
-      start,
-      ferienYear1?.ferien,
-      ferienYear2?.ferien,
-    )
-    if (smart && smart > start) {
-      setEnde(smart)
+  const [prevFerienRefs, setPrevFerienRefs] = useState<[FerienState, FerienState]>([
+    ferienYear1,
+    ferienYear2,
+  ])
+  if (prevFerienRefs[0] !== ferienYear1 || prevFerienRefs[1] !== ferienYear2) {
+    setPrevFerienRefs([ferienYear1, ferienYear2])
+    if (endeWasAutoSet && !hasKontext) {
+      const smart = smartDefaultEnd(start, ferienYear1?.ferien, ferienYear2?.ferien)
+      if (smart && smart > start) {
+        setEnde(smart)
+      }
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ferienYear1, ferienYear2])
+  }
 
   // Close preset dropdown on outside click
   useEffect(() => {
