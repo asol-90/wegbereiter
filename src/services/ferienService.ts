@@ -45,9 +45,23 @@ const SUBDIVISION: Record<BundeslandKey, string> = {
 }
 
 const API_BASE = 'https://openholidaysapi.org'
+const FETCH_TIMEOUT_MS = 8000
 
 type OHName = { language: string; text: string }
 type OHHoliday = { name: OHName[]; startDate: string; endDate: string }
+
+function isOHName(x: unknown): x is OHName {
+  return typeof x === 'object' && x !== null
+    && typeof (x as OHName).language === 'string'
+    && typeof (x as OHName).text === 'string'
+}
+
+function isOHHoliday(x: unknown): x is OHHoliday {
+  if (typeof x !== 'object' || x === null) return false
+  const h = x as OHHoliday
+  return Array.isArray(h.name) && h.name.every(isOHName)
+    && typeof h.startDate === 'string' && typeof h.endDate === 'string'
+}
 
 /** Pick the German name (or first available). */
 function pickName(names: OHName[]): string {
@@ -65,10 +79,11 @@ async function fetchFeiertage(
   const url =
     `${API_BASE}/PublicHolidays?countryIsoCode=DE&subdivisionCode=${sub}` +
     `&validFrom=${jahr}-01-01&validTo=${jahr}-12-31&languageIsoCode=DE`
-  const res = await fetch(url)
+  const res = await fetch(url, { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) })
   if (!res.ok) throw new Error(`OpenHolidaysAPI PublicHolidays: ${res.status}`)
-  const data = (await res.json()) as OHHoliday[]
-  return data.map((h) => ({
+  const raw = await res.json()
+  if (!Array.isArray(raw)) throw new Error('OpenHolidaysAPI PublicHolidays: unexpected payload')
+  return raw.filter(isOHHoliday).map((h) => ({
     name: pickName(h.name),
     datum: h.startDate,
     bundesweit: false,
@@ -86,10 +101,11 @@ async function fetchFerien(
   const url =
     `${API_BASE}/SchoolHolidays?countryIsoCode=DE&subdivisionCode=${sub}` +
     `&validFrom=${jahr}-01-01&validTo=${jahr}-12-31&languageIsoCode=DE`
-  const res = await fetch(url)
+  const res = await fetch(url, { signal: AbortSignal.timeout(FETCH_TIMEOUT_MS) })
   if (!res.ok) throw new Error(`OpenHolidaysAPI SchoolHolidays: ${res.status}`)
-  const data = (await res.json()) as OHHoliday[]
-  return data.map((h) => ({
+  const raw = await res.json()
+  if (!Array.isArray(raw)) throw new Error('OpenHolidaysAPI SchoolHolidays: unexpected payload')
+  return raw.filter(isOHHoliday).map((h) => ({
     name: pickName(h.name),
     start: h.startDate,
     ende: h.endDate,

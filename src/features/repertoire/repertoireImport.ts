@@ -4,7 +4,7 @@
  * All imported items receive fresh IDs and quelle='eigene'.
  * Discriminator field: __typ = 'aktivitaeten' | 'andachtsreihen' | 'abzeichen'
  */
-import {isAktivitaetTyp, isMinStufe, type AktivitaetUntertyp} from '@/domain/aktivitaetKatalog'
+import {isAktivitaetTyp, isMinStufe, istGueltigerUntertyp, type AktivitaetUntertyp} from '@/domain/aktivitaetKatalog'
 import {newId, type AbzeichenAnforderungId, type AbzeichenId, type AktivitaetId, type AndachtsEinheitId, type AndachtsreiheId,} from '@/domain/ids'
 import type {Abzeichen, AbzeichenAnforderung, Aktivitaet, AndachtsEinheit, Andachtsreihe,} from '@/domain/types'
 
@@ -92,11 +92,16 @@ function parseAktivitaet(raw: unknown): Aktivitaet | null {
   const untertypRaw = str(raw.untertyp)
   const minStufeRaw = str(raw.minStufe)
 
+  const untertyp: AktivitaetUntertyp | undefined =
+    untertypRaw && istGueltigerUntertyp(typRaw, untertypRaw)
+      ? (untertypRaw as AktivitaetUntertyp)
+      : undefined
+
   return {
     id: newId<AktivitaetId>(),
     name,
     typ: typRaw,
-    untertyp: (untertypRaw as AktivitaetUntertyp | undefined) ?? undefined,
+    untertyp,
     wbTags: parseWBTags(raw.wbTags),
     themenTags: parseThemenTags(raw.themenTags),
     zeitMin: num(raw.zeitMin, 15),

@@ -6,7 +6,8 @@
  * from other drag sources (e.g. file drops).
  */
 import type {AbzeichenAnforderungId, AktivitaetId, AndachtsEinheitId, StammAktionId} from '@/domain/ids'
-import type {AktivitaetTyp, AktivitaetUntertyp, WBTag} from '@/domain/types'
+import type {AktivitaetTyp, AktivitaetUntertyp} from '@/domain/types'
+import type {WBTag} from '@/domain/wb'
 
 export const KONTEXT_DRAG_MIME = 'application/x-kontext-drag'
 
@@ -43,9 +44,17 @@ export function encodePayload(payload: KontextDragPayload): string {
   return JSON.stringify(payload)
 }
 
+const VALID_KINDS: ReadonlySet<KontextDragPayload['kind']> = new Set([
+  'andacht', 'abzeichen', 'stammaktion', 'aktivitaet',
+])
+
 export function decodePayload(data: string): KontextDragPayload | null {
   try {
-    return JSON.parse(data) as KontextDragPayload
+    const parsed: unknown = JSON.parse(data)
+    if (typeof parsed !== 'object' || parsed === null) return null
+    const kind = (parsed as { kind?: unknown }).kind
+    if (typeof kind !== 'string' || !VALID_KINDS.has(kind as KontextDragPayload['kind'])) return null
+    return parsed as KontextDragPayload
   } catch {
     return null
   }
