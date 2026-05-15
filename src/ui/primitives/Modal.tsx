@@ -12,7 +12,7 @@ export type ModalProps = {
   onClose: () => void
   title?: ReactNode
   description?: ReactNode
-  children: ReactNode
+  children?: ReactNode
   footer?: ReactNode
   size?: 'sm' | 'md' | 'lg'
   closeOnBackdropClick?: boolean
@@ -83,7 +83,7 @@ export function Modal({
             )}
           </header>
         )}
-        <div className={styles.body}>{children}</div>
+        {children && <div className={styles.body}>{children}</div>}
         {footer && <footer className={styles.footer}>{footer}</footer>}
       </div>
     </dialog>

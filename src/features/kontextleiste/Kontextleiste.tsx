@@ -11,6 +11,7 @@
  * a KontextDragPayload. TreffenKarten act as drop targets.
  */
 import {parseIso} from '@/domain/dateUtils'
+import type {AndachtsreiheId} from '@/domain/ids'
 import type {Abzeichen, Aktivitaet, Andachtsreihe, Planung, Programmpunkt, StammKontext,} from '@/domain/types'
 import {WB_KEYS, type WBKey} from '@/domain/wb'
 import {characterize, characterLabel, combine, contributionOf, normalize,} from '@/domain/wbLogic'
@@ -47,7 +48,7 @@ export function Kontextleiste({ planung }: KontextleisteProps) {
     // Fallback für Legacy-Daten
     const legacy = (planung as { andachtsreiheIds?: string[] }).andachtsreiheIds
     if (legacy && legacy.length > 0) {
-      return legacy.map((id: string) => ({ reiheId: id }))
+      return legacy.map((id: string) => ({ reiheId: id as AndachtsreiheId }))
     }
     return []
   }, [planung])
@@ -80,7 +81,7 @@ export function Kontextleiste({ planung }: KontextleisteProps) {
     const items: AccordionGroupItem[] = []
 
     for (const reihe of andachtsreihen) {
-      const zuweisungen = countAndachtsZuweisungen(reihe, planung)
+      const zuweisungen = countAndachtsZuweisungen(planung)
       const total = reihe.einheiten.length
       const done = reihe.einheiten.filter(
         (e) => (zuweisungen.get(e.id as string)?.length ?? 0) > 0,
@@ -435,10 +436,7 @@ function CheckRow({
 
 // ─── Data helpers ───────────────────────────────────────────────────────────
 
-function countAndachtsZuweisungen(
-  reihe: Andachtsreihe,
-  planung: Planung,
-): Map<string, string[]> {
+function countAndachtsZuweisungen(planung: Planung): Map<string, string[]> {
   const map = new Map<string, string[]>()
   for (const t of planung.treffen) {
     for (const pp of t.programm) {

@@ -29,5 +29,5 @@ export {
   type SegmentedOption
 } from './SegmentedControl'
 export { Spotlight, type SpotlightItem, type SpotlightProps } from './Spotlight'
-export { Tabs, type TabItem, type TabsProps } from './Tabs'
+export { Tabs, type TabsProps } from './Tabs'
 export { Toggle, type ToggleProps } from './Toggle'

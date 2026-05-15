@@ -29,7 +29,7 @@ export function useKontextDaten(
   // ── Abzeichen: resolve synchronously from Katalog ──
   const abzeichen = useMemo(() => {
     if (abzeichenIds.length === 0) return []
-    const idSet = new Set<string>(abzeichenIds as string[])
+    const idSet = new Set<string>(abzeichenIds as readonly string[])
     // First: check the built-in catalogue
     const found = ABZEICHEN_KATALOG.filter((a) => idSet.has(a.id as string))
     return found

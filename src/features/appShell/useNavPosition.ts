@@ -32,8 +32,6 @@ export type NavState = {
   kontextActive: boolean
 }
 
-type PlanungMatch = { planungId?: string }
-
 const overviewMatch = '/'
 const kalenderMatch = '/planung/:planungId/kalender'
 const listeMatch = '/planung/:planungId/liste'
@@ -52,7 +50,7 @@ export function derive(pathname: string): NavState {
   if (pathname === '/stammkontext' || pathname.startsWith('/stammkontext/')) {
     return { position: 'none', planungId: null, repertoireActive: false, kontextActive: true }
   }
-  const kalender = matchPath<PlanungMatch, typeof kalenderMatch>(
+  const kalender = matchPath<'planungId', typeof kalenderMatch>(
     kalenderMatch,
     pathname,
   )
@@ -64,7 +62,7 @@ export function derive(pathname: string): NavState {
       kontextActive: false,
     }
   }
-  const liste = matchPath<PlanungMatch, typeof listeMatch>(listeMatch, pathname)
+  const liste = matchPath<'planungId', typeof listeMatch>(listeMatch, pathname)
   if (liste) {
     return {
       position: 2,

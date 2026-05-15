@@ -132,7 +132,7 @@ export function StammImportDialog({
             <div className={styles.bloecke}>
               {kontext.defaultAnfangsBlock.length > 0 && (
                 <div className={styles.block}>
-                  <Badge tone="neutral" size="sm">Anfang</Badge>
+                  <Badge tone="neutral" sizeVariant="sm">Anfang</Badge>
                   <span>
                     {kontext.defaultAnfangsBlock.map((b) => `${b.name} (${b.dauerMin} Min)`).join(', ')}
                   </span>
@@ -140,7 +140,7 @@ export function StammImportDialog({
               )}
               {kontext.defaultEndBlock.length > 0 && (
                 <div className={styles.block}>
-                  <Badge tone="neutral" size="sm">Ende</Badge>
+                  <Badge tone="neutral" sizeVariant="sm">Ende</Badge>
                   <span>
                     {kontext.defaultEndBlock.map((b) => `${b.name} (${b.dauerMin} Min)`).join(', ')}
                   </span>

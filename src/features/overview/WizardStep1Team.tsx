@@ -79,7 +79,7 @@ export type WizardStep1TeamProps = {
   bisPresets: BisPreset[]
   bisPresetOpen: boolean
   setBisPresetOpen: React.Dispatch<React.SetStateAction<boolean>>
-  bisPresetRef: React.RefObject<HTMLDivElement>
+  bisPresetRef: React.RefObject<HTMLDivElement | null>
   team: Mitarbeiter[]
   newTeamName: string
   setNewTeamName: (n: string) => void
@@ -220,7 +220,7 @@ export function WizardStep1Team({
               </button>
             )}
             {!hol && (
-              <Badge tone="neutral" size="sm">
+              <Badge tone="neutral" sizeVariant="sm">
                 {isKontext ? 'Stamm' : 'Regel'}
               </Badge>
             )}

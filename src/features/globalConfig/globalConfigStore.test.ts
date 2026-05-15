@@ -42,6 +42,8 @@ describe('GlobalConfigStore', () => {
       defaultRhythmus: { kind: 'biweekly' },
       defaultDauerMinuten: 120,
       lastActivePlanungId: null,
+      teilstamm: null,
+      teamname: '',
     })
     expect(store.getSnapshot().config.bundesland).toBe('BW')
     expect(store.getSnapshot().config.defaultWeekday).toBe('montag')

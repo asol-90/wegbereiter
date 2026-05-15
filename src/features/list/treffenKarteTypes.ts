@@ -2,12 +2,17 @@ import type { Treffen, Mitarbeiter, Programmpunkt, StammBlock, AktivitaetTyp, Ak
 import type { TreffenId, ProgrammpunktId, MitarbeiterId } from '@/domain/ids'
 import type { WBKey } from '@/domain/wb'
 
+/** Distributive Omit — preserves discriminated-union variants. */
+type DistributiveOmit<T, K extends PropertyKey> = T extends unknown ? Omit<T, K> : never
+
+export type ProgrammpunktInput = DistributiveOmit<Programmpunkt, 'id'>
+
 export type TreffenMutations = {
   setTitel: (treffenId: TreffenId, titel: string) => void
   setNotiz: (treffenId: TreffenId, notiz: string) => void
   toggleFixiert: (treffenId: TreffenId) => void
   toggleSollWB: (treffenId: TreffenId, key: WBKey) => void
-  addProgrammpunkt: (treffenId: TreffenId, pp: Omit<Programmpunkt, 'id'>) => void
+  addProgrammpunkt: (treffenId: TreffenId, pp: ProgrammpunktInput) => void
   removeProgrammpunkt: (treffenId: TreffenId, ppId: ProgrammpunktId) => void
   updateProgrammpunkt: (
     treffenId: TreffenId,
@@ -15,7 +20,7 @@ export type TreffenMutations = {
     patch: Partial<Pick<Programmpunkt, 'name' | 'dauerMin' | 'verantwortlicherId' | 'gastName'>>,
   ) => void
   reorderProgrammpunkte: (treffenId: TreffenId, orderedIds: ProgrammpunktId[]) => void
-  replaceProgrammpunkt: (treffenId: TreffenId, oldPpId: ProgrammpunktId, pp: Omit<Programmpunkt, 'id'>) => void
+  replaceProgrammpunkt: (treffenId: TreffenId, oldPpId: ProgrammpunktId, pp: ProgrammpunktInput) => void
 }
 
 export type StammBlocksForTreffen = {

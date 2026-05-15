@@ -10,6 +10,9 @@ import type {Planung, Programmpunkt, Treffen} from '@/domain/types'
 import type {WBKey} from '@/domain/wb'
 import {usePlanungenActions} from '@/features/planungen'
 import {useCallback} from 'react'
+import type {ProgrammpunktInput} from './treffenKarteTypes'
+
+export type {ProgrammpunktInput}
 
 export type TreffenPatch = Partial<
   Pick<Treffen, 'titel' | 'notiz' | 'fixiert' | 'sollWB' | 'programm'>
@@ -90,13 +93,10 @@ export function useTreffenMutations(planung: Planung) {
   // ─── Programmpunkt mutations ──────────────────────────────────────────
 
   const addProgrammpunkt = useCallback(
-    (treffenId: TreffenId, pp: Omit<Programmpunkt, 'id'>) => {
+    (treffenId: TreffenId, pp: ProgrammpunktInput) => {
       const treffen = planung.treffen.find((t) => t.id === treffenId)
       if (!treffen) return
-      const newPP: Programmpunkt = {
-        ...pp,
-        id: newId<ProgrammpunktId>(),
-      }
+      const newPP = { ...pp, id: newId<ProgrammpunktId>() } as Programmpunkt
       persist(treffenId, { programm: [...treffen.programm, newPP] })
     },
     [planung, persist],
@@ -145,10 +145,10 @@ export function useTreffenMutations(planung: Planung) {
 
   /** Replace an existing Programmpunkt at its current index (for Konkretisieren). */
   const replaceProgrammpunkt = useCallback(
-    (treffenId: TreffenId, oldPpId: ProgrammpunktId, pp: Omit<Programmpunkt, 'id'>) => {
+    (treffenId: TreffenId, oldPpId: ProgrammpunktId, pp: ProgrammpunktInput) => {
       const treffen = planung.treffen.find((t) => t.id === treffenId)
       if (!treffen) return
-      const newPP: Programmpunkt = { ...pp, id: newId<ProgrammpunktId>() }
+      const newPP = { ...pp, id: newId<ProgrammpunktId>() } as Programmpunkt
       persist(treffenId, {
         programm: treffen.programm.map((p) => (p.id === oldPpId ? newPP : p)),
       })

@@ -9,7 +9,7 @@
  */
 import {addDays, getYear} from 'date-fns'
 import {parseIso, toIso} from './dateUtils'
-import type {Ferien, IsoDate, StammKontext} from './types'
+import type {Ferien, IsoDate} from './types'
 
 export type ZeitraumVorschlag = {
   label: string
@@ -101,11 +101,3 @@ function findFerienContaining(
   )
 }
 
-export function stammBasierterVorschlag(stamm: StammKontext): ZeitraumVorschlag {
-  return {
-    label: 'Wie Stamm-Kontext',
-    start: stamm.zeitraum.start,
-    ende: stamm.zeitraum.ende,
-    rationale: `Thema „${stamm.thema}"`,
-  }
-}
