@@ -100,7 +100,8 @@ DB-Name: `stammtreff-planer`, Version 2
 
 - `ui/tokens/tokens.css` + `base.css` — Design Tokens (Farben, Typography, Spacing als CSS Custom Properties)
 - `ui/primitives/` — generische Komponenten (Button, Input, Modal, Chip, …)
-- `ui/domain-primitives/` — domänen-spezifische Komponenten (WBBar, WBDot, DurationBar, TypeIcon, …)
+- `ui/domain/` — domänen-spezifische Komponenten (WBBar, WBDot, DurationBar, TypeIcon, …)
+- `ui/domain-primitives/` — zusammengesetzte Domänen-Editoren (z.B. `WBAktivitaetEditor`)
 - CSS Modules durchgehend (`.module.css`)
 
 Komponenten-Showcase unter `/dev/kit` (nur im Dev-Build).
