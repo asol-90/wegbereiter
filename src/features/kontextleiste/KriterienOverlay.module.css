@@ -1,0 +1,60 @@
+.section {
+  margin-bottom: 14px;
+}
+
+.section:last-child {
+  margin-bottom: 0;
+}
+
+.artLabel {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--t3);
+  font-weight: 500;
+  margin-bottom: 6px;
+  padding-bottom: 4px;
+  border-bottom: 0.5px solid var(--brd);
+}
+
+.row {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 4px 0;
+  font-size: 12px;
+}
+
+.icon {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.icon[data-status='ok'] {
+  color: var(--t-ok);
+}
+
+.icon[data-status='warn'] {
+  color: var(--t-warn);
+}
+
+.icon[data-status='fehler'] {
+  color: var(--t-err);
+}
+
+.text {
+  color: var(--t2);
+  line-height: 1.4;
+}
+
+.allOk {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  padding: 8px 10px;
+  background: var(--bg-ok);
+  border-radius: var(--r-sm);
+  font-size: 12px;
+  color: var(--t-ok);
+}

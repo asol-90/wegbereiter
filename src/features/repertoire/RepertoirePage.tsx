@@ -11,8 +11,7 @@ import { Panels, Panel } from '@/features/appShell'
 import { useRepertoire, useRepertoireActions } from './useRepertoire'
 import { Icon } from '@/ui/primitives/Icon'
 import { SegmentedControl } from '@/ui/primitives/SegmentedControl'
-import { newId } from '@/domain/ids'
-import type { AktivitaetId, AndachtsreiheId, AbzeichenId } from '@/domain/ids'
+import { newId, type AktivitaetId, type AndachtsreiheId, type AbzeichenId } from '@/domain/ids'
 import type { Aktivitaet, Andachtsreihe, Abzeichen } from '@/domain/types'
 import {
   AKTIVITAET_TYPEN,

@@ -23,6 +23,7 @@ import {AccordionGroup, type AccordionGroupItem, Icon} from '@/ui/primitives'
 import {format} from 'date-fns'
 import {de} from 'date-fns/locale'
 import {type DragEvent, useCallback, useMemo} from 'react'
+import {AbschlussSektion} from './AbschlussSektion'
 import {encodePayload, KONTEXT_DRAG_MIME, type KontextDragPayload,} from './dragPayload'
 import styles from './Kontextleiste.module.css'
 import {useKontextDaten} from './useKontextDaten'
@@ -62,6 +63,16 @@ export function Kontextleiste({ planung }: KontextleisteProps) {
         ? kontexte.find((k) => k.id === planung.stammKontextId) ?? null
         : null,
     [kontexte, planung.stammKontextId],
+  )
+
+  const stammAktivitaeten = useMemo(
+    () =>
+      stammKontext
+        ? aktivitaeten.filter(
+            (a) => a.stammImportId === stammKontext.stammImportId && !a.deaktiviert,
+          )
+        : [],
+    [aktivitaeten, stammKontext],
   )
 
   // Build exclusive accordion items for sections 2–4
@@ -116,9 +127,6 @@ export function Kontextleiste({ planung }: KontextleisteProps) {
     }
 
     if (stammKontext) {
-      const stammAktivitaeten = aktivitaeten.filter(
-        (a) => a.stammImportId === stammKontext.stammImportId && !a.deaktiviert,
-      )
       items.push({
         id: `stamm-${stammKontext.id}`,
         title: 'Stamm-Kontext',
@@ -133,22 +141,33 @@ export function Kontextleiste({ planung }: KontextleisteProps) {
     }
 
     return items
-  }, [andachtsreihen, abzeichen, stammKontext, aktivitaeten, planung])
+  }, [andachtsreihen, abzeichen, stammKontext, stammAktivitaeten, planung])
 
   return (
     <div className={styles.root}>
-      <WBSektion planung={planung} />
+      <div className={styles.scrollArea}>
+        <WBSektion planung={planung} />
 
-      {accordionItems.length > 0 && (
-        <>
-          <hr className={styles.separator} />
-          <AccordionGroup
-            items={accordionItems}
-            mode="exclusive"
-            defaultOpen={accordionItems[0]?.id}
-          />
-        </>
-      )}
+        {accordionItems.length > 0 && (
+          <>
+            <hr className={styles.separator} />
+            <AccordionGroup
+              items={accordionItems}
+              mode="exclusive"
+              defaultOpen={accordionItems[0]?.id}
+            />
+          </>
+        )}
+      </div>
+
+      <AbschlussSektion
+        planung={planung}
+        andachtsreihen={andachtsreihen}
+        abzeichen={abzeichen}
+        stammKontext={stammKontext}
+        stammAktivitaeten={stammAktivitaeten}
+        alleAktivitaeten={aktivitaeten}
+      />
     </div>
   )
 }

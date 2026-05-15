@@ -140,31 +140,31 @@ export function AbwesenheitsSidebar({
   const membersAreaRef = useRef<HTMLDivElement>(null)
 
   // Refs for stable access in document-level listeners
-  // eslint-disable-next-line react-hooks/refs
+   
   const dragRef = useRef(drag)
   // eslint-disable-next-line react-hooks/refs
   dragRef.current = drag
-  // eslint-disable-next-line react-hooks/refs
+   
   const abwesenheitenRef = useRef(abwesenheiten)
   // eslint-disable-next-line react-hooks/refs
   abwesenheitenRef.current = abwesenheiten
-  // eslint-disable-next-line react-hooks/refs
+   
   const weekRowsRef = useRef(weekRows)
   // eslint-disable-next-line react-hooks/refs
   weekRowsRef.current = weekRows
-  // eslint-disable-next-line react-hooks/refs
+   
   const zeitraumRef = useRef(zeitraum)
   // eslint-disable-next-line react-hooks/refs
   zeitraumRef.current = zeitraum
-  // eslint-disable-next-line react-hooks/refs
+   
   const onUpdateRef = useRef(onUpdate)
   // eslint-disable-next-line react-hooks/refs
   onUpdateRef.current = onUpdate
-  // eslint-disable-next-line react-hooks/refs
+   
   const totalRowsRef = useRef(totalRows)
   // eslint-disable-next-line react-hooks/refs
   totalRowsRef.current = totalRows
-  // eslint-disable-next-line react-hooks/refs
+   
   const onAbwesenheitHoverRef = useRef(onAbwesenheitHover)
   // eslint-disable-next-line react-hooks/refs
   onAbwesenheitHoverRef.current = onAbwesenheitHover

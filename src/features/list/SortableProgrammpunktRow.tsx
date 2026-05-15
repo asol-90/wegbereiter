@@ -130,7 +130,12 @@ export function SortableProgrammpunktRow({
         value={pp.verantwortlicherId ?? ''}
         onChange={(e) => {
           const val = e.target.value
-          if (val) {
+          if (val === 'offen') {
+            mutations.updateProgrammpunkt(treffenId, pp.id, {
+              verantwortlicherId: 'offen',
+              gastName: undefined,
+            })
+          } else if (val) {
             mutations.updateProgrammpunkt(treffenId, pp.id, {
               verantwortlicherId: val as MitarbeiterId,
               gastName: undefined,
@@ -144,6 +149,7 @@ export function SortableProgrammpunktRow({
         title="Verantwortlich"
       >
         <option value="">—</option>
+        <option value="offen">Offen</option>
         {team.map((m) => (
           <option key={m.id} value={m.id}>{m.name}</option>
         ))}

@@ -8,8 +8,7 @@ import {
   UNTERTYP_LABELS,
   type AktivitaetUntertyp,
 } from '@/domain/aktivitaetKatalog'
-import { newId } from '@/domain/ids'
-import type { AktivitaetId } from '@/domain/ids'
+import { newId, type AktivitaetId } from '@/domain/ids'
 import type { Aktivitaet, AktivitaetTyp } from '@/domain/types'
 import styles from './StammKontextEditorPanel.module.css'
 

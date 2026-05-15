@@ -29,7 +29,7 @@ import {
 } from '@/features/kontextleiste'
 import { WB_KEYS } from '@/domain/wb'
 import { DurationBar } from '@/ui/domain/DurationBar'
-import { WBDot } from '@/ui/domain/WBDot'
+import { WBIconItem } from '@/ui/domain/WBIconStack'
 import { Icon } from '@/ui/primitives/Icon'
 import { Avatar } from '@/ui/domain/Avatar'
 import clsx from '@/ui/utils/clsx'
@@ -178,7 +178,7 @@ export function TreffenKarte({
         }
       }
     },
-    [treffen.id, mutations],
+    [tid, mutations],
   )
   const { weekday, day, month } = formatDate(treffen.datum)
   const wbMap = aggregateWB(treffen)
@@ -292,7 +292,7 @@ export function TreffenKarte({
                     onClick={() => mutations.toggleSollWB(tid, key)}
                     title={`Soll-WB ${isSoll ? 'entfernen' : 'setzen'}: ${key}`}
                   >
-                    <WBDot wb={key} intensity={intensity} size={11} />
+                    <WBIconItem wb={key} intensity={intensity} />
                   </div>
                 )
               })}

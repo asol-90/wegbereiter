@@ -1,12 +1,10 @@
 import { Input } from '@/ui/primitives'
-import type { Andachtsreihe, IsoDate, StammAktion, StammKontext, Weekday } from '@/domain/types'
+import type { Andachtsreihe, IsoDate, StammAktion, StammKontext, Weekday, WbSchwerpunktModus } from '@/domain/types'
 import type { AbzeichenId, AndachtsEinheitId, AndachtsreiheId } from '@/domain/ids'
 import { WB_CSS_VAR, WB_LABELS, type WBKey } from '@/domain/wb'
 import { ABZEICHEN_KATALOG, ALTERSSTUFE_LABELS } from '@/domain/abzeichenKatalog'
-import type { AktionBereich, AndachtMode, RhythmusKey } from './newPlanungWizardUtils'
-import { formatDateShort, WEEKDAY_LABELS, RHYTHMUS_LABELS } from './newPlanungWizardUtils'
+import { formatDateShort, WEEKDAY_LABELS, RHYTHMUS_LABELS, type AktionBereich, type AndachtMode, type RhythmusKey } from './newPlanungWizardUtils'
 import styles from './NewPlanungWizard.module.css'
-import type { WbSchwerpunktModus } from '@/domain/types'
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 

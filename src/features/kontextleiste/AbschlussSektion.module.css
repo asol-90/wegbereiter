@@ -1,0 +1,184 @@
+.root {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-bottom: 6px;
+}
+
+.sep {
+  border: none;
+  border-top: 0.5px solid var(--brd);
+  margin: 0 0 4px;
+}
+
+/* ─── Split button ─── */
+
+.splitWrap {
+  display: flex;
+  align-items: stretch;
+  background: var(--t1);
+  border-radius: var(--r-md);
+  overflow: visible;
+  position: relative;
+}
+
+.splitMain {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 5px 10px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--bg1);
+  background: none;
+  border: none;
+  border-radius: var(--r-md) 0 0 var(--r-md);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background var(--dur-fast) var(--ease);
+}
+
+.splitMain:not(:disabled):hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.splitMain:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.splitDivider {
+  width: 0.5px;
+  background: rgba(255, 255, 255, 0.18);
+  align-self: stretch;
+  flex-shrink: 0;
+}
+
+.splitInfo {
+  position: relative;
+  flex-shrink: 0;
+  width: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--bg1);
+  border-radius: 0 var(--r-md) var(--r-md) 0;
+  cursor: default;
+  transition: background var(--dur-fast) var(--ease);
+}
+
+.splitInfo:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* ─── Criteria popover ─── */
+
+.popover {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  right: 0;
+  width: 260px;
+  background: var(--bg1);
+  border: 0.5px solid var(--brd2);
+  border-radius: var(--r-md);
+  box-shadow: var(--sh-menu);
+  padding: 10px 12px;
+  z-index: 200;
+  pointer-events: none;
+}
+
+.popoverGroup {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--t3);
+  font-weight: 500;
+  padding-bottom: 4px;
+  margin-bottom: 4px;
+  margin-top: 8px;
+  border-bottom: 0.5px solid var(--brd);
+}
+
+.popoverGroup:first-child {
+  margin-top: 0;
+}
+
+.popoverRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 2px 0;
+}
+
+.popoverIcon {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.popoverIcon[data-status='ok'] { color: var(--t-ok); }
+.popoverIcon[data-status='warn'] { color: var(--t-warn); }
+.popoverIcon[data-status='fehler'] { color: var(--t-err); }
+
+.popoverText {
+  font-size: 11px;
+  color: var(--t2);
+  line-height: 1.4;
+}
+
+.popoverAllOk {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 6px 8px;
+  background: var(--bg-ok);
+  border-radius: var(--r-sm);
+  font-size: 11px;
+  color: var(--t-ok);
+}
+
+/* ─── Abgeschlossen banner ─── */
+
+.doneBanner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-ok);
+  border-radius: var(--r-md);
+  padding: 8px 10px;
+}
+
+.doneIcon {
+  flex-shrink: 0;
+  color: var(--t-ok);
+}
+
+.doneLabel {
+  flex: 1;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--t-ok);
+}
+
+.resetBtn {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: none;
+  color: var(--t3);
+  cursor: pointer;
+  border-radius: var(--r-sm);
+  padding: 0;
+  transition: color var(--dur-fast) var(--ease);
+}
+
+.resetBtn:hover {
+  color: var(--t2);
+}

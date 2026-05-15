@@ -25,7 +25,7 @@ export function useKontextDaten(
   abzeichenIds: readonly AbzeichenId[],
 ): KontextDaten {
   // Defensiv: zuordnungen kann bei Legacy-Planungen undefined sein
-  const safeZuordnungen = zuordnungen ?? []
+  const safeZuordnungen = useMemo(() => zuordnungen ?? [], [zuordnungen])
   // ── Abzeichen: resolve synchronously from Katalog ──
   const abzeichen = useMemo(() => {
     if (abzeichenIds.length === 0) return []

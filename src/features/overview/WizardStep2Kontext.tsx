@@ -1,7 +1,6 @@
 import type { Aktivitaet, StammAktion, StammKontext } from '@/domain/types'
 import { aktivitaetLabel } from '@/domain/aktivitaetKatalog'
-import type { AktionBereich } from './newPlanungWizardUtils'
-import { formatTerminDate, formatDateRange } from './newPlanungWizardUtils'
+import { formatTerminDate, formatDateRange, type AktionBereich } from './newPlanungWizardUtils'
 import styles from './NewPlanungWizard.module.css'
 
 // ─── Props ────────────────────────────────────────────────────────────────────

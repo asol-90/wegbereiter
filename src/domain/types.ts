@@ -313,7 +313,7 @@ type ProgrammpunktBase = {
   /** Pre-computed or overridden WB tags — source of truth for WB calc. */
   wbTags: WBTag[]
   dauerMin: number
-  verantwortlicherId?: MitarbeiterId
+  verantwortlicherId?: MitarbeiterId | 'offen'
   /** Guest (one-off) mitarbeiter name. */
   gastName?: string
   notizen?: string
@@ -467,7 +467,7 @@ export type UeberhangEintrag =
       grund: string
     }
 
-export type PlanungStatus = 'entwurf' | 'aktiv' | 'archiviert'
+export type PlanungStatus = 'entwurf' | 'aktiv' | 'abgeschlossen' | 'archiviert'
 
 // ─── Ferien & Feiertage ─────────────────────────────────────────────────────
 

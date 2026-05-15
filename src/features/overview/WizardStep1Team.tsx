@@ -6,22 +6,18 @@ import {
   type SelectOption,
 } from '@/ui/primitives'
 import { Icon } from '@/ui/primitives/Icon'
-import type { IsoDate, Mitarbeiter, StammAktion, StammKontext, Weekday } from '@/domain/types'
+import { WEEKDAYS, type IsoDate, type Mitarbeiter, type StammAktion, type StammKontext, type Weekday } from '@/domain/types'
 import type { MitarbeiterId } from '@/domain/ids'
-import { WEEKDAYS } from '@/domain/types'
 import { stammAbzugFuerTreffen } from '@/domain/zeitbudget'
-import type {
-  AktionBereich,
-  BisPreset,
-  PreviewItem,
-  RhythmusKey,
-} from './newPlanungWizardUtils'
 import {
   WEEKDAY_LABELS,
   RHYTHMUS_LABELS,
   formatTerminDate,
   formatDateRange,
   formatDateShort,
+  type BisPreset,
+  type PreviewItem,
+  type RhythmusKey,
 } from './newPlanungWizardUtils'
 import styles from './NewPlanungWizard.module.css'
 

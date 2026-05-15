@@ -26,11 +26,10 @@ import type {
   Weekday,
   WbSchwerpunktModus,
 } from '@/domain/types'
-import type { AbzeichenId, AndachtsEinheitId, AndachtsreiheId, MitarbeiterId } from '@/domain/ids'
-import { newId } from '@/domain/ids'
+import { newId, type AbzeichenId, type AndachtsEinheitId, type AndachtsreiheId, type MitarbeiterId } from '@/domain/ids'
 import { generateTermine } from '@/domain/dateUtils'
 import { generatePlanungsName } from '@/domain/planungFactory'
-import { WB_KEYS, type WBKey } from '@/domain/wb'
+import { type WBKey } from '@/domain/wb'
 import { useRepertoire } from '@/features/repertoire/useRepertoire'
 import { saveAndachtsreihe } from '@/storage/repertoireRepo'
 import { classifyDay } from './monthGrid'
@@ -54,7 +53,6 @@ import {
   STEP_META,
   type AndachtMode,
   type AktionBereich,
-  type BisPreset,
   type LogicalStep,
   type PreviewItem,
   type RhythmusKey,

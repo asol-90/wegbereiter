@@ -1,7 +1,6 @@
 import { useState, useCallback } from 'react'
 import { Icon } from '@/ui/primitives/Icon'
-import { newId } from '@/domain/ids'
-import type { AndachtsEinheitId, AndachtsreiheId } from '@/domain/ids'
+import { newId, type AndachtsEinheitId, type AndachtsreiheId } from '@/domain/ids'
 import type { AndachtsEinheit, Andachtsreihe } from '@/domain/types'
 import { quelleLabel } from './repertoireUtils'
 import styles from './RepertoirePage.module.css'

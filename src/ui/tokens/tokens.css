@@ -45,10 +45,10 @@
   --denim-light: #bfd4ee;
 
   /* ─── Wachstumsbereiche (WB) ─── */
-  --wb-k: #d85a30; /* körperlich */
-  --wb-g: #1d9e75; /* gesellschaftlich */
-  --wb-i: #378add; /* geistig */
-  --wb-s: #7f77dd; /* geistlich */
+  --wb-k: #b34a4a; /* körperlich */
+  --wb-g: #3d7a5a; /* gesellschaftlich */
+  --wb-i: #4a6fa5; /* geistig */
+  --wb-s: #7a5c99; /* geistlich */
 
   /* ─── Typography ─── */
   --sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Helvetica Neue',

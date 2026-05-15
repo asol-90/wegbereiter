@@ -138,18 +138,18 @@
 }
 
 .wbSlot {
-  width: 20px;
-  height: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
+  border-radius: var(--r-sm);
+  padding: 3px;
   cursor: pointer;
   transition: transform var(--dur-fast) var(--ease);
 }
 
 .wbSlot:hover {
-  transform: scale(1.2);
+  transform: scale(1.1);
+  background: var(--bg2);
 }
 
 .wbSlotSoll {

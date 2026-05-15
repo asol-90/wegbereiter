@@ -13,7 +13,7 @@ import { parseIso, rhythmusWeekInterval } from '@/domain/dateUtils'
 import type { Planung, StammKontext, IsoDate, AktivitaetTyp, AktivitaetUntertyp } from '@/domain/types'
 import type { TreffenId, ProgrammpunktId, MitarbeiterId } from '@/domain/ids'
 import { useStammKontext } from '@/features/stammKontext'
-import { stammAbzugFuerTreffen } from '@/domain/zeitbudget'
+
 import { Icon } from '@/ui/primitives/Icon'
 import { TreffenKarte } from './TreffenKarte'
 import type { StammBlocksForTreffen } from './treffenKarteTypes'

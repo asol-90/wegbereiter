@@ -151,6 +151,8 @@ function statusLabel(status: Planung['status']): string {
       return 'Entwurf'
     case 'aktiv':
       return 'aktiv'
+    case 'abgeschlossen':
+      return 'abgeschlossen'
     case 'archiviert':
       return 'archiviert'
   }

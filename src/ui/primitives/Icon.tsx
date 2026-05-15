@@ -52,6 +52,7 @@ export type IconName =
   | 'award'
   | 'book-open'
   | 'crosshair'
+  | 'arrow-right'
 
 type IconDef = {
   /** SVG inner markup as a React node. */
@@ -407,6 +408,14 @@ const ICONS: Record<IconName, IconDef> = {
         {line(2, 12, 6, 12)}
         {line(12, 2, 12, 6)}
         {line(12, 22, 12, 18)}
+      </>
+    ),
+  },
+  'arrow-right': {
+    content: (
+      <>
+        {line(5, 12, 19, 12)}
+        {path('M13 6l6 6-6 6')}
       </>
     ),
   },
