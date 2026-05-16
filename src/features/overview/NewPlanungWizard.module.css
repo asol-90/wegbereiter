@@ -253,10 +253,34 @@
   gap: 8px;
 }
 
+.teamHint {
+  margin: -4px 0 0;
+  font-size: 11px;
+  color: var(--t3);
+  line-height: 1.3;
+  transition: color var(--dur-fast) var(--ease);
+}
+
+.teamHintWarn {
+  color: var(--t-err);
+  font-weight: 500;
+}
+
 .teamChips {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
+  padding: 6px;
+  margin: -6px;
+  border-radius: var(--r-md);
+  border: 1px solid transparent;
+  transition: border-color var(--dur-fast) var(--ease),
+    background var(--dur-fast) var(--ease);
+}
+
+.teamChipsWarn {
+  border-color: var(--t-err);
+  background: var(--bg-err);
 }
 
 .teamChip {
@@ -940,6 +964,31 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
+  padding: 8px;
+  margin: -8px;
+  border-radius: var(--r-md);
+  border: 1px solid transparent;
+  transition: border-color var(--dur-fast) var(--ease),
+    background var(--dur-fast) var(--ease);
+}
+
+.zieleSectionBodyError {
+  border-color: var(--t-err);
+  background: var(--bg-err);
+}
+
+.zieleSectionError {
+  margin: 0;
+  font-size: 12px;
+  color: var(--t-err);
+  font-weight: 500;
+}
+
+.accordionWarn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--t-err);
 }
 
 /* ─── WB-Schwerpunkt ────────────────────────────────────────────────── */

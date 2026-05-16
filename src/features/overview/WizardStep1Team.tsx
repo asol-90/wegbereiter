@@ -96,6 +96,7 @@ export type WizardStep1TeamProps = {
   toggleReinstated: (iso: IsoDate) => void
   activeKontext: StammKontext | undefined
   error: string | null
+  teamWarn: boolean
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -136,6 +137,7 @@ export function WizardStep1Team({
   toggleReinstated,
   activeKontext,
   error,
+  teamWarn,
 }: WizardStep1TeamProps) {
   function renderTerminPreview() {
     if (mergedItems.length === 0) {
@@ -390,7 +392,10 @@ export function WizardStep1Team({
       {/* Team section */}
       <div className={styles.teamSection}>
         <span className={styles.kontextSectionLabel}>Mitarbeiter</span>
-        <div className={styles.teamChips}>
+        <p className={`${styles.teamHint} ${teamWarn ? styles.teamHintWarn : ''}`}>
+          Mindestens einen Mitarbeiter hinzufügen.
+        </p>
+        <div className={`${styles.teamChips} ${teamWarn ? styles.teamChipsWarn : ''}`}>
           {team.map((member) => (
             <div
               key={member.id}

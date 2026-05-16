@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { AccordionGroup, Input, Select } from '@/ui/primitives'
+import { Icon } from '@/ui/primitives/Icon'
 import type { Altersstufe, Andachtsreihe, WbSchwerpunktModus } from '@/domain/types'
 import { newId, type AbzeichenId, type AndachtsEinheitId, type AndachtsreiheId } from '@/domain/ids'
 import { WB_CSS_VAR, WB_KEYS, WB_LABELS, type WBKey } from '@/domain/wb'
@@ -34,7 +35,9 @@ export type WizardStep3ZieleProps = {
   teamAndachtsBedarf: number
   stammandachtenCount: number
   activeMeetingCount: number
-  error: string | null
+  wbError: string | null
+  andachtError: string | null
+  abzeichenError: string | null
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -64,20 +67,46 @@ export function WizardStep3Ziele({
   teamAndachtsBedarf,
   stammandachtenCount,
   activeMeetingCount,
-  error,
+  wbError,
+  andachtError,
+  abzeichenError,
 }: WizardStep3ZieleProps) {
   const [andachtFocusId, setAndachtFocusId] = useState<string | null>(null)
+  const [openIds, setOpenIds] = useState<string[]>(['wb'])
+  const [prevErrors, setPrevErrors] = useState<{ wb: string | null; andacht: string | null; abzeichen: string | null }>({ wb: wbError, andacht: andachtError, abzeichen: abzeichenError })
+
+  // Wenn Validierungsfehler neu eingehen: betroffene Sektion aufklappen,
+  // damit der Hinweistext sichtbar ist. Render-Phase-Pattern statt useEffect,
+  // um cascading renders zu vermeiden.
+  if (prevErrors.wb !== wbError || prevErrors.andacht !== andachtError || prevErrors.abzeichen !== abzeichenError) {
+    setPrevErrors({ wb: wbError, andacht: andachtError, abzeichen: abzeichenError })
+    const next = new Set(openIds)
+    if (wbError) next.add('wb')
+    if (andachtError) next.add('andacht')
+    if (abzeichenError) next.add('abzeichen')
+    if (next.size !== openIds.length) setOpenIds(Array.from(next))
+  }
+
+  const warnTrailing = (
+    <span className={styles.accordionWarn} aria-label="Fehler in dieser Sektion">
+      <Icon name="warning" size={12} />
+    </span>
+  )
+
   return (
     <div className={styles.section}>
       <AccordionGroup
         mode="multi"
-        defaultOpen={['wb']}
+        openIds={openIds}
+        onOpenChange={setOpenIds}
         items={[
           {
             id: 'wb',
             title: <span className={styles.kontextSectionLabel}>Wachstumsbereich</span>,
+            trailing: wbError ? warnTrailing : undefined,
             children: (
-              <div className={styles.zieleSectionBody}>
+              <div className={`${styles.zieleSectionBody} ${wbError ? styles.zieleSectionBodyError : ''}`}>
+                {wbError && <p className={styles.zieleSectionError}>{wbError}</p>}
                 {/* Tab-Leiste für Modus */}
                 <div className={styles.wbTabRow}>
                   {(['ausgewogen', 'tendenz', 'fokus', 'haupt-neben', 'dominant'] as WbSchwerpunktModus[]).map((m) => (
@@ -155,8 +184,10 @@ export function WizardStep3Ziele({
           {
             id: 'andacht',
             title: <span className={styles.kontextSectionLabel}>Andachtsreihe</span>,
+            trailing: andachtError ? warnTrailing : undefined,
             children: (
-              <div className={styles.zieleSectionBody}>
+              <div className={`${styles.zieleSectionBody} ${andachtError ? styles.zieleSectionBodyError : ''}`}>
+                {andachtError && <p className={styles.zieleSectionError}>{andachtError}</p>}
                 <div className={styles.wbTabRow}>
                   {(['none', 'reihe', 'sammlung', 'new'] as AndachtMode[]).map((m) => (
                     <button
@@ -334,8 +365,10 @@ export function WizardStep3Ziele({
           {
             id: 'abzeichen',
             title: <span className={styles.kontextSectionLabel}>Abzeichen</span>,
+            trailing: abzeichenError ? warnTrailing : undefined,
             children: (
-              <div className={styles.zieleSectionBody}>
+              <div className={`${styles.zieleSectionBody} ${abzeichenError ? styles.zieleSectionBodyError : ''}`}>
+                {abzeichenError && <p className={styles.zieleSectionError}>{abzeichenError}</p>}
                 <div className={styles.wbTabRow}>
                   <button
                     type="button"
@@ -377,7 +410,6 @@ export function WizardStep3Ziele({
           },
         ]}
       />
-      {error && <p className={styles.error}>{error}</p>}
     </div>
   )
 }

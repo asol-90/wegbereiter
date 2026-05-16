@@ -180,6 +180,8 @@ function NewPlanungWizardBody({ open, onClose, onCreated, initialZeitraum }: New
   const bisPresetRef = useRef<HTMLDivElement>(null)
   const [team, setTeam] = useState<Mitarbeiter[]>(initial.team)
   const [newTeamName, setNewTeamName] = useState('')
+  const [teamWarn, setTeamWarn] = useState(false)
+  const [zieleErrors, setZieleErrors] = useState<{ wb: string | null; andacht: string | null; abzeichen: string | null }>({ wb: null, andacht: null, abzeichen: null })
 
   // ─── Step 2: Ziele (WB-Schwerpunkt, Andachtsreihe, Abzeichen) ──
 
@@ -496,6 +498,7 @@ function NewPlanungWizardBody({ open, onClose, onCreated, initialZeitraum }: New
     }
     setTeam([...team, newMember])
     setNewTeamName('')
+    setTeamWarn(false)
   }
 
   function removeTeamMember(id: MitarbeiterId) {
@@ -514,14 +517,49 @@ function NewPlanungWizardBody({ open, onClose, onCreated, initialZeitraum }: New
         return `Der Zeitraum überschneidet sich mit der Planung „${p.name}" (${formatDateShort(p.zeitraum.start)} – ${formatDateShort(p.zeitraum.ende)}).`
       }
     }
+    if (team.length === 0) return 'Mindestens einen Mitarbeiter hinzufügen.'
     return null
+  }
+
+  function validateZiele(): { wb: string | null; andacht: string | null; abzeichen: string | null } {
+    const wb = wbModus !== 'ausgewogen' && wbBereiche.length === 0
+      ? 'Bitte mindestens einen Wachstumsbereich auswählen.'
+      : null
+    let andacht: string | null = null
+    if (andachtMode === 'reihe' && !andachtReiheId) {
+      andacht = 'Bitte eine Andachtsreihe wählen.'
+    } else if (andachtMode === 'sammlung') {
+      if (!andachtReiheId) andacht = 'Bitte eine Sammlung wählen.'
+      else if (andachtAusgewaehlt.size === 0) andacht = 'Bitte mindestens eine Einheit aus der Sammlung aktivieren.'
+    } else if (andachtMode === 'new') {
+      const hasUnit = andachtEinheiten.some((e) => e.titel.trim())
+      if (!andachtTitel.trim()) andacht = 'Bitte einen Titel für die Reihe angeben.'
+      else if (!hasUnit) andacht = 'Bitte mindestens eine Einheit angeben.'
+    }
+    const abzeichen = selectedAltersstufe && !selectedAbzeichenId
+      ? 'Bitte ein Abzeichen für die gewählte Stufe auswählen.'
+      : null
+    return { wb, andacht, abzeichen }
   }
 
   function handleNext() {
     if (currentStep === 'teamplanung') {
       const err = validateBasics()
-      if (err) { setError(err); return }
+      if (err) {
+        setError(err)
+        if (team.length === 0) setTeamWarn(true)
+        return
+      }
     }
+    if (currentStep === 'ziele') {
+      const errs = validateZiele()
+      if (errs.wb || errs.andacht || errs.abzeichen) {
+        setZieleErrors(errs)
+        // Generic bottom error wird nicht gesetzt — Per-Section-Errors decken's ab.
+        return
+      }
+    }
+    setZieleErrors({ wb: null, andacht: null, abzeichen: null })
     setError(null)
     setStepIndex((s) => Math.min(stepSequence.length - 1, s + 1))
   }
@@ -534,7 +572,19 @@ function NewPlanungWizardBody({ open, onClose, onCreated, initialZeitraum }: New
   async function handleStart() {
     if (saving) return
     const err = validateBasics()
-    if (err) { setStepIndex(0); setError(err); return }
+    if (err) {
+      setStepIndex(0)
+      setError(err)
+      if (team.length === 0) setTeamWarn(true)
+      return
+    }
+    const zErrs = validateZiele()
+    if (zErrs.wb || zErrs.andacht || zErrs.abzeichen) {
+      const zieleIdx = stepSequence.indexOf('ziele')
+      if (zieleIdx >= 0) setStepIndex(zieleIdx)
+      setZieleErrors(zErrs)
+      return
+    }
     try {
       setSaving(true)
       // Collect dates to exclude from the factory's generateTermine output:
@@ -717,6 +767,7 @@ function NewPlanungWizardBody({ open, onClose, onCreated, initialZeitraum }: New
           toggleReinstated={toggleReinstated}
           activeKontext={activeKontext}
           error={error}
+          teamWarn={teamWarn}
         />
       )}
 
@@ -734,30 +785,32 @@ function NewPlanungWizardBody({ open, onClose, onCreated, initialZeitraum }: New
       {currentStep === 'ziele' && (
         <WizardStep3Ziele
           wbModus={wbModus}
-          setWbModus={setWbModus}
+          setWbModus={(m) => { setWbModus(m); setZieleErrors((e) => ({ ...e, wb: null })) }}
           wbBereiche={wbBereiche}
-          setWbBereiche={setWbBereiche}
+          setWbBereiche={(b) => { setWbBereiche(b); setZieleErrors((e) => ({ ...e, wb: null })) }}
           andachtMode={andachtMode}
-          setAndachtMode={setAndachtMode}
+          setAndachtMode={(m) => { setAndachtMode(m); setZieleErrors((e) => ({ ...e, andacht: null })) }}
           andachtReiheId={andachtReiheId}
-          setAndachtReiheId={setAndachtReiheId}
+          setAndachtReiheId={(id) => { setAndachtReiheId(id); setZieleErrors((e) => ({ ...e, andacht: null })) }}
           andachtAusgewaehlt={andachtAusgewaehlt}
-          setAndachtAusgewaehlt={setAndachtAusgewaehlt}
+          setAndachtAusgewaehlt={(s) => { setAndachtAusgewaehlt(s); setZieleErrors((e) => ({ ...e, andacht: null })) }}
           andachtTitel={andachtTitel}
-          setAndachtTitel={setAndachtTitel}
+          setAndachtTitel={(t) => { setAndachtTitel(t); setZieleErrors((e) => ({ ...e, andacht: null })) }}
           andachtEinheiten={andachtEinheiten}
-          setAndachtEinheiten={setAndachtEinheiten}
+          setAndachtEinheiten={(e) => { setAndachtEinheiten(e); setZieleErrors((er) => ({ ...er, andacht: null })) }}
           selectedAltersstufe={selectedAltersstufe}
-          setSelectedAltersstufe={setSelectedAltersstufe}
+          setSelectedAltersstufe={(s) => { setSelectedAltersstufe(s); setZieleErrors((e) => ({ ...e, abzeichen: null })) }}
           selectedAbzeichenId={selectedAbzeichenId}
-          setSelectedAbzeichenId={setSelectedAbzeichenId}
+          setSelectedAbzeichenId={(id) => { setSelectedAbzeichenId(id); setZieleErrors((e) => ({ ...e, abzeichen: null })) }}
           availableReihen={availableReihen}
           availableSammlungen={availableSammlungen}
           selectedSammlung={selectedSammlung}
           teamAndachtsBedarf={teamAndachtsBedarf}
           stammandachtenCount={stammandachtenCount}
           activeMeetingCount={activeMeetingCount}
-          error={error}
+          wbError={zieleErrors.wb}
+          andachtError={zieleErrors.andacht}
+          abzeichenError={zieleErrors.abzeichen}
         />
       )}
 
