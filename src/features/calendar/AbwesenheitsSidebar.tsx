@@ -552,7 +552,7 @@ export function AbwesenheitsSidebar({
 
       {onNavigateToList && (
         <div className={styles.footer}>
-          <Button variant="secondary" size="sm" onClick={onNavigateToList}>
+          <Button variant="secondary" size="sm" fullWidth onClick={onNavigateToList}>
             Weiter zur Detailplanung
           </Button>
         </div>
