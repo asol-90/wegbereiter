@@ -2,9 +2,18 @@ import { pruefePlanung, type AbschlussKriterien, type Kriterium, type KriteriumS
 import type { Abzeichen, Aktivitaet, Andachtsreihe, Planung, StammKontext } from '@/domain/types'
 import { usePlanungenActions } from '@/features/planungen'
 import { Button, Icon } from '@/ui/primitives'
+import { SealWarning } from '@phosphor-icons/react'
 import { useMemo, useState } from 'react'
 import { ExportDialog } from './ExportDialog'
 import styles from './AbschlussSektion.module.css'
+
+type SealTone = 'ok' | 'warn' | 'block'
+
+function sealToneFor(kriterien: AbschlussKriterien): SealTone {
+  if (!kriterien.kannAbschliessen) return 'block'
+  if (kriterien.kriterien.some((k) => k.status === 'warn')) return 'warn'
+  return 'ok'
+}
 
 type Props = {
   planung: Planung
@@ -88,6 +97,7 @@ function AbschliessenSplitButton({
 }) {
   const [popoverOpen, setPopoverOpen] = useState(false)
   const disabled = !kriterien.kannAbschliessen
+  const tone = sealToneFor(kriterien)
 
   return (
     <div className={styles.splitWrap}>
@@ -104,11 +114,12 @@ function AbschliessenSplitButton({
       <div className={styles.splitDivider} />
 
       <div
-        className={styles.splitInfo}
+        className={`${styles.splitInfo} ${styles[`splitInfo_${tone}`]}`}
         onMouseEnter={() => setPopoverOpen(true)}
         onMouseLeave={() => setPopoverOpen(false)}
+        aria-label={tone === 'block' ? 'Pflicht-Kriterien offen' : tone === 'warn' ? 'Hinweise zu offenen Punkten' : 'Alle Kriterien erfüllt'}
       >
-        <Icon name="info" size={12} />
+        <SealWarning size={14} weight={tone === 'ok' ? 'regular' : 'fill'} />
 
         {popoverOpen && <KriterienPopover kriterien={kriterien} />}
       </div>

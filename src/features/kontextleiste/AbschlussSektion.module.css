@@ -67,12 +67,20 @@
   color: var(--bg1);
   border-radius: 0 var(--r-md) var(--r-md) 0;
   cursor: default;
-  transition: background var(--dur-fast) var(--ease);
+  transition: background var(--dur-fast) var(--ease),
+    color var(--dur-fast) var(--ease);
 }
 
 .splitInfo:hover {
   background: rgba(255, 255, 255, 0.12);
 }
+
+/* Tone-Varianten: weiß = alles ok, gelb = Hinweise, rot = Blocker.
+   Hand-picked Hex statt --t-warn/--t-err, weil die Token auf hellem Grund
+   designt sind und auf dem dunklen Split-Button-Background zu matt wirken. */
+.splitInfo_ok { color: var(--bg1); }
+.splitInfo_warn { color: #f5b400; }
+.splitInfo_block { color: #ff5454; }
 
 /* ─── Criteria popover ─── */
 
