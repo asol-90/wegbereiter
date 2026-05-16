@@ -181,16 +181,17 @@
   border-radius: var(--r-md);
   border: none;
   background: transparent;
-  color: var(--t3);
+  color: var(--t-warn); /* Ferien/Feiertag-Ton, vgl. .terminBadgeFerien */
   cursor: pointer;
   z-index: 1;
   transition: background var(--dur-fast) var(--ease),
-    color var(--dur-fast) var(--ease);
+    color var(--dur-fast) var(--ease),
+    transform var(--dur-fast) var(--ease);
 }
 
 .presetBtn:hover {
-  background: var(--bg2);
-  color: var(--t1);
+  background: rgba(186, 117, 23, 0.12);
+  transform: scale(1.08);
 }
 
 .presetDropdown {

@@ -1,4 +1,5 @@
 import React from 'react'
+import { Star } from '@phosphor-icons/react'
 import {
   Badge,
   Input,
@@ -359,8 +360,9 @@ export function WizardStep1Team({
                 className={styles.presetBtn}
                 onClick={() => setBisPresetOpen((o) => !o)}
                 title="Bis-Vorschläge"
+                aria-label="Bis-Vorschläge"
               >
-                <Icon name="preset" size={14} />
+                <Star size={18} weight="duotone" />
               </button>
             )}
             {bisPresetOpen && bisPresets.length > 0 && (
