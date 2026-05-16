@@ -149,6 +149,7 @@
   flex-shrink: 0;
   position: relative;
   cursor: crosshair;
+  touch-action: none;
 }
 
 /* ── Horizontal grid lines ── */
@@ -199,6 +200,7 @@
   height: 6px;
   cursor: ns-resize;
   z-index: 4;
+  touch-action: none;
 }
 
 .resizeHandle.top {

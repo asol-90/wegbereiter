@@ -12,7 +12,7 @@ import {Avatar} from '@/ui/domain'
 import {Button, IconButton} from '@/ui/primitives'
 import clsx from '@/ui/utils/clsx'
 import {addDays, differenceInCalendarDays, endOfWeek, startOfWeek} from 'date-fns'
-import {useCallback, useEffect, useMemo, useRef, useState} from 'react'
+import {useCallback, useMemo, useRef, useState} from 'react'
 import styles from './AbwesenheitsSidebar.module.css'
 
 const ACCENT_HUE_SEQUENCE = [220, 160, 40, 280, 70, 320]
@@ -139,153 +139,120 @@ export function AbwesenheitsSidebar({
   const [drag, setDrag] = useState<DragState | null>(null)
   const membersAreaRef = useRef<HTMLDivElement>(null)
 
-  // Refs for stable access in document-level listeners
-   
-  const dragRef = useRef(drag)
-  // eslint-disable-next-line react-hooks/refs
-  dragRef.current = drag
-   
-  const abwesenheitenRef = useRef(abwesenheiten)
-  // eslint-disable-next-line react-hooks/refs
-  abwesenheitenRef.current = abwesenheiten
-   
-  const weekRowsRef = useRef(weekRows)
-  // eslint-disable-next-line react-hooks/refs
-  weekRowsRef.current = weekRows
-   
-  const zeitraumRef = useRef(zeitraum)
-  // eslint-disable-next-line react-hooks/refs
-  zeitraumRef.current = zeitraum
-   
-  const onUpdateRef = useRef(onUpdate)
-  // eslint-disable-next-line react-hooks/refs
-  onUpdateRef.current = onUpdate
-   
-  const totalRowsRef = useRef(totalRows)
-  // eslint-disable-next-line react-hooks/refs
-  totalRowsRef.current = totalRows
-   
-  const onAbwesenheitHoverRef = useRef(onAbwesenheitHover)
-  // eslint-disable-next-line react-hooks/refs
-  onAbwesenheitHoverRef.current = onAbwesenheitHover
-
   const yToRow = useCallback(
     (clientY: number): number => {
-      if (!membersAreaRef.current) return 0
-      const tr = totalRowsRef.current
-      if (tr === 0) return 0
+      if (!membersAreaRef.current || totalRows === 0) return 0
       const rect = membersAreaRef.current.getBoundingClientRect()
       const pct = (clientY - rect.top) / rect.height
-      return Math.max(0, Math.min(tr, pct * tr))
+      return Math.max(0, Math.min(totalRows, pct * totalRows))
     },
-    [],
+    [totalRows],
   )
 
-  // ── Document-level drag listeners ─────────────────────────────────────
-  useEffect(() => {
-    const handleMove = (e: MouseEvent) => {
-      if (!dragRef.current) return
-      const row = yToRow(e.clientY)
-      setDrag((prev) => prev ? { ...prev, currentRow: row } : null)
+  // ── Pointer-capture-based drag ────────────────────────────────────────
+  // The element that handles pointerdown captures the pointer, so all
+  // subsequent pointermove/up events route to it (and bubble up to
+  // membersArea) regardless of where the cursor goes. JSX-bound handlers
+  // close over current props/state — no refs needed.
 
-      // Update crosshover live during drag
-      const d = dragRef.current
-      const rows = weekRowsRef.current
-      const zr = zeitraumRef.current
-      const abs = abwesenheitenRef.current
-      if (d.kind === 'create') {
-        const minRow = Math.min(d.startRow, row)
-        const maxRow = Math.max(d.startRow, row)
-        if (maxRow - minRow > 0.15) {
-          const von = clampDate(rowToDate(minRow, rows), zr.start, zr.ende)
-          const bis = clampDate(rowToDate(maxRow, rows), zr.start, zr.ende)
-          onAbwesenheitHoverRef.current?.({ id: '' as AbwesenheitId, mitarbeiterId: d.memberId, von, bis })
-        }
-      } else if (d.kind === 'resize') {
-        const target = abs.find((a) => a.id === d.absId)
-        if (target) {
-          const delta = row - d.startRow
-          let von = target.von
-          let bis = target.bis
-          if (d.edge === 'top') {
-            von = clampDate(rowToDate(dateToRow(target.von, rows) + delta, rows), zr.start, zr.ende)
-          } else {
-            bis = clampDate(rowToDate(dateToRow(target.bis, rows) + delta, rows), zr.start, zr.ende)
-          }
-          if (von < bis) onAbwesenheitHoverRef.current?.({ ...target, von, bis })
-        }
-      }
-    }
-
-    const handleUp = () => {
-      const d = dragRef.current
-      if (!d) return
-      const rows = weekRowsRef.current
-      const zr = zeitraumRef.current
-      const abs = abwesenheitenRef.current
-
-      if (d.kind === 'create') {
-        const minRow = Math.min(d.startRow, d.currentRow)
-        const maxRow = Math.max(d.startRow, d.currentRow)
-        if (maxRow - minRow > 0.3) {
-          const von = clampDate(rowToDate(minRow, rows), zr.start, zr.ende)
-          const bis = clampDate(rowToDate(maxRow, rows), zr.start, zr.ende)
-          if (von < bis) {
-            onUpdateRef.current([
-              ...abs,
-              { id: newId<AbwesenheitId>(), mitarbeiterId: d.memberId, von, bis },
-            ])
-          }
-        }
-      } else if (d.kind === 'resize') {
-        const target = abs.find((a) => a.id === d.absId)
-        if (target) {
-          const delta = d.currentRow - d.startRow
-          let newVon = target.von
-          let newBis = target.bis
-          if (d.edge === 'top') {
-            newVon = clampDate(rowToDate(dateToRow(target.von, rows) + delta, rows), zr.start, zr.ende)
-          } else {
-            newBis = clampDate(rowToDate(dateToRow(target.bis, rows) + delta, rows), zr.start, zr.ende)
-          }
-          if (newVon < newBis) {
-            onUpdateRef.current(abs.map((a) => a.id === d.absId ? { ...a, von: newVon, bis: newBis } : a))
-          }
-        }
-      }
-
-      onAbwesenheitHoverRef.current?.(null)
-      setDrag(null)
-    }
-
-    document.addEventListener('mousemove', handleMove)
-    document.addEventListener('mouseup', handleUp)
-    return () => {
-      document.removeEventListener('mousemove', handleMove)
-      document.removeEventListener('mouseup', handleUp)
-    }
-  }, [yToRow])
-
-  const handleColMouseDown = useCallback(
-    (memberId: MitarbeiterId, e: React.MouseEvent) => {
+  const handleColPointerDown = useCallback(
+    (memberId: MitarbeiterId, e: React.PointerEvent<HTMLDivElement>) => {
+      if (e.button !== 0) return
       const target = e.target as HTMLElement
       if (target.closest(`.${styles.absBlock}`) || target.closest('button')) return
       e.preventDefault()
+      e.currentTarget.setPointerCapture(e.pointerId)
       const row = yToRow(e.clientY)
       setDrag({ kind: 'create', memberId, startRow: row, currentRow: row })
     },
     [yToRow],
   )
 
-  const handleResizeStart = useCallback(
-    (absId: AbwesenheitId, edge: 'top' | 'bottom', e: React.MouseEvent) => {
+  const handleResizePointerDown = useCallback(
+    (absId: AbwesenheitId, edge: 'top' | 'bottom', e: React.PointerEvent<HTMLDivElement>) => {
+      if (e.button !== 0) return
       e.preventDefault()
       e.stopPropagation()
+      e.currentTarget.setPointerCapture(e.pointerId)
       const row = yToRow(e.clientY)
       setDrag({ kind: 'resize', absId, edge, startRow: row, currentRow: row })
     },
     [yToRow],
   )
+
+  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!drag) return
+    const row = yToRow(e.clientY)
+    setDrag((prev) => prev ? { ...prev, currentRow: row } : null)
+
+    if (drag.kind === 'create') {
+      const minRow = Math.min(drag.startRow, row)
+      const maxRow = Math.max(drag.startRow, row)
+      if (maxRow - minRow > 0.15) {
+        const von = clampDate(rowToDate(minRow, weekRows), zeitraum.start, zeitraum.ende)
+        const bis = clampDate(rowToDate(maxRow, weekRows), zeitraum.start, zeitraum.ende)
+        onAbwesenheitHover?.({ id: '' as AbwesenheitId, mitarbeiterId: drag.memberId, von, bis })
+      }
+    } else {
+      const target = abwesenheiten.find((a) => a.id === drag.absId)
+      if (target) {
+        const delta = row - drag.startRow
+        let von = target.von
+        let bis = target.bis
+        if (drag.edge === 'top') {
+          von = clampDate(rowToDate(dateToRow(target.von, weekRows) + delta, weekRows), zeitraum.start, zeitraum.ende)
+        } else {
+          bis = clampDate(rowToDate(dateToRow(target.bis, weekRows) + delta, weekRows), zeitraum.start, zeitraum.ende)
+        }
+        if (von < bis) onAbwesenheitHover?.({ ...target, von, bis })
+      }
+    }
+  }
+
+  const handlePointerUp = () => {
+    if (!drag) return
+
+    if (drag.kind === 'create') {
+      const minRow = Math.min(drag.startRow, drag.currentRow)
+      const maxRow = Math.max(drag.startRow, drag.currentRow)
+      if (maxRow - minRow > 0.3) {
+        const von = clampDate(rowToDate(minRow, weekRows), zeitraum.start, zeitraum.ende)
+        const bis = clampDate(rowToDate(maxRow, weekRows), zeitraum.start, zeitraum.ende)
+        if (von < bis) {
+          onUpdate([
+            ...abwesenheiten,
+            { id: newId<AbwesenheitId>(), mitarbeiterId: drag.memberId, von, bis },
+          ])
+        }
+      }
+    } else {
+      const target = abwesenheiten.find((a) => a.id === drag.absId)
+      if (target) {
+        const delta = drag.currentRow - drag.startRow
+        let newVon = target.von
+        let newBis = target.bis
+        if (drag.edge === 'top') {
+          newVon = clampDate(rowToDate(dateToRow(target.von, weekRows) + delta, weekRows), zeitraum.start, zeitraum.ende)
+        } else {
+          newBis = clampDate(rowToDate(dateToRow(target.bis, weekRows) + delta, weekRows), zeitraum.start, zeitraum.ende)
+        }
+        if (newVon < newBis) {
+          onUpdate(abwesenheiten.map((a) => a.id === drag.absId ? { ...a, von: newVon, bis: newBis } : a))
+        }
+      }
+    }
+
+    onAbwesenheitHover?.(null)
+    setDrag(null)
+  }
+
+  // Releases drag state if pointer capture is lost (e.g. captured element
+  // unmounts mid-drag, OS interruption). Without this, drag state could stick.
+  const handleLostPointerCapture = () => {
+    if (!drag) return
+    onAbwesenheitHover?.(null)
+    setDrag(null)
+  }
 
   const handleDelete = useCallback(
     (absId: AbwesenheitId) => {
@@ -468,7 +435,13 @@ export function AbwesenheitsSidebar({
         </div>
 
         {/* Members area */}
-        <div className={styles.membersArea} ref={membersAreaRef}>
+        <div
+          className={styles.membersArea}
+          ref={membersAreaRef}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
+          onLostPointerCapture={handleLostPointerCapture}
+        >
           {/* Grid lines */}
           <div className={styles.gridLines}>
             {gridLines.map((gl, i) => (
@@ -485,7 +458,7 @@ export function AbwesenheitsSidebar({
             <div
               key={member.id}
               className={styles.memberCol}
-              onMouseDown={(e) => handleColMouseDown(member.id, e)}
+              onPointerDown={(e) => handleColPointerDown(member.id, e)}
             >
               {/* Absence blocks */}
               {abwesenheiten
@@ -530,11 +503,11 @@ export function AbwesenheitsSidebar({
                     >
                       <div
                         className={`${styles.resizeHandle} ${styles.top}`}
-                        onMouseDown={(e) => handleResizeStart(abs.id, 'top', e)}
+                        onPointerDown={(e) => handleResizePointerDown(abs.id, 'top', e)}
                       />
                       <div
                         className={`${styles.resizeHandle} ${styles.bottom}`}
-                        onMouseDown={(e) => handleResizeStart(abs.id, 'bottom', e)}
+                        onPointerDown={(e) => handleResizePointerDown(abs.id, 'bottom', e)}
                       />
                       <div className={styles.absDeleteBtn}>
                         <IconButton
