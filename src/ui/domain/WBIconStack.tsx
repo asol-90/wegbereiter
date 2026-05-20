@@ -64,6 +64,48 @@ export function WBIconItem({ wb, intensity = 0, iconSize = 16 }: WBIconItemProps
   )
 }
 
+export type WBToggleItemProps = {
+  wb: WBKey
+  selected: boolean
+  disabled?: boolean
+  /** Optional badge text shown in top-right (z.B. „H"/„N" für haupt-neben). */
+  badge?: string
+  onClick?: () => void
+  iconSize?: number
+  /** Horizontal (Icon links, Label rechts) oder vertikal (Icon oben, Label unten). */
+  orientation?: 'horizontal' | 'vertical'
+}
+
+/** Toggle-Variante: anklickbarer Button mit Phosphor-Icon und WB-Label;
+ *  bei selected erscheint eine farbige Outline + Hintergrund-Tinte. */
+export function WBToggleItem({
+  wb,
+  selected,
+  disabled,
+  badge,
+  onClick,
+  iconSize = 18,
+  orientation = 'horizontal',
+}: WBToggleItemProps) {
+  const Ic = WB_ICON[wb]
+  const colorVar = `var(${WB_CSS_VAR[wb]})`
+  return (
+    <button
+      type="button"
+      role="checkbox"
+      aria-checked={selected}
+      disabled={disabled}
+      className={`${styles.toggle} ${orientation === 'vertical' ? styles.toggleVertical : styles.toggleHorizontal} ${selected ? styles.toggleSelected : ''}`}
+      style={{ ['--wb-color' as string]: colorVar }}
+      onClick={onClick}
+    >
+      <Ic size={iconSize} weight="duotone" style={{ color: colorVar }} />
+      <span className={styles.toggleLabel}>{WB_LABELS[wb]}</span>
+      {badge && <span className={styles.toggleBadge}>{badge}</span>}
+    </button>
+  )
+}
+
 export type WBIconStackProps = {
   tags: WBTag[]
   iconSize?: number

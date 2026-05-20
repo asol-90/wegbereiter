@@ -4,7 +4,11 @@ export { DragHandle, type DragHandleProps } from './DragHandle'
 export { DurationBar, type DurationBarProps } from './DurationBar'
 export { TypeIcon, type TypeIconKind, type TypeIconProps } from './TypeIcon'
 export { WBBar, type WBBarProps } from './WBBar'
-export { WBIconItem, type WBIconItemProps, WBIconStack, type WBIconStackProps } from './WBIconStack'
+export {
+  WBIconItem, type WBIconItemProps,
+  WBIconStack, type WBIconStackProps,
+  WBToggleItem, type WBToggleItemProps,
+} from './WBIconStack'
 export { WBDonut, type WBDonutProps } from './WBDonut'
 export { WBDot, type WBDotProps } from './WBDot'
 export { WBDotGrid, type WBDotGridProps } from './WBDotGrid'
@@ -15,3 +19,4 @@ export {
   WBIntensitySegment,
   type WBIntensitySegmentProps
 } from './WBIntensitySegment'
+export { WBZielVorschau, type WBZielVorschauProps } from './WBZielVorschau'

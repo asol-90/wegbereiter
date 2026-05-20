@@ -1,0 +1,43 @@
+.grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 100%;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 84px 1fr 32px;
+  align-items: center;
+  gap: 8px;
+}
+
+.label {
+  font-size: 11px;
+  color: var(--t2);
+  text-align: right;
+}
+
+.track {
+  position: relative;
+  height: 8px;
+  background: var(--bg2);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  border-radius: 4px;
+  transition: width var(--dur-fast) var(--ease);
+}
+
+.percent {
+  font-size: 11px;
+  color: var(--t3);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}

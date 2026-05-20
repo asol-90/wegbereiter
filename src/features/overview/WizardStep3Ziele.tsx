@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { AccordionGroup, Input, Select } from '@/ui/primitives'
 import { Icon } from '@/ui/primitives/Icon'
+import { WBToggleItem, WBZielVorschau } from '@/ui/domain'
 import type { Altersstufe, Andachtsreihe, WbSchwerpunktModus } from '@/domain/types'
 import { newId, type AbzeichenId, type AndachtsEinheitId, type AndachtsreiheId } from '@/domain/ids'
-import { WB_CSS_VAR, WB_KEYS, WB_LABELS, type WBKey } from '@/domain/wb'
+import { WB_KEYS, type WBKey } from '@/domain/wb'
 import { ALTERSSTUFE_LABELS, abzeichenFuerStufe } from '@/domain/abzeichenKatalog'
 import type { AndachtMode } from './newPlanungWizardUtils'
 import styles from './NewPlanungWizard.module.css'
@@ -132,51 +133,50 @@ export function WizardStep3Ziele({
                   {wbModus === 'haupt-neben' && 'Wähle einen Haupt- und einen Nebenbereich.'}
                   {wbModus === 'dominant' && 'Wähle einen Bereich, der dominant im Vordergrund steht.'}
                 </p>
-                {/* Checkbox-Liste */}
-                <div className={styles.wbCheckList}>
-                  {WB_KEYS.map((key) => {
-                    const isAusgewogen = wbModus === 'ausgewogen'
-                    const selectedIndex = wbBereiche.indexOf(key)
-                    const isSelected = isAusgewogen || selectedIndex >= 0
-                    const maxSelectable =
-                      wbModus === 'tendenz' ? 2
-                      : wbModus === 'fokus' ? 1
-                      : wbModus === 'haupt-neben' ? 2
-                      : wbModus === 'dominant' ? 1
-                      : 0
-                    const checkLabel = wbModus === 'haupt-neben'
-                      ? (selectedIndex === 0 ? 'H' : selectedIndex === 1 ? 'N' : '')
-                      : (isSelected ? '✓' : '')
-                    return (
-                      <button
-                        key={key}
-                        type="button"
-                        role="checkbox"
-                        aria-checked={isSelected}
-                        disabled={isAusgewogen}
-                        className={styles.wbCheckRow}
-                        onClick={() => {
-                          if (selectedIndex >= 0) {
-                            setWbBereiche(wbBereiche.filter((k) => k !== key))
-                          } else if (wbBereiche.length < maxSelectable) {
-                            setWbBereiche([...wbBereiche, key])
-                          }
-                        }}
-                      >
-                        <span
-                          className={`${styles.wbCheckIcon} ${isSelected ? styles.wbCheckIconChecked : ''}`}
-                          style={isSelected ? { ['--wb-check-color' as string]: `var(${WB_CSS_VAR[key]})` } : undefined}
-                        >
-                          {checkLabel}
-                        </span>
-                        <span
-                          className={styles.wbColorBar}
-                          style={{ backgroundColor: `var(${WB_CSS_VAR[key]})` }}
+                {/* Toggle-Buttons + Ziel-Vorschau */}
+                <div className={styles.wbToggleLayout}>
+                  <div className={styles.wbToggleGrid}>
+                    {WB_KEYS.map((key) => {
+                      const isAusgewogen = wbModus === 'ausgewogen'
+                      const selectedIndex = wbBereiche.indexOf(key)
+                      const isSelected = isAusgewogen || selectedIndex >= 0
+                      const maxSelectable =
+                        wbModus === 'tendenz' ? 2
+                        : wbModus === 'fokus' ? 1
+                        : wbModus === 'haupt-neben' ? 2
+                        : wbModus === 'dominant' ? 1
+                        : 0
+                      const badge = wbModus === 'haupt-neben'
+                        ? (selectedIndex === 0 ? 'H' : selectedIndex === 1 ? 'N' : undefined)
+                        : undefined
+                      return (
+                        <WBToggleItem
+                          key={key}
+                          wb={key}
+                          selected={isSelected}
+                          disabled={isAusgewogen}
+                          badge={badge}
+                          onClick={() => {
+                            if (selectedIndex >= 0) {
+                              setWbBereiche(wbBereiche.filter((k) => k !== key))
+                            } else if (wbBereiche.length < maxSelectable) {
+                              setWbBereiche([...wbBereiche, key])
+                            }
+                          }}
                         />
-                        <span className={styles.wbCheckLabel}>{WB_LABELS[key]}</span>
-                      </button>
-                    )
-                  })}
+                      )
+                    })}
+                  </div>
+                  <div className={styles.wbToggleVorschau}>
+                    <div className={styles.wbToggleVorschauLabel}>Zielverteilung</div>
+                    {(wbModus === 'ausgewogen' || wbBereiche.length > 0) ? (
+                      <WBZielVorschau schwerpunkt={{ modus: wbModus, bereiche: wbBereiche }} />
+                    ) : (
+                      <p className={styles.wbToggleVorschauHint}>
+                        Bereich auswählen, um die Zielverteilung zu sehen.
+                      </p>
+                    )}
+                  </div>
                 </div>
               </div>
             ),
