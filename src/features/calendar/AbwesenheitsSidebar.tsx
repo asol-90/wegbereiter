@@ -10,9 +10,10 @@ import {newId, type AbwesenheitId, type MitarbeiterId} from '@/domain/ids'
 import type {Abwesenheit, IsoDate, Mitarbeiter, Planung} from '@/domain/types'
 import {Avatar} from '@/ui/domain'
 import {Button, IconButton} from '@/ui/primitives'
+import {PencilSimple} from '@phosphor-icons/react'
 import clsx from '@/ui/utils/clsx'
 import {addDays, differenceInCalendarDays, endOfWeek, startOfWeek} from 'date-fns'
-import {useCallback, useMemo, useRef, useState} from 'react'
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react'
 import styles from './AbwesenheitsSidebar.module.css'
 
 const ACCENT_HUE_SEQUENCE = [220, 160, 40, 280, 70, 320]
@@ -116,6 +117,25 @@ export function AbwesenheitsSidebar({
   const [addingMember, setAddingMember] = useState(false)
   const [newMemberName, setNewMemberName] = useState('')
   const addInputRef = useRef<HTMLInputElement>(null)
+  const [editingMemberId, setEditingMemberId] = useState<MitarbeiterId | null>(null)
+
+  const handleMemberEdit = useCallback(
+    (updated: Mitarbeiter) => {
+      if (!onTeamUpdate) return
+      onTeamUpdate(team.map((m) => (m.id === updated.id ? updated : m)))
+    },
+    [onTeamUpdate, team],
+  )
+
+  const handleMemberDelete = useCallback(
+    (id: MitarbeiterId) => {
+      if (!onTeamUpdate || team.length <= 1) return
+      onTeamUpdate(team.filter((m) => m.id !== id))
+      onUpdate(abwesenheiten.filter((a) => a.mitarbeiterId !== id))
+      setEditingMemberId(null)
+    },
+    [abwesenheiten, onTeamUpdate, onUpdate, team],
+  )
 
   const handleAddMemberConfirm = useCallback(() => {
     const name = newMemberName.trim()
@@ -369,7 +389,31 @@ export function AbwesenheitsSidebar({
             key={m.id}
             className={clsx(styles.avatarSlot, absentOnHoveredDate.has(m.id) && styles.highlighted)}
           >
-            <Avatar name={m.name} initials={m.initials} size={26} />
+            {onTeamUpdate ? (
+              <button
+                type="button"
+                className={styles.avatarBtn}
+                data-member-anchor={m.id}
+                onClick={() => setEditingMemberId((prev) => prev === m.id ? null : m.id)}
+                title={m.name}
+              >
+                <Avatar name={m.name} initials={m.initials} hue={m.accentHue} size={26} />
+                <span className={styles.avatarEditBadge} aria-hidden="true">
+                  <PencilSimple size={9} weight="bold" />
+                </span>
+              </button>
+            ) : (
+              <Avatar name={m.name} initials={m.initials} hue={m.accentHue} size={26} />
+            )}
+            {editingMemberId === m.id && onTeamUpdate && (
+              <MemberPopover
+                member={m}
+                canDelete={team.length > 1}
+                onSave={handleMemberEdit}
+                onDelete={() => handleMemberDelete(m.id)}
+                onClose={() => setEditingMemberId(null)}
+              />
+            )}
           </div>
         ))}
         {/* Team member add */}
@@ -557,6 +601,94 @@ export function AbwesenheitsSidebar({
           </Button>
         </div>
       )}
+    </div>
+  )
+}
+
+// ─── MemberPopover ─────────────────────────────────────────────────────────
+
+type MemberPopoverProps = {
+  member: Mitarbeiter
+  canDelete: boolean
+  onSave: (m: Mitarbeiter) => void
+  onDelete: () => void
+  onClose: () => void
+}
+
+function MemberPopover({ member, canDelete, onSave, onDelete, onClose }: MemberPopoverProps) {
+  const ref = useRef<HTMLDivElement>(null)
+  const [name, setName] = useState(member.name)
+  const [hue, setHue] = useState<number>(member.accentHue ?? 0)
+
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      const target = e.target as HTMLElement
+      if (ref.current?.contains(target)) return
+      // Klick auf den eigenen Anker-Avatar nicht doppelt verarbeiten —
+      // dessen onClick toggelt das Popover bereits selbst.
+      if (target.closest(`[data-member-anchor="${member.id}"]`)) return
+      const trimmed = name.trim()
+      if (trimmed && (trimmed !== member.name || hue !== (member.accentHue ?? 0))) {
+        onSave({ ...member, name: trimmed, accentHue: hue })
+      }
+      onClose()
+    }
+    document.addEventListener('mousedown', handleClick)
+    return () => document.removeEventListener('mousedown', handleClick)
+  }, [name, hue, member, onSave, onClose])
+
+  function commit() {
+    const trimmed = name.trim()
+    if (!trimmed) {
+      onClose()
+      return
+    }
+    if (trimmed !== member.name || hue !== (member.accentHue ?? 0)) {
+      onSave({ ...member, name: trimmed, accentHue: hue })
+    }
+    onClose()
+  }
+
+  return (
+    <div ref={ref} className={styles.memberPopover} role="dialog" aria-label="Mitarbeiter bearbeiten">
+      <input
+        autoFocus
+        className={styles.memberPopoverInput}
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') commit()
+          if (e.key === 'Escape') onClose()
+        }}
+        placeholder="Name"
+      />
+      <div className={styles.memberPopoverHueRow}>
+        {ACCENT_HUE_SEQUENCE.map((h) => (
+          <button
+            key={h}
+            type="button"
+            className={clsx(styles.memberPopoverHueDot, hue === h && styles.memberPopoverHueDotActive)}
+            style={{ background: `hsl(${h}, 55%, 60%)` }}
+            onClick={() => setHue(h)}
+            aria-label={`Farbe ${h}°`}
+            aria-pressed={hue === h}
+          />
+        ))}
+      </div>
+      <div className={styles.memberPopoverFooter}>
+        <button
+          type="button"
+          className={styles.memberPopoverDelete}
+          onClick={onDelete}
+          disabled={!canDelete}
+          title={canDelete ? 'Mitarbeiter entfernen' : 'Mindestens ein Mitarbeiter muss bleiben'}
+        >
+          Entfernen
+        </button>
+        <button type="button" className={styles.memberPopoverSave} onClick={commit}>
+          Übernehmen
+        </button>
+      </div>
     </div>
   )
 }

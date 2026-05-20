@@ -42,6 +42,159 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  position: relative;
+}
+
+.avatarBtn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: transform var(--dur-fast) var(--ease),
+    box-shadow var(--dur-fast) var(--ease);
+}
+
+.avatarBtn:hover,
+.avatarBtn:focus-visible {
+  transform: scale(1.08);
+  outline: none;
+  box-shadow: 0 0 0 1.5px var(--t2);
+}
+
+.avatarEditBadge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 13px;
+  height: 13px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--t2);
+  color: var(--bg1);
+  opacity: 0;
+  transform: scale(0.6);
+  pointer-events: none;
+  transition: opacity var(--dur-fast) var(--ease),
+    transform var(--dur-fast) var(--ease);
+}
+
+.avatarBtn:hover .avatarEditBadge,
+.avatarBtn:focus-visible .avatarEditBadge {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* ── Member popover ── */
+.memberPopover {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  padding: 10px;
+  background: var(--bg1);
+  border: 0.5px solid var(--brd2);
+  border-radius: var(--r-md);
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.14);
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.memberPopoverInput {
+  height: 26px;
+  padding: 0 8px;
+  border: 0.5px solid var(--brd2);
+  border-radius: var(--r-sm);
+  font-size: 12px;
+  font-family: var(--sans);
+  background: var(--bg1);
+  color: var(--t1);
+  outline: none;
+}
+
+.memberPopoverInput:focus {
+  border-color: var(--acc);
+}
+
+.memberPopoverHueRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.memberPopoverHueDot {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid transparent;
+  cursor: pointer;
+  padding: 0;
+  transition: transform var(--dur-fast) var(--ease),
+    border-color var(--dur-fast) var(--ease);
+}
+
+.memberPopoverHueDot:hover {
+  transform: scale(1.15);
+}
+
+.memberPopoverHueDotActive {
+  border-color: var(--t1);
+  transform: scale(1.1);
+}
+
+.memberPopoverFooter {
+  display: flex;
+  justify-content: space-between;
+  gap: 6px;
+  padding-top: 2px;
+}
+
+.memberPopoverDelete {
+  font-size: 11px;
+  font-weight: 500;
+  border: none;
+  background: transparent;
+  color: var(--t-err);
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: var(--r-sm);
+  transition: background var(--dur-fast) var(--ease),
+    color var(--dur-fast) var(--ease);
+}
+
+.memberPopoverDelete:hover:not(:disabled) {
+  background: var(--bg-err);
+}
+
+.memberPopoverDelete:disabled {
+  color: var(--t3);
+  cursor: not-allowed;
+}
+
+.memberPopoverSave {
+  font-size: 11px;
+  font-weight: 500;
+  border: none;
+  background: var(--t1);
+  color: var(--bg1);
+  cursor: pointer;
+  padding: 4px 10px;
+  border-radius: var(--r-sm);
+  transition: background var(--dur-fast) var(--ease);
+}
+
+.memberPopoverSave:hover {
+  background: var(--t2);
 }
 
 /* ── Avatar add button/input ── */

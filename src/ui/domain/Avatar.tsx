@@ -11,6 +11,8 @@ export type AvatarProps = {
   size?: number
   initials?: string
   tone?: 'auto' | 'brand' | 'muted'
+  /** Optional HSL-Hue (0..360). Wird verwendet, statt aus dem Namen zu hashen. */
+  hue?: number
 } & Omit<HTMLAttributes<HTMLSpanElement>, 'color'>
 
 const PALETTE = [
@@ -41,6 +43,7 @@ export function Avatar({
   size = 24,
   initials,
   tone = 'auto',
+  hue,
   className,
   style,
   ...rest
@@ -51,7 +54,12 @@ export function Avatar({
       ? 'var(--t3)'
       : tone === 'brand'
         ? 'var(--acc)'
-        : PALETTE[hash(name) % PALETTE.length]
+        : hue != null
+          ? `hsl(${hue}, 55%, 45%)`
+          : PALETTE[hash(name) % PALETTE.length]
+  const background = hue != null
+    ? `hsl(${hue}, 55%, 82%)`
+    : `color-mix(in srgb, ${color} 18%, var(--bg2))`
   return (
     <span
       className={clsx(styles.avatar, className)}
@@ -61,7 +69,7 @@ export function Avatar({
         width: size,
         height: size,
         fontSize: Math.max(9, Math.round(size * 0.42)),
-        background: `color-mix(in srgb, ${color} 18%, var(--bg2))`,
+        background,
         color,
         ...style,
       }}
