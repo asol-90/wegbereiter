@@ -28,7 +28,7 @@ export type WizardStep4VorschauProps = {
   andachtEinheiten: { id: AndachtsEinheitId; titel: string }[]
   andachtReiheId: AndachtsreiheId | null
   andachtAusgewaehlt: Set<AndachtsEinheitId>
-  availableReihen: Andachtsreihe[]
+  availableReihen: readonly Andachtsreihe[]
   selectedSammlung: Andachtsreihe | null
   selectedAbzeichenId: AbzeichenId | null
   error: string | null

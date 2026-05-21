@@ -7,7 +7,7 @@ import styles from './NewPlanungWizard.module.css'
 
 export type WizardStep2KontextProps = {
   activeKontext: StammKontext
-  stammAktivitaeten: Aktivitaet[]
+  stammAktivitaeten: readonly Aktivitaet[]
   alleAktionenInRange: Array<StammAktion & { bereich: AktionBereich }>
   kontextTreffenInRange: StammKontext['treffen']
 }
