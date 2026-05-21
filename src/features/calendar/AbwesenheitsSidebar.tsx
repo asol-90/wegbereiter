@@ -1,24 +1,22 @@
 /**
  * AbwesenheitsSidebar — vertical timeline with one column per team member.
  *
- * Layout: month labels (30px) + treffen column (12px, small diamonds) +
- * one 28px-wide column per member. Horizontal lines: dashed per KW, solid
- * at month boundaries. Avatars as column headers.
+ * Layout: month labels + treffen column (small diamonds) + one column per
+ * member. Horizontal lines: dashed per KW, solid at month boundaries.
+ * Avatars as column headers.
+ *
+ * The actual rendering, drag logic and per-member popover live in
+ * AbwesenheitsTimeline, useAbwesenheitsDrag, and MemberPopover respectively.
  */
-import {parseIso, toIso} from '@/domain/dateUtils'
-import {newId, type AbwesenheitId, type MitarbeiterId} from '@/domain/ids'
-import type {Abwesenheit, IsoDate, Mitarbeiter, Planung} from '@/domain/types'
-import {Avatar} from '@/ui/domain'
-import {Button, IconButton} from '@/ui/primitives'
-import {PencilSimple} from '@phosphor-icons/react'
-import clsx from '@/ui/utils/clsx'
-import {addDays, differenceInCalendarDays, endOfWeek, startOfWeek} from 'date-fns'
-import {useCallback, useEffect, useMemo, useRef, useState} from 'react'
+import { useCallback, useMemo, useRef } from 'react'
+import { type AbwesenheitId, type MitarbeiterId } from '@/domain/ids'
+import type { Abwesenheit, IsoDate, Mitarbeiter, Planung } from '@/domain/types'
+import { Button } from '@/ui/primitives'
+import { AbwesenheitsAvatarRow } from './AbwesenheitsAvatarRow'
+import { AbwesenheitsTimeline } from './AbwesenheitsTimeline'
+import { buildWeekRows } from './abwesenheitsHelpers'
+import { useAbwesenheitsDrag } from './useAbwesenheitsDrag'
 import styles from './AbwesenheitsSidebar.module.css'
-
-const ACCENT_HUE_SEQUENCE = [220, 160, 40, 280, 70, 320]
-
-// ─── Types ──────────────────────────────────────────────────────────────────
 
 export type AbwesenheitsSidebarProps = {
   planung: Planung
@@ -29,250 +27,32 @@ export type AbwesenheitsSidebarProps = {
   onAbwesenheitHover?: (abwesenheit: Abwesenheit | null) => void
 }
 
-type WeekRow = {
-  monday: IsoDate
-  isMonthBorder: boolean
-  monthLabel?: string
+function EmptyState() {
+  return (
+    <div className={styles.root}>
+      <div className={styles.header}>
+        <span className={styles.headerLabel}>Abwesenheiten</span>
+      </div>
+      <div className={styles.emptyHint}>
+        Noch keine Teammitglieder vorhanden.
+      </div>
+    </div>
+  )
 }
-
-type DragState =
-  | { kind: 'create'; memberId: MitarbeiterId; startRow: number; currentRow: number }
-  | { kind: 'resize'; absId: AbwesenheitId; edge: 'top' | 'bottom'; startRow: number; currentRow: number }
-
-// ─── Helpers ────────────────────────────────────────────────────────────────
-
-const MONTH_SHORT = ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun', 'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'] as const
-
-function buildWeekRows(start: IsoDate, ende: IsoDate): WeekRow[] {
-  const rows: WeekRow[] = []
-  const sDate = startOfWeek(parseIso(start), { weekStartsOn: 1 })
-  const eDate = endOfWeek(parseIso(ende), { weekStartsOn: 1 })
-  let cursor = sDate
-  let lastMonth = -1
-
-  while (cursor <= eDate) {
-    const iso = toIso(cursor) as IsoDate
-    const weekEnd = addDays(cursor, 6)
-
-    let isMonthBorder = false
-    let monthLabel: string | undefined
-    for (let d = new Date(cursor); d <= weekEnd; d = addDays(d, 1)) {
-      if (d.getDate() === 1 && d.getMonth() !== lastMonth) {
-        isMonthBorder = true
-        monthLabel = MONTH_SHORT[d.getMonth()]
-        lastMonth = d.getMonth()
-        break
-      }
-    }
-    if (rows.length === 0 && !monthLabel) {
-      monthLabel = MONTH_SHORT[cursor.getMonth()]
-      lastMonth = cursor.getMonth()
-    }
-
-    rows.push({ monday: iso, isMonthBorder: isMonthBorder || rows.length === 0, monthLabel })
-    cursor = addDays(cursor, 7)
-  }
-
-  return rows
-}
-
-function formatDateShort(iso: IsoDate): string {
-  const d = parseIso(iso)
-  const dayNames = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa']
-  const day = d.getDate().toString().padStart(2, '0')
-  const month = (d.getMonth() + 1).toString().padStart(2, '0')
-  return `${dayNames[d.getDay()]}, ${day}.${month}.`
-}
-
-function dateToRow(iso: IsoDate, rows: WeekRow[]): number {
-  if (rows.length === 0) return 0
-  const firstMonday = parseIso(rows[0].monday)
-  return differenceInCalendarDays(parseIso(iso), firstMonday) / 7
-}
-
-function rowToDate(row: number, rows: WeekRow[]): IsoDate {
-  if (rows.length === 0) return '' as IsoDate
-  const firstMonday = parseIso(rows[0].monday)
-  return toIso(addDays(firstMonday, Math.round(row * 7))) as IsoDate
-}
-
-function clampDate(iso: IsoDate, start: IsoDate, ende: IsoDate): IsoDate {
-  if (iso < start) return start
-  if (iso > ende) return ende
-  return iso
-}
-
-// ─── Component ──────────────────────────────────────────────────────────────
 
 export function AbwesenheitsSidebar({
-  planung,
-  onUpdate,
-  onTeamUpdate,
-  onNavigateToList,
-  hoveredTreffenDatum,
-  onAbwesenheitHover,
+  planung, onUpdate, onTeamUpdate, onNavigateToList, hoveredTreffenDatum, onAbwesenheitHover,
 }: AbwesenheitsSidebarProps) {
   const { team, abwesenheiten, zeitraum, treffen } = planung
 
-  const [addingMember, setAddingMember] = useState(false)
-  const [newMemberName, setNewMemberName] = useState('')
-  const addInputRef = useRef<HTMLInputElement>(null)
-  const [editingMemberId, setEditingMemberId] = useState<MitarbeiterId | null>(null)
-
-  const handleMemberEdit = useCallback(
-    (updated: Mitarbeiter) => {
-      if (!onTeamUpdate) return
-      onTeamUpdate(team.map((m) => (m.id === updated.id ? updated : m)))
-    },
-    [onTeamUpdate, team],
-  )
-
-  const handleMemberDelete = useCallback(
-    (id: MitarbeiterId) => {
-      if (!onTeamUpdate || team.length <= 1) return
-      onTeamUpdate(team.filter((m) => m.id !== id))
-      onUpdate(abwesenheiten.filter((a) => a.mitarbeiterId !== id))
-      setEditingMemberId(null)
-    },
-    [abwesenheiten, onTeamUpdate, onUpdate, team],
-  )
-
-  const handleAddMemberConfirm = useCallback(() => {
-    const name = newMemberName.trim()
-    if (!name || !onTeamUpdate) return
-    const newMember: Mitarbeiter = {
-      id: newId<MitarbeiterId>(),
-      name,
-      accentHue: ACCENT_HUE_SEQUENCE[team.length % ACCENT_HUE_SEQUENCE.length],
-    }
-    onTeamUpdate([...team, newMember])
-    setNewMemberName('')
-    setAddingMember(false)
-  }, [newMemberName, onTeamUpdate, team])
-
-  const weekRows = useMemo(
-    () => buildWeekRows(zeitraum.start, zeitraum.ende),
-    [zeitraum.start, zeitraum.ende],
-  )
-  const totalRows = weekRows.length
-
-  const [drag, setDrag] = useState<DragState | null>(null)
+  const weekRows = useMemo(() => buildWeekRows(zeitraum.start, zeitraum.ende), [zeitraum.start, zeitraum.ende])
   const membersAreaRef = useRef<HTMLDivElement>(null)
 
-  const yToRow = useCallback(
-    (clientY: number): number => {
-      if (!membersAreaRef.current || totalRows === 0) return 0
-      const rect = membersAreaRef.current.getBoundingClientRect()
-      const pct = (clientY - rect.top) / rect.height
-      return Math.max(0, Math.min(totalRows, pct * totalRows))
-    },
-    [totalRows],
-  )
-
-  // ── Pointer-capture-based drag ────────────────────────────────────────
-  // The element that handles pointerdown captures the pointer, so all
-  // subsequent pointermove/up events route to it (and bubble up to
-  // membersArea) regardless of where the cursor goes. JSX-bound handlers
-  // close over current props/state — no refs needed.
-
-  const handleColPointerDown = useCallback(
-    (memberId: MitarbeiterId, e: React.PointerEvent<HTMLDivElement>) => {
-      if (e.button !== 0) return
-      const target = e.target as HTMLElement
-      if (target.closest(`.${styles.absBlock}`) || target.closest('button')) return
-      e.preventDefault()
-      e.currentTarget.setPointerCapture(e.pointerId)
-      const row = yToRow(e.clientY)
-      setDrag({ kind: 'create', memberId, startRow: row, currentRow: row })
-    },
-    [yToRow],
-  )
-
-  const handleResizePointerDown = useCallback(
-    (absId: AbwesenheitId, edge: 'top' | 'bottom', e: React.PointerEvent<HTMLDivElement>) => {
-      if (e.button !== 0) return
-      e.preventDefault()
-      e.stopPropagation()
-      e.currentTarget.setPointerCapture(e.pointerId)
-      const row = yToRow(e.clientY)
-      setDrag({ kind: 'resize', absId, edge, startRow: row, currentRow: row })
-    },
-    [yToRow],
-  )
-
-  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (!drag) return
-    const row = yToRow(e.clientY)
-    setDrag((prev) => prev ? { ...prev, currentRow: row } : null)
-
-    if (drag.kind === 'create') {
-      const minRow = Math.min(drag.startRow, row)
-      const maxRow = Math.max(drag.startRow, row)
-      if (maxRow - minRow > 0.15) {
-        const von = clampDate(rowToDate(minRow, weekRows), zeitraum.start, zeitraum.ende)
-        const bis = clampDate(rowToDate(maxRow, weekRows), zeitraum.start, zeitraum.ende)
-        onAbwesenheitHover?.({ id: '' as AbwesenheitId, mitarbeiterId: drag.memberId, von, bis })
-      }
-    } else {
-      const target = abwesenheiten.find((a) => a.id === drag.absId)
-      if (target) {
-        const delta = row - drag.startRow
-        let von = target.von
-        let bis = target.bis
-        if (drag.edge === 'top') {
-          von = clampDate(rowToDate(dateToRow(target.von, weekRows) + delta, weekRows), zeitraum.start, zeitraum.ende)
-        } else {
-          bis = clampDate(rowToDate(dateToRow(target.bis, weekRows) + delta, weekRows), zeitraum.start, zeitraum.ende)
-        }
-        if (von < bis) onAbwesenheitHover?.({ ...target, von, bis })
-      }
-    }
-  }
-
-  const handlePointerUp = () => {
-    if (!drag) return
-
-    if (drag.kind === 'create') {
-      const minRow = Math.min(drag.startRow, drag.currentRow)
-      const maxRow = Math.max(drag.startRow, drag.currentRow)
-      if (maxRow - minRow > 0.3) {
-        const von = clampDate(rowToDate(minRow, weekRows), zeitraum.start, zeitraum.ende)
-        const bis = clampDate(rowToDate(maxRow, weekRows), zeitraum.start, zeitraum.ende)
-        if (von < bis) {
-          onUpdate([
-            ...abwesenheiten,
-            { id: newId<AbwesenheitId>(), mitarbeiterId: drag.memberId, von, bis },
-          ])
-        }
-      }
-    } else {
-      const target = abwesenheiten.find((a) => a.id === drag.absId)
-      if (target) {
-        const delta = drag.currentRow - drag.startRow
-        let newVon = target.von
-        let newBis = target.bis
-        if (drag.edge === 'top') {
-          newVon = clampDate(rowToDate(dateToRow(target.von, weekRows) + delta, weekRows), zeitraum.start, zeitraum.ende)
-        } else {
-          newBis = clampDate(rowToDate(dateToRow(target.bis, weekRows) + delta, weekRows), zeitraum.start, zeitraum.ende)
-        }
-        if (newVon < newBis) {
-          onUpdate(abwesenheiten.map((a) => a.id === drag.absId ? { ...a, von: newVon, bis: newBis } : a))
-        }
-      }
-    }
-
-    onAbwesenheitHover?.(null)
-    setDrag(null)
-  }
-
-  // Releases drag state if pointer capture is lost (e.g. captured element
-  // unmounts mid-drag, OS interruption). Without this, drag state could stick.
-  const handleLostPointerCapture = () => {
-    if (!drag) return
-    onAbwesenheitHover?.(null)
-    setDrag(null)
-  }
+  const drag = useAbwesenheitsDrag({
+    abwesenheiten, weekRows, zeitraum,
+    containerRef: membersAreaRef,
+    onUpdate, onAbwesenheitHover,
+  })
 
   const handleDelete = useCallback(
     (absId: AbwesenheitId) => {
@@ -280,6 +60,13 @@ export function AbwesenheitsSidebar({
       onUpdate(abwesenheiten.filter((a) => a.id !== absId))
     },
     [abwesenheiten, onUpdate, onAbwesenheitHover],
+  )
+
+  const handleAbsenceCleanup = useCallback(
+    (deletedMemberId: MitarbeiterId) => {
+      onUpdate(abwesenheiten.filter((a) => a.mitarbeiterId !== deletedMemberId))
+    },
+    [abwesenheiten, onUpdate],
   )
 
   const absentOnHoveredDate = useMemo(() => {
@@ -291,309 +78,31 @@ export function AbwesenheitsSidebar({
     )
   }, [abwesenheiten, hoveredTreffenDatum])
 
-  // ── Rendering ─────────────────────────────────────────────────────────
-
-  if (team.length === 0) {
-    return (
-      <div className={styles.root}>
-        <div className={styles.header}>
-          <span className={styles.headerLabel}>Abwesenheiten</span>
-        </div>
-        <div className={styles.emptyHint}>
-          Noch keine Teammitglieder vorhanden.
-        </div>
-      </div>
-    )
-  }
-
-  // ── Compute drag/resize date labels ───────────────────────────────────
-  // For create drags: show von–bis outside the selection
-  // For resize drags: show the moving edge's date outside the block
-  let dateTooltip: { topPct: number; bottomPct: number; vonLabel: string; bisLabel: string } | null = null
-
-  if (drag?.kind === 'create') {
-    const minRow = Math.min(drag.startRow, drag.currentRow)
-    const maxRow = Math.max(drag.startRow, drag.currentRow)
-    if (maxRow - minRow > 0.15) {
-      const von = clampDate(rowToDate(minRow, weekRows), zeitraum.start, zeitraum.ende)
-      const bis = clampDate(rowToDate(maxRow, weekRows), zeitraum.start, zeitraum.ende)
-      dateTooltip = {
-        topPct: (minRow / totalRows) * 100,
-        bottomPct: (maxRow / totalRows) * 100,
-        vonLabel: formatDateShort(von),
-        bisLabel: formatDateShort(bis),
-      }
-    }
-  } else if (drag?.kind === 'resize') {
-    const abs = abwesenheiten.find((a) => a.id === drag.absId)
-    if (abs) {
-      const delta = drag.currentRow - drag.startRow
-      let von = abs.von
-      let bis = abs.bis
-      if (drag.edge === 'top') {
-        von = clampDate(rowToDate(dateToRow(abs.von, weekRows) + delta, weekRows), zeitraum.start, zeitraum.ende)
-      } else {
-        bis = clampDate(rowToDate(dateToRow(abs.bis, weekRows) + delta, weekRows), zeitraum.start, zeitraum.ende)
-      }
-      if (von >= bis) { von = abs.von; bis = abs.bis }
-      dateTooltip = {
-        topPct: (dateToRow(von, weekRows) / totalRows) * 100,
-        bottomPct: (dateToRow(bis, weekRows) / totalRows) * 100,
-        vonLabel: formatDateShort(von),
-        bisLabel: formatDateShort(bis),
-      }
-    }
-  }
-
-  // Grid lines & month labels
-  const gridLines = weekRows.map((wr, ri) => ({
-    topPct: (ri / totalRows) * 100,
-    isMonthBorder: wr.isMonthBorder && ri > 0,
-  }))
-
-  const monthLabels = weekRows
-    .map((wr, ri) => wr.monthLabel ? { label: wr.monthLabel, topPct: (ri / totalRows) * 100 } : null)
-    .filter(Boolean) as { label: string; topPct: number }[]
-
-  // Treffen positions for diamond column
-  const treffenDiamonds = treffen
-    .map((t) => {
-      const row = dateToRow(t.datum, weekRows)
-      if (row < 0 || row > totalRows) return null
-      return { id: t.id, datum: t.datum, topPct: (row / totalRows) * 100 }
-    })
-    .filter(Boolean) as { id: string; datum: IsoDate; topPct: number }[]
-
-  // Drag selection preview for visual feedback
-  let dragPreview: { memberId: MitarbeiterId; topPct: number; heightPct: number } | null = null
-  if (drag?.kind === 'create') {
-    const minRow = Math.min(drag.startRow, drag.currentRow)
-    const maxRow = Math.max(drag.startRow, drag.currentRow)
-    dragPreview = {
-      memberId: drag.memberId,
-      topPct: (minRow / totalRows) * 100,
-      heightPct: ((maxRow - minRow) / totalRows) * 100,
-    }
-  }
+  if (team.length === 0) return <EmptyState />
 
   return (
     <div className={styles.root}>
       <div className={styles.header}>
         <span className={styles.headerLabel}>Abwesenheiten</span>
       </div>
-
-      {/* Avatar row — offset for month + treffen columns */}
-      <div className={styles.avatarRow}>
-        {team.map((m) => (
-          <div
-            key={m.id}
-            className={clsx(styles.avatarSlot, absentOnHoveredDate.has(m.id) && styles.highlighted)}
-          >
-            {onTeamUpdate ? (
-              <button
-                type="button"
-                className={styles.avatarBtn}
-                data-member-anchor={m.id}
-                onClick={() => setEditingMemberId((prev) => prev === m.id ? null : m.id)}
-                title={m.name}
-              >
-                <Avatar name={m.name} initials={m.initials} hue={m.accentHue} size={26} />
-                <span className={styles.avatarEditBadge} aria-hidden="true">
-                  <PencilSimple size={9} weight="bold" />
-                </span>
-              </button>
-            ) : (
-              <Avatar name={m.name} initials={m.initials} hue={m.accentHue} size={26} />
-            )}
-            {editingMemberId === m.id && onTeamUpdate && (
-              <MemberPopover
-                member={m}
-                canDelete={team.length > 1}
-                onSave={handleMemberEdit}
-                onDelete={() => handleMemberDelete(m.id)}
-                onClose={() => setEditingMemberId(null)}
-              />
-            )}
-          </div>
-        ))}
-        {/* Team member add */}
-        {onTeamUpdate && !addingMember && (
-          <div className={styles.avatarAddSlot}>
-            <IconButton
-              icon="plus"
-              size={12}
-              label="Teammitglied hinzufügen"
-              onClick={() => setAddingMember(true)}
-            />
-          </div>
-        )}
-        {addingMember && (
-          <div className={styles.avatarAddInput}>
-            <input
-              ref={addInputRef}
-              autoFocus
-              className={styles.memberInput}
-              value={newMemberName}
-              onChange={(e) => setNewMemberName(e.target.value)}
-              placeholder="Name"
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') handleAddMemberConfirm()
-                if (e.key === 'Escape') { setAddingMember(false); setNewMemberName('') }
-              }}
-              onBlur={() => {
-                if (!newMemberName.trim()) { setAddingMember(false); setNewMemberName('') }
-              }}
-            />
-            {newMemberName.trim() && (
-              <IconButton
-                icon="check"
-                size={11}
-                label="Bestätigen"
-                onClick={handleAddMemberConfirm}
-              />
-            )}
-          </div>
-        )}
-      </div>
-
-      {/* Timeline */}
-      <div className={styles.timeline}>
-        {/* Month label column */}
-        <div className={styles.monthCol}>
-          {monthLabels.map((ml, i) => (
-            <span key={i} className={styles.monthLabel} style={{ top: `${ml.topPct}%` }}>
-              {ml.label}
-            </span>
-          ))}
-        </div>
-
-        {/* Treffen diamond column */}
-        <div className={styles.treffenCol}>
-          {treffenDiamonds.map((td) => (
-            <div
-              key={td.id}
-              className={clsx(styles.diamond, hoveredTreffenDatum === td.datum && styles.diamondHighlighted)}
-              style={{ top: `${td.topPct}%` }}
-            />
-          ))}
-        </div>
-
-        {/* Members area */}
-        <div
-          className={styles.membersArea}
-          ref={membersAreaRef}
-          onPointerMove={handlePointerMove}
-          onPointerUp={handlePointerUp}
-          onLostPointerCapture={handleLostPointerCapture}
-        >
-          {/* Grid lines */}
-          <div className={styles.gridLines}>
-            {gridLines.map((gl, i) => (
-              <div
-                key={i}
-                className={clsx(styles.gridLine, gl.isMonthBorder && styles.monthBorder)}
-                style={{ top: `${gl.topPct}%` }}
-              />
-            ))}
-          </div>
-
-          {/* Member columns */}
-          {team.map((member) => (
-            <div
-              key={member.id}
-              className={styles.memberCol}
-              onPointerDown={(e) => handleColPointerDown(member.id, e)}
-            >
-              {/* Absence blocks */}
-              {abwesenheiten
-                .filter((a) => a.mitarbeiterId === member.id)
-                .map((abs) => {
-                  let von = abs.von
-                  let bis = abs.bis
-
-                  if (drag?.kind === 'resize' && drag.absId === abs.id) {
-                    const delta = drag.currentRow - drag.startRow
-                    if (drag.edge === 'top') {
-                      von = clampDate(rowToDate(dateToRow(abs.von, weekRows) + delta, weekRows), zeitraum.start, zeitraum.ende)
-                    } else {
-                      bis = clampDate(rowToDate(dateToRow(abs.bis, weekRows) + delta, weekRows), zeitraum.start, zeitraum.ende)
-                    }
-                    if (von >= bis) { von = abs.von; bis = abs.bis }
-                  }
-
-                  const topRow = dateToRow(von, weekRows)
-                  const bottomRow = dateToRow(bis, weekRows)
-                  const topPct = (topRow / totalRows) * 100
-                  const heightPct = ((bottomRow - topRow) / totalRows) * 100
-
-                  const isHighlighted = hoveredTreffenDatum
-                    ? von <= hoveredTreffenDatum && bis >= hoveredTreffenDatum
-                    : false
-
-                  const hue = member.accentHue ?? 0
-
-                  return (
-                    <div
-                      key={abs.id}
-                      className={clsx(styles.absBlock, isHighlighted && styles.highlighted)}
-                      style={{
-                        top: `${topPct}%`,
-                        height: `${Math.max(heightPct, 2)}%`,
-                        background: `hsl(${hue}, 55%, 78%)`,
-                      }}
-                      title={`${member.name}: ${formatDateShort(von)} – ${formatDateShort(bis)}`}
-                      onMouseEnter={() => onAbwesenheitHover?.(abs)}
-                      onMouseLeave={() => onAbwesenheitHover?.(null)}
-                    >
-                      <div
-                        className={`${styles.resizeHandle} ${styles.top}`}
-                        onPointerDown={(e) => handleResizePointerDown(abs.id, 'top', e)}
-                      />
-                      <div
-                        className={`${styles.resizeHandle} ${styles.bottom}`}
-                        onPointerDown={(e) => handleResizePointerDown(abs.id, 'bottom', e)}
-                      />
-                      <div className={styles.absDeleteBtn}>
-                        <IconButton
-                          icon="x"
-                          size={10}
-                          label="Entfernen"
-                          tone="danger"
-                          onClick={(e) => { e.stopPropagation(); handleDelete(abs.id) }}
-                          style={{ width: 14, height: 14, minWidth: 14, minHeight: 14 }}
-                        />
-                      </div>
-                    </div>
-                  )
-                })}
-
-              {/* Drag selection preview */}
-              {dragPreview && dragPreview.memberId === member.id && (
-                <div
-                  className={styles.dragSelection}
-                  style={{
-                    top: `${dragPreview.topPct}%`,
-                    height: `${Math.max(dragPreview.heightPct, 1)}%`,
-                  }}
-                />
-              )}
-            </div>
-          ))}
-        </div>
-
-        {/* Date labels — absolutely within timeline so they're never clipped by panel */}
-        {dateTooltip && (
-          <>
-            <div className={styles.dateLabel} style={{ top: `${dateTooltip.topPct}%` }}>
-              {dateTooltip.vonLabel}
-            </div>
-            <div className={styles.dateLabel} style={{ top: `${dateTooltip.bottomPct}%` }}>
-              {dateTooltip.bisLabel}
-            </div>
-          </>
-        )}
-      </div>
-
+      <AbwesenheitsAvatarRow
+        team={team}
+        absentOnHoveredDate={absentOnHoveredDate}
+        onTeamUpdate={onTeamUpdate}
+        onAbsenceCleanup={handleAbsenceCleanup}
+      />
+      <AbwesenheitsTimeline
+        team={team}
+        abwesenheiten={abwesenheiten}
+        treffen={treffen}
+        weekRows={weekRows}
+        zeitraum={zeitraum}
+        hoveredTreffenDatum={hoveredTreffenDatum}
+        drag={drag}
+        containerRef={membersAreaRef}
+        onDelete={handleDelete}
+        onHover={onAbwesenheitHover}
+      />
       {onNavigateToList && (
         <div className={styles.footer}>
           <Button variant="secondary" size="sm" fullWidth onClick={onNavigateToList}>
@@ -601,94 +110,6 @@ export function AbwesenheitsSidebar({
           </Button>
         </div>
       )}
-    </div>
-  )
-}
-
-// ─── MemberPopover ─────────────────────────────────────────────────────────
-
-type MemberPopoverProps = {
-  member: Mitarbeiter
-  canDelete: boolean
-  onSave: (m: Mitarbeiter) => void
-  onDelete: () => void
-  onClose: () => void
-}
-
-function MemberPopover({ member, canDelete, onSave, onDelete, onClose }: MemberPopoverProps) {
-  const ref = useRef<HTMLDivElement>(null)
-  const [name, setName] = useState(member.name)
-  const [hue, setHue] = useState<number>(member.accentHue ?? 0)
-
-  useEffect(() => {
-    function handleClick(e: MouseEvent) {
-      const target = e.target as HTMLElement
-      if (ref.current?.contains(target)) return
-      // Klick auf den eigenen Anker-Avatar nicht doppelt verarbeiten —
-      // dessen onClick toggelt das Popover bereits selbst.
-      if (target.closest(`[data-member-anchor="${member.id}"]`)) return
-      const trimmed = name.trim()
-      if (trimmed && (trimmed !== member.name || hue !== (member.accentHue ?? 0))) {
-        onSave({ ...member, name: trimmed, accentHue: hue })
-      }
-      onClose()
-    }
-    document.addEventListener('mousedown', handleClick)
-    return () => document.removeEventListener('mousedown', handleClick)
-  }, [name, hue, member, onSave, onClose])
-
-  function commit() {
-    const trimmed = name.trim()
-    if (!trimmed) {
-      onClose()
-      return
-    }
-    if (trimmed !== member.name || hue !== (member.accentHue ?? 0)) {
-      onSave({ ...member, name: trimmed, accentHue: hue })
-    }
-    onClose()
-  }
-
-  return (
-    <div ref={ref} className={styles.memberPopover} role="dialog" aria-label="Mitarbeiter bearbeiten">
-      <input
-        autoFocus
-        className={styles.memberPopoverInput}
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') commit()
-          if (e.key === 'Escape') onClose()
-        }}
-        placeholder="Name"
-      />
-      <div className={styles.memberPopoverHueRow}>
-        {ACCENT_HUE_SEQUENCE.map((h) => (
-          <button
-            key={h}
-            type="button"
-            className={clsx(styles.memberPopoverHueDot, hue === h && styles.memberPopoverHueDotActive)}
-            style={{ background: `hsl(${h}, 55%, 60%)` }}
-            onClick={() => setHue(h)}
-            aria-label={`Farbe ${h}°`}
-            aria-pressed={hue === h}
-          />
-        ))}
-      </div>
-      <div className={styles.memberPopoverFooter}>
-        <button
-          type="button"
-          className={styles.memberPopoverDelete}
-          onClick={onDelete}
-          disabled={!canDelete}
-          title={canDelete ? 'Mitarbeiter entfernen' : 'Mindestens ein Mitarbeiter muss bleiben'}
-        >
-          Entfernen
-        </button>
-        <button type="button" className={styles.memberPopoverSave} onClick={commit}>
-          Übernehmen
-        </button>
-      </div>
     </div>
   )
 }
