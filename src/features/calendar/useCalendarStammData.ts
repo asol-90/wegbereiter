@@ -9,7 +9,7 @@ import type { Planung, StammAktion, StammKontext, StammTreffen } from '@/domain/
 
 export function useCalendarStammData(
   planung: Planung | undefined,
-  kontexte: StammKontext[],
+  kontexte: readonly StammKontext[],
 ) {
   const stammAktionen = useMemo<StammAktion[]>(() => {
     if (!planung) return []

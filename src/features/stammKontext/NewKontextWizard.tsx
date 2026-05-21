@@ -71,7 +71,7 @@ export function NewKontextWizard({ open, onClose, initialZeitraum }: NewKontextW
 
   const addAktivitaet = useCallback(() => {
     const key = `${Date.now()}-${Math.random()}`
-    setAktivitaeten((prev) => [...prev, { _key: key, name: '', typ: 'spiel' }])
+    setAktivitaeten((prev) => [...prev, { _key: key, name: '', typ: 'spiel-sport' }])
   }, [])
   const updateAktivitaet = useCallback((key: string, patch: Partial<AktivitaetDraft>) => {
     setAktivitaeten((prev) => prev.map((a) => a._key === key ? { ...a, ...patch } : a))

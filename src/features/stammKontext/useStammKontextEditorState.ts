@@ -4,11 +4,17 @@
  * Keeps a draft copy in React state and debounces saves to the store so the
  * UI stays snappy while the DB write happens in the background.
  */
-import {newId, type AktivitaetId, type StammAktionId, type StammKontextId, type StammTreffenId} from '@/domain/ids'
-import type {IsoDate, StammAktion, StammBlock, StammKontext, StammTreffen,} from '@/domain/types'
-import {useCallback, useEffect, useRef, useState} from 'react'
-import {stammKontextStore} from './stammKontextStore'
-import {useStammKontext} from './useStammKontext'
+import type { StammKontextId } from '@/domain/ids'
+import type { StammBlock, StammKontext } from '@/domain/types'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { stammKontextStore } from './stammKontextStore'
+import { useStammKontext } from './useStammKontext'
+import {
+  useAktionActions,
+  useImportedAktivitaetActions,
+  useSaveAktion,
+  useTreffenActions,
+} from './useStammKontextEditorActions'
 
 const DEBOUNCE_MS = 500
 
@@ -46,8 +52,6 @@ export function useStammKontextEditorState(kontextId: StammKontextId) {
     [draft, save],
   )
 
-  // ── Thema ──
-
   const setThema = useCallback((thema: string) => patch({ thema }), [patch])
   const setThemaBeschreibung = useCallback(
     (v: string) => patch({ themaBeschreibung: v || undefined }),
@@ -62,8 +66,6 @@ export function useStammKontextEditorState(kontextId: StammKontextId) {
     [patch],
   )
 
-  // ── Stammzeit (default blocks) ──
-
   const setDefaultAnfangsBlock = useCallback(
     (blocks: StammBlock[]) => patch({ defaultAnfangsBlock: blocks }),
     [patch],
@@ -73,150 +75,27 @@ export function useStammKontextEditorState(kontextId: StammKontextId) {
     [patch],
   )
 
-  // ── Treffen ──
-
-  const addTreffen = useCallback(
-    (datum: IsoDate, dauerMin = 90) => {
-      if (!draft) return
-      const t: StammTreffen = { id: newId<StammTreffenId>(), datum, dauerMin }
-      const sorted = [...draft.treffen, t].sort((a, b) =>
-        a.datum.localeCompare(b.datum),
-      )
-      save({ ...draft, treffen: sorted })
-    },
-    [draft, save],
-  )
-
-  const updateTreffen = useCallback(
-    (id: StammTreffenId, partial: Partial<Omit<StammTreffen, 'id'>>) => {
-      if (!draft) return
-      const treffen = draft.treffen
-        .map((t) => (t.id === id ? { ...t, ...partial } : t))
-        .sort((a, b) => a.datum.localeCompare(b.datum))
-      save({ ...draft, treffen })
-    },
-    [draft, save],
-  )
-
-  const removeTreffen = useCallback(
-    (id: StammTreffenId) => {
-      if (!draft) return
-      save({ ...draft, treffen: draft.treffen.filter((t) => t.id !== id) })
-    },
-    [draft, save],
-  )
-
-  // ── Aktionen (all three groups share the same shape) ──
-
-  function makeAktionHelpers(
-    field: 'stammaktionen' | 'distriktAktionen' | 'regionalAktionen',
-  ) {
-    const addAktion = (beginn: IsoDate) => {
-      if (!draft) return
-      const a: StammAktion = {
-        id: newId<StammAktionId>(),
-        titel: '',
-        beginn,
-        ende: beginn,
-      }
-      save({ ...draft, [field]: [...draft[field], a] })
-    }
-
-    const updateAktion = (
-      id: StammAktionId,
-      partial: Partial<Omit<StammAktion, 'id'>>,
-    ) => {
-      if (!draft) return
-      save({
-        ...draft,
-        [field]: draft[field].map((a) =>
-          a.id === id ? { ...a, ...partial } : a,
-        ),
-      })
-    }
-
-    const removeAktion = (id: StammAktionId) => {
-      if (!draft) return
-      save({ ...draft, [field]: draft[field].filter((a) => a.id !== id) })
-    }
-
-    return { addAktion, updateAktion, removeAktion }
-  }
-
-  const stammAktionHelpers = makeAktionHelpers('stammaktionen')
-  const distriktAktionHelpers = makeAktionHelpers('distriktAktionen')
-  const regionalAktionHelpers = makeAktionHelpers('regionalAktionen')
-
-  // ── Treffen / Aktionen upsert helpers ──
-
-  const saveTreffen = useCallback(
-    (t: StammTreffen) => {
-      if (!draft) return
-      const exists = draft.treffen.some((x) => x.id === t.id)
-      const list = exists
-        ? draft.treffen.map((x) => (x.id === t.id ? t : x))
-        : [...draft.treffen, t]
-      save({ ...draft, treffen: list.sort((a, b) => a.datum.localeCompare(b.datum)) })
-    },
-    [draft, save],
-  )
-
-  const saveAktion = useCallback(
-    (a: StammAktion, gruppe: 'stammaktionen' | 'distriktAktionen' | 'regionalAktionen') => {
-      if (!draft) return
-      const list = draft[gruppe]
-      const exists = list.some((x) => x.id === a.id)
-      const updated = exists ? list.map((x) => (x.id === a.id ? a : x)) : [...list, a]
-      save({ ...draft, [gruppe]: updated })
-    },
-    [draft, save],
-  )
-
-  // ── Aktivitäten (stamm-import) ──
-
-  const addImportedAktivitaetId = useCallback(
-    (id: AktivitaetId) => {
-      if (!draft) return
-      if (draft.importierteAktivitaetIds.includes(id)) return
-      save({ ...draft, importierteAktivitaetIds: [...draft.importierteAktivitaetIds, id] })
-    },
-    [draft, save],
-  )
-
-  const removeImportedAktivitaetId = useCallback(
-    (id: AktivitaetId) => {
-      if (!draft) return
-      save({
-        ...draft,
-        importierteAktivitaetIds: draft.importierteAktivitaetIds.filter((x) => x !== id),
-      })
-    },
-    [draft, save],
-  )
+  const treffenActions = useTreffenActions(draft, save)
+  const stammAktionHelpers = useAktionActions(draft, save, 'stammaktionen')
+  const distriktAktionHelpers = useAktionActions(draft, save, 'distriktAktionen')
+  const regionalAktionHelpers = useAktionActions(draft, save, 'regionalAktionen')
+  const saveAktion = useSaveAktion(draft, save)
+  const aktivitaetActions = useImportedAktivitaetActions(draft, save)
 
   return {
     draft,
     patch,
-    // Thema
     setThema,
     setThemaBeschreibung,
     setBearbeitungsNotiz,
     setThemenTag,
-    // Stammzeit
     setDefaultAnfangsBlock,
     setDefaultEndBlock,
-    // Treffen
-    addTreffen,
-    updateTreffen,
-    removeTreffen,
-    saveTreffen,
-    // Aktionen
+    ...treffenActions,
     stamm: stammAktionHelpers,
     distrikt: distriktAktionHelpers,
     regional: regionalAktionHelpers,
     saveAktion,
-    // Aktivitäten
-    addImportedAktivitaetId,
-    removeImportedAktivitaetId,
+    ...aktivitaetActions,
   }
 }
