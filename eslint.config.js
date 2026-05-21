@@ -40,4 +40,11 @@ export default defineConfig([
       'max-lines': 'off',
     },
   },
+  {
+    files: ['src/dev/**'],
+    rules: {
+      'max-lines-per-function': 'off',
+      'max-lines': 'off',
+    },
+  },
 ])
