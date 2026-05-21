@@ -4,18 +4,18 @@
  * Shows existing Kontexte as clickable blocks. Drag to create a new Kontext.
  * A DropZone at the bottom accepts JSON import files.
  */
-import {parseIso} from '@/domain/dateUtils'
 import type {StammKontextId} from '@/domain/ids'
 import type {StammKontext} from '@/domain/types'
 import {DropZone} from '@/features/overview/DropZone'
 import {StammImportDialog} from '@/features/overview/StammImportDialog'
 import {Icon} from '@/ui/primitives/Icon'
 import clsx from '@/ui/utils/clsx'
-import {format} from 'date-fns'
-import {de} from 'date-fns/locale'
-import {useCallback, useMemo, useState} from 'react'
+import {useMemo} from 'react'
 import {useNavigate} from 'react-router-dom'
+import {KontextBlock} from './KontextBlock'
+import {kontextInYear, kontextRowSpan} from './kontextBlockHelpers'
 import styles from './KontextSidebar.module.css'
+import {useKontextDragSelect} from './useKontextDragSelect'
 import {useStammImport} from './useStammImport'
 import {useStammKontext} from './useStammKontext'
 
@@ -27,106 +27,40 @@ export type KontextSidebarProps = {
   onDragComplete: (start: string, ende: string) => void
 }
 
-function rowToPercent(row: number): number {
-  return (row / 24) * 100
-}
-
-function kontextInYear(k: StammKontext, year: number): boolean {
-  const prefix = `${year}`
-  return (
-    k.treffen.some((t) => t.datum.startsWith(prefix)) ||
-    k.stammaktionen.some((a) => a.beginn.startsWith(prefix) || a.ende.startsWith(prefix))
-  )
-}
-
-function kontextRowSpan(k: StammKontext, year: number): { top: number; bottom: number } | null {
-  const dates: string[] = []
-  for (const t of k.treffen) {
-    if (t.datum.startsWith(`${year}`)) dates.push(t.datum)
-  }
-  for (const a of k.stammaktionen) {
-    if (a.beginn.startsWith(`${year}`)) dates.push(a.beginn)
-    if (a.ende.startsWith(`${year}`)) dates.push(a.ende)
-  }
-  if (dates.length === 0) return null
-  dates.sort()
-  const first = dates[0]!
-  const last = dates[dates.length - 1]!
-  const firstMonth = parseInt(first.slice(5, 7), 10) - 1
-  const lastMonth = parseInt(last.slice(5, 7), 10) - 1
-  return {
-    top: firstMonth * 2,
-    bottom: (lastMonth + 1) * 2,
-  }
-}
-
-function formatKontextRange(k: StammKontext): string {
-  const allDates = [
-    ...k.treffen.map((t) => t.datum),
-    ...k.stammaktionen.map((a) => a.beginn),
-    ...k.stammaktionen.map((a) => a.ende),
-  ].sort()
-  if (allDates.length === 0) return ''
-  const first = parseIso(allDates[0]!)
-  const last = parseIso(allDates[allDates.length - 1]!)
-  return `${format(first, 'MMM yyyy', { locale: de })} – ${format(last, 'MMM yyyy', { locale: de })}`
+function rowIndexFromY(e: React.MouseEvent): number {
+  const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
+  const y = e.clientY - rect.top
+  return Math.floor((y / rect.height) * 24)
 }
 
 export function KontextSidebar({ displayYear, activeKontextId, onDragComplete }: KontextSidebarProps) {
   const { kontexte, remove } = useStammKontext()
   const navigate = useNavigate()
-  const { fileInputRef, parseError, pendingImport, handleFileDrop, handleFileInput, triggerFileSelect, handleConfirmImport, clearPendingImport, clearError } = useStammImport()
-
-  const [dragStart, setDragStart] = useState<number | null>(null)
-  const [dragEnd, setDragEnd] = useState<number | null>(null)
-  const isDragging = dragStart !== null && dragEnd !== null
+  const {
+    fileInputRef, parseError, pendingImport,
+    handleFileDrop, handleFileInput, triggerFileSelect,
+    handleConfirmImport, clearPendingImport, clearError,
+  } = useStammImport()
+  const {
+    dragStart, dragSelection, isDragging,
+    handleMouseDown, handleMouseMove, handleMouseUp, reset,
+  } = useKontextDragSelect({ displayYear, onDragComplete })
 
   const yearKontexte = useMemo(
     () => kontexte.filter((k) => kontextInYear(k, displayYear)),
     [kontexte, displayYear],
   )
 
-  const rows = useMemo(() => {
-    return Array.from({ length: 24 }, (_, i) => ({
-      index: i,
-      isMonthStart: i % 2 === 0,
-    }))
-  }, [])
+  const rows = useMemo(
+    () => Array.from({ length: 24 }, (_, i) => ({ index: i, isMonthStart: i % 2 === 0 })),
+    [],
+  )
 
   const kontextBlocks = useMemo(() => {
-    return yearKontexte.map((k) => {
-      const span = kontextRowSpan(k, displayYear)
-      return { kontext: k, span }
-    }).filter((x): x is { kontext: StammKontext; span: { top: number; bottom: number } } => x.span !== null)
+    return yearKontexte
+      .map((k) => ({ kontext: k, span: kontextRowSpan(k, displayYear) }))
+      .filter((x): x is { kontext: StammKontext; span: { top: number; bottom: number } } => x.span !== null)
   }, [yearKontexte, displayYear])
-
-  const dragSelection = useMemo(() => {
-    if (dragStart === null || dragEnd === null) return null
-    const min = Math.min(dragStart, dragEnd)
-    const max = Math.max(dragStart, dragEnd)
-    return {
-      top: rowToPercent(min),
-      height: rowToPercent(max + 1) - rowToPercent(min),
-    }
-  }, [dragStart, dragEnd])
-
-  const handleMouseUp = useCallback(() => {
-    if (dragStart !== null && dragEnd !== null) {
-      const minRow = Math.min(dragStart, dragEnd)
-      const maxRow = Math.max(dragStart, dragEnd)
-      const startMonth = Math.floor(minRow / 2)
-      const endMonth = Math.floor(maxRow / 2)
-      if (endMonth >= startMonth) {
-        const startDay = minRow % 2 === 0 ? '01' : '15'
-        const endDay = maxRow % 2 === 0 ? '15' : new Date(displayYear, endMonth + 1, 0).getDate().toString().padStart(2, '0')
-        const start = `${displayYear}-${(startMonth + 1).toString().padStart(2, '0')}-${startDay}`
-        const ende = `${displayYear}-${(endMonth + 1).toString().padStart(2, '0')}-${endDay}`
-        onDragComplete(start, ende)
-      }
-    }
-    setDragStart(null)
-    setDragEnd(null)
-  }, [dragStart, dragEnd, displayYear, onDragComplete])
 
   return (
     <div className={styles.root}>
@@ -147,12 +81,7 @@ export function KontextSidebar({ displayYear, activeKontextId, onDragComplete }:
       <div
         className={styles.timeline}
         onMouseUp={handleMouseUp}
-        onMouseLeave={() => {
-          if (isDragging) {
-            setDragStart(null)
-            setDragEnd(null)
-          }
-        }}
+        onMouseLeave={() => { if (isDragging) reset() }}
       >
         {Array.from({ length: 12 }, (_, m) => (
           <div
@@ -176,62 +105,28 @@ export function KontextSidebar({ displayYear, activeKontextId, onDragComplete }:
           className={styles.kontextCol}
           style={{ gridRow: '1 / -1', gridColumn: 2 }}
           onMouseDown={(e) => {
-            const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
-            const y = e.clientY - rect.top
-            const rowIndex = Math.floor((y / rect.height) * 24)
             if ((e.target as HTMLElement).closest(`.${styles.kontextBlock}`)) return
             e.preventDefault()
-            setDragStart(Math.max(0, Math.min(23, rowIndex)))
-            setDragEnd(Math.max(0, Math.min(23, rowIndex)))
+            handleMouseDown(rowIndexFromY(e))
           }}
           onMouseMove={(e) => {
             if (dragStart === null) return
-            const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
-            const y = e.clientY - rect.top
-            const rowIndex = Math.floor((y / rect.height) * 24)
-            setDragEnd(Math.max(0, Math.min(23, rowIndex)))
+            handleMouseMove(rowIndexFromY(e))
           }}
         >
-          {kontextBlocks.map(({ kontext: k, span }) => {
-            const topPct = rowToPercent(span.top)
-            const heightPct = rowToPercent(span.bottom) - topPct
-            const isActive = activeKontextId === k.id
-            const topRound = span.top > 0
-            const bottomRound = span.bottom < 24
-
-            return (
-              <div
-                key={k.id}
-                className={clsx(
-                  styles.kontextBlock,
-                  isActive && styles.active,
-                  topRound && bottomRound && styles.roundedBoth,
-                  topRound && !bottomRound && styles.roundedTop,
-                  !topRound && bottomRound && styles.roundedBottom,
-                  !topRound && !bottomRound && styles.middle,
-                )}
-                style={{ top: `${topPct}%`, height: `${Math.max(heightPct, 4)}%` }}
-                onClick={() => navigate(`/stammkontext/${k.id}`)}
-              >
-                <span className={styles.kontextName}>{k.thema || '(ohne Thema)'}</span>
-                <span className={styles.kontextRange}>{formatKontextRange(k)}</span>
-                <button
-                  type="button"
-                  className={styles.kontextDeleteBtn}
-                  title="Stammkontext löschen"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    if (window.confirm('Stammkontext wirklich löschen?')) {
-                      void remove(k.id)
-                      if (activeKontextId === k.id) navigate('/stammkontext')
-                    }
-                  }}
-                >
-                  <Icon name="trash" size={11} />
-                </button>
-              </div>
-            )
-          })}
+          {kontextBlocks.map(({ kontext: k, span }) => (
+            <KontextBlock
+              key={k.id}
+              kontext={k}
+              span={span}
+              isActive={activeKontextId === k.id}
+              onOpen={() => navigate(`/stammkontext/${k.id}`)}
+              onDelete={() => {
+                void remove(k.id)
+                if (activeKontextId === k.id) navigate('/stammkontext')
+              }}
+            />
+          ))}
 
           {dragSelection && (
             <div
