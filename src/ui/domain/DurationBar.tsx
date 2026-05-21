@@ -33,6 +33,39 @@ export type DurationBarProps = {
   className?: string
 }
 
+type DurationState = {
+  fillPct: number
+  stammPct: number
+  inTarget: boolean
+  tone: 'ok' | 'warn' | 'err'
+  ariaText: string
+  over: boolean
+  overBy: number
+}
+
+function computeDurationState(
+  ist: number,
+  verfuegbar: number,
+  targetRange: [number, number],
+  stammMin: number,
+): DurationState {
+  const ratio = verfuegbar > 0 ? ist / verfuegbar : 0
+  const over = ratio > 1
+  const [targetMin, targetMax] = targetRange
+  const inTarget = !over && ratio >= targetMin && ratio <= targetMax
+  const tone: DurationState['tone'] = over ? 'err' : inTarget ? 'ok' : 'warn'
+  const status = over ? 'überschritten' : inTarget ? 'im Zielbereich' : 'außerhalb Zielbereich'
+  return {
+    fillPct: Math.min(100, ratio * 100),
+    stammPct: verfuegbar > 0 ? Math.min(100, (stammMin / verfuegbar) * 100) : 0,
+    inTarget,
+    tone,
+    ariaText: `${status}: ${ist}/${verfuegbar} min`,
+    over,
+    overBy: ist - verfuegbar,
+  }
+}
+
 export function DurationBar({
   ist,
   verfuegbar,
@@ -42,16 +75,11 @@ export function DurationBar({
   showLabel,
   className,
 }: DurationBarProps) {
-  const ratio = verfuegbar > 0 ? ist / verfuegbar : 0
-  const clampedPct = Math.min(100, ratio * 100)
-  const stammPct = verfuegbar > 0 ? Math.min(100, (stammMin / verfuegbar) * 100) : 0
-  const over = ratio > 1
+  const state = computeDurationState(ist, verfuegbar, targetRange, stammMin)
   const [targetMin, targetMax] = targetRange
-  const inTarget = !over && ratio >= targetMin && ratio <= targetMax
-  const tone = over ? 'err' : inTarget ? 'ok' : 'warn'
 
   return (
-    <div className={clsx(styles.wrap, styles[`t-${tone}`], className)}>
+    <div className={clsx(styles.wrap, styles[`t-${state.tone}`], className)}>
       <div
         className={styles.track}
         style={{ height }}
@@ -59,30 +87,24 @@ export function DurationBar({
         aria-valuenow={ist}
         aria-valuemin={0}
         aria-valuemax={verfuegbar}
-        aria-valuetext={
-          over
-            ? `überschritten: ${ist}/${verfuegbar} min`
-            : inTarget
-              ? `im Zielbereich: ${ist}/${verfuegbar} min`
-              : `außerhalb Zielbereich: ${ist}/${verfuegbar} min`
-        }
+        aria-valuetext={state.ariaText}
       >
         {stammMin > 0 && (
           <div
             className={styles.stammFill}
-            style={{ width: `${stammPct}%` }}
+            style={{ width: `${state.stammPct}%` }}
             aria-hidden
           />
         )}
         <div
-          className={clsx(styles.targetBand, inTarget && styles.targetBandHit)}
+          className={clsx(styles.targetBand, state.inTarget && styles.targetBandHit)}
           style={{
             left: `${targetMin * 100}%`,
             width: `${(targetMax - targetMin) * 100}%`,
           }}
           aria-hidden
         />
-        <div className={styles.fill} style={{ width: `${clampedPct}%` }} />
+        <div className={styles.fill} style={{ width: `${state.fillPct}%` }} />
       </div>
       {showLabel && (
         <div className={styles.label}>
@@ -90,11 +112,8 @@ export function DurationBar({
           {stammMin > 0 && (
             <span className={styles.labelStamm}> · {stammMin} Stamm</span>
           )}
-          {over && (
-            <span className={styles.labelOver}>
-              {' '}
-              · +{ist - verfuegbar} min
-            </span>
+          {state.over && (
+            <span className={styles.labelOver}> · +{state.overBy} min</span>
           )}
         </div>
       )}

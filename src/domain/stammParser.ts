@@ -286,36 +286,43 @@ export type StammParseResult = {
   aktivitaeten: Aktivitaet[]
 }
 
-/**
- * Parse a raw JSON string into a StammKontext + imported Aktivitäten.
- *
- * Throws StammParseError with a human-readable German message on validation failure.
- */
-export function parseStammDatei(jsonString: string): StammParseResult {
+/** Parse a generic list field with a per-item parser. Returns [] if field missing. */
+function parseList<TIn, TOut>(
+  raw: unknown,
+  field: string,
+  parseItem: (item: TIn, index: number) => TOut,
+): TOut[] {
+  if (raw === undefined) return []
+  assertArray(raw, field)
+  return (raw as TIn[]).map((item, i) => parseItem(item, i))
+}
+
+type ValidatedRoot = RawStammFile & { bearbeitetAm: string; thema: string }
+
+function parseRoot(jsonString: string): ValidatedRoot {
   let raw: RawStammFile
   try {
     raw = JSON.parse(jsonString) as RawStammFile
   } catch {
     throw new StammParseError('Die Datei enthält kein gültiges JSON.')
   }
-
   if (typeof raw !== 'object' || raw === null)
     throw new StammParseError('Die Datei muss ein JSON-Objekt enthalten.')
-
-  // ─── Type check ───
   if (raw.typ !== 'stammkontext')
-    throw new StammParseError(
-      'Unbekannter Dateityp. Erwartet: "stammkontext".',
-      'typ',
-    )
-
-  // ─── Meta ───
+    throw new StammParseError('Unbekannter Dateityp. Erwartet: "stammkontext".', 'typ')
   assertIsoDateTime(raw.bearbeitetAm, 'bearbeitetAm')
-
-  // ─── Thema ───
   assertString(raw.thema, 'thema')
+  return raw as ValidatedRoot
+}
 
-  // ─── Default blocks ───
+/**
+ * Parse a raw JSON string into a StammKontext + imported Aktivitäten.
+ *
+ * Throws StammParseError with a human-readable German message on validation failure.
+ */
+export function parseStammDatei(jsonString: string): StammParseResult {
+  const raw = parseRoot(jsonString)
+
   const defaultAnfangsBlock = raw.defaultAnfangsBlock !== undefined
     ? parseBlockList(raw.defaultAnfangsBlock, 'defaultAnfangsBlock')
     : []
@@ -323,41 +330,10 @@ export function parseStammDatei(jsonString: string): StammParseResult {
     ? parseBlockList(raw.defaultEndBlock, 'defaultEndBlock')
     : []
 
-  // ─── Treffen ───
-  const treffen: StammTreffen[] = []
-  if (raw.treffen !== undefined) {
-    assertArray(raw.treffen, 'treffen')
-    for (let i = 0; i < (raw.treffen as unknown[]).length; i++) {
-      treffen.push(parseTreffen((raw.treffen as RawTreffen[])[i], i))
-    }
-  }
-
-  // ─── Stammaktionen ───
-  const stammaktionen: StammAktion[] = []
-  if (raw.stammaktionen !== undefined) {
-    assertArray(raw.stammaktionen, 'stammaktionen')
-    for (let i = 0; i < (raw.stammaktionen as unknown[]).length; i++) {
-      stammaktionen.push(parseAktion((raw.stammaktionen as RawAktion[])[i], i))
-    }
-  }
-
-  // ─── DistriktAktionen ───
-  const distriktAktionen: StammAktion[] = []
-  if (raw.distriktAktionen !== undefined) {
-    assertArray(raw.distriktAktionen, 'distriktAktionen')
-    for (let i = 0; i < (raw.distriktAktionen as unknown[]).length; i++) {
-      distriktAktionen.push(parseAktion((raw.distriktAktionen as RawAktion[])[i], i))
-    }
-  }
-
-  // ─── RegionalAktionen ───
-  const regionalAktionen: StammAktion[] = []
-  if (raw.regionalAktionen !== undefined) {
-    assertArray(raw.regionalAktionen, 'regionalAktionen')
-    for (let i = 0; i < (raw.regionalAktionen as unknown[]).length; i++) {
-      regionalAktionen.push(parseAktion((raw.regionalAktionen as RawAktion[])[i], i))
-    }
-  }
+  const treffen = parseList<RawTreffen, StammTreffen>(raw.treffen, 'treffen', parseTreffen)
+  const stammaktionen = parseList<RawAktion, StammAktion>(raw.stammaktionen, 'stammaktionen', parseAktion)
+  const distriktAktionen = parseList<RawAktion, StammAktion>(raw.distriktAktionen, 'distriktAktionen', parseAktion)
+  const regionalAktionen = parseList<RawAktion, StammAktion>(raw.regionalAktionen, 'regionalAktionen', parseAktion)
 
   if (treffen.length === 0 && stammaktionen.length === 0) {
     throw new StammParseError(
@@ -365,23 +341,13 @@ export function parseStammDatei(jsonString: string): StammParseResult {
     )
   }
 
-  // ─── Imported activities ───
   const stammImportId = newId<StammImportId>()
   const themenTag = typeof raw.themenTag === 'string' ? raw.themenTag : undefined
-  const aktivitaeten: Aktivitaet[] = []
-  if (raw.aktivitaeten !== undefined) {
-    assertArray(raw.aktivitaeten, 'aktivitaeten')
-    for (let i = 0; i < (raw.aktivitaeten as unknown[]).length; i++) {
-      aktivitaeten.push(
-        parseImportAktivitaet(
-          (raw.aktivitaeten as RawAktivitaet[])[i],
-          i,
-          stammImportId,
-          themenTag,
-        ),
-      )
-    }
-  }
+  const aktivitaeten = parseList<RawAktivitaet, Aktivitaet>(
+    raw.aktivitaeten,
+    'aktivitaeten',
+    (item, i) => parseImportAktivitaet(item, i, stammImportId, themenTag),
+  )
 
   const kontext: StammKontext = {
     id: newId<StammKontextId>(),
