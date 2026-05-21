@@ -92,7 +92,7 @@ function serializeAktivitaet(a: Aktivitaet): RawAktivitaet {
 
 export function serializeStammKontext(
   kontext: StammKontext,
-  aktivitaeten: Aktivitaet[],
+  aktivitaeten: readonly Aktivitaet[],
 ): string {
   const raw: RawStammFile = {
     typ: 'stammkontext',
@@ -132,7 +132,7 @@ export function serializeStammKontext(
 
 export function downloadStammKontext(
   kontext: StammKontext,
-  aktivitaeten: Aktivitaet[],
+  aktivitaeten: readonly Aktivitaet[],
 ): void {
   const json = serializeStammKontext(kontext, aktivitaeten)
   const blob = new Blob([json], { type: 'application/json' })
