@@ -8,22 +8,19 @@
  */
 import {isoToday} from '@/domain/dateUtils'
 import type {PlanungId} from '@/domain/ids'
-import {checkOverlap, clipKontext} from '@/domain/stammOverlap'
-import {detectFileType, parseStammDatei, StammParseError} from '@/domain/stammParser'
-import type {Aktivitaet, Planung, StammKontext} from '@/domain/types'
+import type {Planung, StammKontext} from '@/domain/types'
 import {usePlanungen} from '@/features/planungen'
-import {repertoireStore} from '@/features/repertoire/repertoireStore'
-import {useStammKontext, useStammKontextActions} from '@/features/stammKontext'
-import {ContextMenu, type MenuItem} from '@/ui/primitives'
-import {Icon} from '@/ui/primitives/Icon'
-import {useCallback, useMemo, useRef, useState} from 'react'
+import {useStammKontext} from '@/features/stammKontext'
+import {useMemo, useRef, useState} from 'react'
 import {useNavigate} from 'react-router-dom'
 import {DropZone} from './DropZone'
 import {NewPlanungWizard} from './NewPlanungWizard'
 import {PlanungsCard} from './PlanungsCard'
+import {PlanungslisteHeader} from './PlanungslisteHeader'
 import styles from './Planungsliste.module.css'
 import {StammImportDialog} from './StammImportDialog'
 import {StammKontextCard} from './StammKontextCard'
+import {useStammKontextImport} from './useStammKontextImport'
 
 export type PlanungslisteProps = {
   /** Year currently displayed in the Jahreskalender. */
@@ -75,7 +72,6 @@ export function Planungsliste({
   const { kontexte } = useStammKontext()
   const today = isoToday()
 
-  // Filter by displayed year
   const yearPlanungen = useMemo(
     () => planungen.filter((p) => planungInYear(p, displayYear)),
     [planungen, displayYear],
@@ -84,137 +80,24 @@ export function Planungsliste({
     () => kontexte.filter((k) => kontextInYear(k, displayYear)),
     [kontexte, displayYear],
   )
-  const stammActions = useStammKontextActions()
+
   const [dialogOpen, setDialogOpen] = useState(false)
-  const [menuOpen, setMenuOpen] = useState(false)
-  const [menuAnchor, setMenuAnchor] = useState<{ x: number; y: number } | null>(null)
   const navigate = useNavigate()
-
-  // Import state
-  const [parseError, setParseError] = useState<string | null>(null)
-  const [pendingImport, setPendingImport] = useState<{
-    kontext: StammKontext
-    aktivitaeten: Aktivitaet[]
-  } | null>(null)
-
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const handleFileDrop = useCallback((content: string, _fileName: string) => {
-    setParseError(null)
-    const fileType = detectFileType(content)
-    if (fileType === 'stammkontext') {
-      try {
-        const result = parseStammDatei(content)
-        setPendingImport(result)
-      } catch (e) {
-        setParseError(
-          e instanceof StammParseError
-            ? e.message
-            : 'Die Datei konnte nicht gelesen werden.',
-        )
-      }
-    } else {
-      setParseError('Unbekanntes Dateiformat. Erwartet: Stammkontext-JSON.')
-    }
-  }, [setParseError, setPendingImport])
-
-  const handleFileInput = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0]
-      if (!file) return
-      const reader = new FileReader()
-      reader.onload = () => {
-        if (typeof reader.result === 'string') {
-          handleFileDrop(reader.result, file.name)
-        }
-      }
-      reader.readAsText(file)
-      // Reset input so the same file can be selected again
-      e.target.value = ''
-    },
-    [handleFileDrop],
-  )
-
-  const handleConfirmImport = useCallback(async () => {
-    if (!pendingImport) return
-    const { kontext: incoming, aktivitaeten: incomingAktivitaeten } = pendingImport
-
-    for (const existing of kontexte) {
-      const result = checkOverlap(existing, incoming)
-      if (result.kind === 'overlap') {
-        const clipped = clipKontext(existing, result.overlapStart)
-        if (clipped) {
-          await stammActions.update(clipped)
-        } else {
-          await stammActions.remove(existing.id)
-        }
-      }
-    }
-
-    await stammActions.importKontext(incoming)
-
-    for (const a of incomingAktivitaeten) {
-      await repertoireStore.saveAktivitaet(a)
-    }
-
-    setPendingImport(null)
-  }, [pendingImport, kontexte, stammActions, setPendingImport])
-
-  const menuItems: MenuItem[] = [
-    {
-      id: 'planung',
-      label: 'Neue Planung',
-      icon: 'plus',
-      onSelect: () => setDialogOpen(true),
-    },
-    {
-      id: 'kontext',
-      label: 'Kontext laden',
-      icon: 'upload',
-      onSelect: () => fileInputRef.current?.click(),
-    },
-  ]
+  const {
+    parseError, setParseError, pendingImport, setPendingImport,
+    handleFileDrop, handleFileInput, handleConfirmImport,
+  } = useStammKontextImport()
 
   return (
     <DropZone onFileDrop={handleFileDrop}>
       <div className={styles.root}>
-        <div className={styles.header}>
-          <span className={styles.sectionLabel}>Planungen & Kontext</span>
-          <div className={styles.headerActions}>
-            <div className={styles.splitBtn}>
-              <button
-                type="button"
-                className={styles.splitMain}
-                onClick={() => setDialogOpen(true)}
-              >
-                <Icon name="plus" size={12} />
-                <span>Neu</span>
-              </button>
-              <button
-                type="button"
-                className={styles.splitChevron}
-                onClick={(e) => {
-                  const rect = (e.currentTarget as HTMLElement).getBoundingClientRect()
-                  setMenuAnchor({ x: rect.right, y: rect.bottom + 4 })
-                  setMenuOpen((prev) => !prev)
-                }}
-                aria-label="Weitere Optionen"
-              >
-                <Icon name="chevron-down" size={12} />
-              </button>
-            </div>
-            {menuOpen && menuAnchor && (
-              <ContextMenu
-                open={menuOpen}
-                sections={[{ id: 'main', items: menuItems }]}
-                position={menuAnchor}
-                onClose={() => setMenuOpen(false)}
-              />
-            )}
-          </div>
-        </div>
+        <PlanungslisteHeader
+          onNewPlanung={() => setDialogOpen(true)}
+          onLoadKontext={() => fileInputRef.current?.click()}
+        />
 
-        {/* StammKontext cards (filtered by year) */}
         {yearKontexte.length > 0 && (
           <div className={styles.kontextSection}>
             {yearKontexte.map((k) => (
@@ -227,7 +110,6 @@ export function Planungsliste({
           </div>
         )}
 
-        {/* Parse error banner */}
         {parseError && (
           <div className={styles.error}>
             <span>{parseError}</span>
@@ -267,7 +149,6 @@ export function Planungsliste({
             ))}
         </div>
 
-        {/* Hidden file input for "Kontext laden" menu action */}
         <input
           ref={fileInputRef}
           type="file"
@@ -276,7 +157,6 @@ export function Planungsliste({
           style={{ display: 'none' }}
         />
 
-        {/* Import preview dialog */}
         {pendingImport && (
           <StammImportDialog
             open
