@@ -95,10 +95,6 @@ Zwei Komponenten: Kontextleiste für Kalender-/Listenansicht und überarbeitete 
 ### Phase 12 — Repertoire überarbeiten
 SegmentedControl mit 4 Bereichen: Aktivitäten (allg.), Pfadfindertechnik (mit Subkategorie-Überschriften), Andachtsreihen (Reihe vs. Sammlung), Abzeichen (read-only Katalog). Datenmodell erweitert um `Andachtsreihe` (art/buchquelle) + `AndachtsEinheit` (kapitelSeite) + `Planung.andachtsreihenZuordnung`. RepertoireStore um andachtsreihen + abzeichen ergänzt. Aktivitäten-Detail um Quell-Filter, Temp-Banner, Stufenbezug und Verwendungs-Anzeige erweitert.
 
----
-
-## Offene Phasen
-
 ### Phase 13 — Ablauf-Korrekturen
 
 Verschiedene Fehler und Inkonsistenzen im bestehenden Ablauf korrigieren:
@@ -132,8 +128,6 @@ Verschiedene Fehler und Inkonsistenzen im bestehenden Ablauf korrigieren:
   - braucht oberhalb der Avatare etwas mehr Luft. Auch der erste Monatsname ist halb abgeschnitten
   - rechts von den Avataren: Möglichkeit, nachträglich Teammitglieder hinzuzufügen. Avatare etwas größer.
   - unterhalb der Liste einen Button: weiter zur Detailplanung
-
----
 
 ### Phase 14 — Header und Legende
 
@@ -169,13 +163,14 @@ Die Farbzuordnung hilft später bei der visuellen Zuordnung im Kalender: Denim-B
 
 **Kalender-Darstellung**: Termine aus Distrikt und Region werden über den Stammkontext importiert, aber in ihrer eigenen Farbe (Denim-Blau) im Kalender angezeigt — visuell getrennt von Stamm-Treffen (Waldgrün) und eigener Planung (Lila).
 
----
 
 ### Phase 15 — Export
 
 PDF-Export der Planung (Treffenliste mit Programmpunkten, WB-Übersicht, Stammkontext-Zusammenfassung). iCal-Export (Treffen als Kalender-Einträge). Details bei Umsetzung zu klären.
 
 ---
+
+## Offene Phasen
 
 ### Phase 16 — Raster
 

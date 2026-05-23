@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Repertoire — Tabelle</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue',Arial,sans-serif;background:#faf8f3;padding:24px}
+
+.page{max-width:720px;margin:0 auto}
+
+/* ─── Tab-Leiste ─── */
+.tab-row{display:flex;align-items:center;padding-bottom:16px}
+.seg-group{display:flex;align-items:center;background:#f5f3ee;border-radius:999px;padding:3px 4px;gap:2px}
+.seg-inactive,.seg-active{padding:8px 20px;font-size:13px;color:#888780;background:transparent;border:none;border-radius:999px;cursor:pointer;font-family:inherit;white-space:nowrap;outline:none}
+.seg-active{background:#ffffff;color:#1a1a1a;font-weight:500;box-shadow:0 1px 3px rgba(0,0,0,0.1),0 .5px 1px rgba(0,0,0,0.06)}
+.seg-inactive:hover{color:#5f5e5a}
+.spacer{flex:1}
+.temp-wrap{position:relative;display:inline-flex;align-items:center;cursor:pointer}
+.temp-icon{font-size:18px;color:#888780}
+.temp-badge{position:absolute;top:-4px;right:-8px;min-width:15px;height:15px;padding:0 4px;font-size:9px;font-weight:500;color:#854f0b;background:#faeeda;border-radius:999px;display:inline-flex;align-items:center;justify-content:center}
+
+/* ─── Suche ─── */
+.search-row{display:flex;align-items:center;gap:8px;padding:0 0 12px;margin-bottom:8px}
+.search-input{flex:1;border:none;outline:none;font-size:13px;color:#1a1a1a;font-family:inherit;background:transparent;padding:4px 0}
+.search-input::placeholder{color:#888780}
+.search-icon{color:#888780;font-size:15px}
+
+/* ─── Gruppen ─── */
+.group{margin-bottom:8px}
+.group-header{display:flex;align-items:center;gap:9px;padding:11px 0;cursor:pointer;user-select:none}
+.group-header:hover{opacity:0.8}
+.chevron{font-size:13px;color:#888780;transition:transform 150ms ease}
+.chevron.open{transform:rotate(90deg)}
+.group-icon{font-size:17px;color:#5f5e5a}
+.group-label{font-size:14px;color:#1a1a1a;font-weight:500;flex:1}
+.group-count{font-size:11px;color:#888780;background:#f5f3ee;border-radius:999px;padding:2px 8px}
+
+/* ─── Tabelle ─── */
+.table-card{background:#ffffff;border-radius:10px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,0.06),0 0.5px 1px rgba(0,0,0,0.04);margin:0 12px 4px}
+.table{width:100%;border-collapse:collapse;table-layout:fixed}
+.col-src{width:28px}
+.col-name{width:38%}
+.col-int{width:22%}
+.col-stufe{width:44px}
+.col-wb{width:48px}
+.col-time{width:72px}
+
+.table-head th{font-size:10px;color:#888780;font-weight:400;text-align:left;padding:6px 10px;text-transform:uppercase;letter-spacing:0.04em;background:#faf8f3;border-bottom:0.5px solid rgba(0,0,0,0.06);cursor:pointer;user-select:none}
+.table-head th:hover{color:#5f5e5a}
+.table-head th.r{text-align:right}
+.table-head th.c{text-align:center}
+.table-head th.no-sort{cursor:default}
+.table-head th.no-sort:hover{color:#888780}
+.sort-arrow{font-size:8px;margin-left:2px;opacity:0.5}
+
+.tr td{font-size:13px;color:#1a1a1a;padding:8px 10px;border-bottom:0.5px solid rgba(0,0,0,0.04);vertical-align:middle}
+.tr:last-child td{border-bottom:none}
+.tr:hover td{background:rgba(0,0,0,0.015)}
+.tr.selected td{background:rgba(60,52,137,0.06)}
+.src-cell{text-align:center;color:#888780;font-size:13px;opacity:0.5}
+.int-cell{color:#888780;font-size:12px}
+.stufe-cell{text-align:center}
+.time-cell{text-align:right;color:#888780;font-size:12px}
+.stufe{font-size:10px;color:#5f5e5a;background:#f5f3ee;border-radius:4px;padding:2px 5px;white-space:nowrap}
+
+/* ─── WB-Segmente (kompakt, in Zeilen) ─── */
+.wb-segs{display:flex;gap:2px;justify-content:center}
+.wb-col{display:flex;flex-direction:column-reverse;gap:1px;width:7px}
+.wb-block{width:7px;height:3px;border-radius:1px}
+.wb-empty{width:7px;height:3px;border:0.5px solid;border-radius:1px;opacity:0.25}
+.wb-k{background:#b34a4a}.wb-ek{border-color:#b34a4a}
+.wb-g{background:#3d7a5a}.wb-eg{border-color:#3d7a5a}
+.wb-i{background:#4a6fa5}.wb-ei{border-color:#4a6fa5}
+.wb-s{background:#7a5c99}.wb-es{border-color:#7a5c99}
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Tab-Leiste -->
+  <div class="tab-row">
+    <div class="seg-group">
+      <div class="seg-active">Aktivitäten</div>
+      <div class="seg-inactive">Pfadfindertechnik</div>
+      <div class="seg-inactive">Andachtsreihen</div>
+      <div class="seg-inactive">Abzeichen</div>
+    </div>
+    <div class="spacer"></div>
+    <div class="temp-wrap">
+      <i class="ti ti-hourglass-low temp-icon" aria-hidden="true"></i>
+      <span class="temp-badge">3</span>
+    </div>
+  </div>
+
+  <!-- Suche -->
+  <div class="search-row">
+    <i class="ti ti-search search-icon" aria-hidden="true"></i>
+    <input class="search-input" placeholder="Aktivität suchen…" />
+  </div>
+
+  <!-- Gruppe: Andacht/Gespräch (offen) -->
+  <div class="group">
+    <div class="group-header">
+      <i class="ti ti-chevron-right chevron open" aria-hidden="true"></i>
+      <i class="ti ti-book group-icon" aria-hidden="true"></i>
+      <span class="group-label">Andacht/Gespräch</span>
+      <span class="group-count">5</span>
+    </div>
+    <div class="table-card">
+      <table class="table">
+        <colgroup><col class="col-src"><col class="col-name"><col class="col-int"><col class="col-stufe"><col class="col-wb"><col class="col-time"></colgroup>
+        <thead class="table-head">
+          <tr>
+            <th class="no-sort"></th>
+            <th>Name <span class="sort-arrow">▲</span></th>
+            <th>Intention</th>
+            <th class="c">Stufe</th>
+            <th class="c no-sort"></th>
+            <th class="r">Dauer</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="tr">
+            <td class="src-cell"></td>
+            <td>Dankbarkeit entdecken</td>
+            <td class="int-cell">Gott begegnen</td>
+            <td class="stufe-cell"></td>
+            <td><div class="wb-segs"><div class="wb-col"><div class="wb-empty wb-ek"></div></div><div class="wb-col"><div class="wb-empty wb-eg"></div></div><div class="wb-col"><div class="wb-block wb-i"></div></div><div class="wb-col"><div class="wb-block wb-s"></div><div class="wb-block wb-s"></div><div class="wb-block wb-s"></div></div></div></td>
+            <td class="time-cell">10–15 min</td>
+          </tr>
+          <tr class="tr selected">
+            <td class="src-cell"><i class="ti ti-book-2" title="Vorinstalliert"></i></td>
+            <td>Psalm 23 gemeinsam lesen</td>
+            <td class="int-cell">Bibel entdecken</td>
+            <td class="stufe-cell"></td>
+            <td><div class="wb-segs"><div class="wb-col"><div class="wb-empty wb-ek"></div></div><div class="wb-col"><div class="wb-empty wb-eg"></div></div><div class="wb-col"><div class="wb-block wb-i"></div><div class="wb-block wb-i"></div></div><div class="wb-col"><div class="wb-block wb-s"></div><div class="wb-block wb-s"></div><div class="wb-block wb-s"></div></div></div></td>
+            <td class="time-cell">15–25 min</td>
+          </tr>
+          <tr class="tr">
+            <td class="src-cell"></td>
+            <td>Wochenrückblick</td>
+            <td class="int-cell">Einander hören</td>
+            <td class="stufe-cell"></td>
+            <td><div class="wb-segs"><div class="wb-col"><div class="wb-empty wb-ek"></div></div><div class="wb-col"><div class="wb-block wb-g"></div><div class="wb-block wb-g"></div><div class="wb-block wb-g"></div></div><div class="wb-col"><div class="wb-block wb-i"></div></div><div class="wb-col"><div class="wb-empty wb-es"></div></div></div></td>
+            <td class="time-cell">10–20 min</td>
+          </tr>
+          <tr class="tr">
+            <td class="src-cell"></td>
+            <td>Lobpreis-Andacht</td>
+            <td class="int-cell">Gott begegnen</td>
+            <td class="stufe-cell"></td>
+            <td><div class="wb-segs"><div class="wb-col"><div class="wb-empty wb-ek"></div></div><div class="wb-col"><div class="wb-block wb-g"></div></div><div class="wb-col"><div class="wb-block wb-i"></div></div><div class="wb-col"><div class="wb-block wb-s"></div><div class="wb-block wb-s"></div></div></div></td>
+            <td class="time-cell">15–20 min</td>
+          </tr>
+          <tr class="tr">
+            <td class="src-cell"><i class="ti ti-trees" title="Stammkontext"></i></td>
+            <td>Bibelquiz AT</td>
+            <td class="int-cell">Bibel entdecken</td>
+            <td class="stufe-cell"><span class="stufe">FS+</span></td>
+            <td><div class="wb-segs"><div class="wb-col"><div class="wb-empty wb-ek"></div></div><div class="wb-col"><div class="wb-empty wb-eg"></div></div><div class="wb-col"><div class="wb-block wb-i"></div><div class="wb-block wb-i"></div></div><div class="wb-col"><div class="wb-block wb-s"></div><div class="wb-block wb-s"></div><div class="wb-block wb-s"></div></div></div></td>
+            <td class="time-cell">15–20 min</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Gruppe: Spiel/Sport (offen) -->
+  <div class="group">
+    <div class="group-header">
+      <i class="ti ti-chevron-right chevron open" aria-hidden="true"></i>
+      <i class="ti ti-bolt group-icon" aria-hidden="true"></i>
+      <span class="group-label">Spiel/Sport</span>
+      <span class="group-count">5</span>
+    </div>
+    <div class="table-card">
+      <table class="table">
+        <colgroup><col class="col-src"><col class="col-name"><col class="col-int"><col class="col-stufe"><col class="col-wb"><col class="col-time"></colgroup>
+        <thead class="table-head">
+          <tr>
+            <th class="no-sort"></th>
+            <th>Name</th>
+            <th>Intention</th>
+            <th class="c">Stufe</th>
+            <th class="c no-sort"></th>
+            <th class="r">Dauer</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="tr">
+            <td class="src-cell"></td>
+            <td>Brennball</td>
+            <td class="int-cell">Auspowern</td>
+            <td class="stufe-cell"></td>
+            <td><div class="wb-segs"><div class="wb-col"><div class="wb-block wb-k"></div><div class="wb-block wb-k"></div><div class="wb-block wb-k"></div></div><div class="wb-col"><div class="wb-block wb-g"></div></div><div class="wb-col"><div class="wb-block wb-i"></div></div><div class="wb-col"><div class="wb-empty wb-es"></div></div></div></td>
+            <td class="time-cell">20–30 min</td>
+          </tr>
+          <tr class="tr">
+            <td class="src-cell"></td>
+            <td>Capture the Flag</td>
+            <td class="int-cell">Auspowern</td>
+            <td class="stufe-cell"><span class="stufe">KS+</span></td>
+            <td><div class="wb-segs"><div class="wb-col"><div class="wb-block wb-k"></div><div class="wb-block wb-k"></div><div class="wb-block wb-k"></div></div><div class="wb-col"><div class="wb-block wb-g"></div></div><div class="wb-col"><div class="wb-block wb-i"></div></div><div class="wb-col"><div class="wb-empty wb-es"></div></div></div></td>
+            <td class="time-cell">25–40 min</td>
+          </tr>
+          <tr class="tr">
+            <td class="src-cell"><i class="ti ti-book-2" title="Vorinstalliert"></i></td>
+            <td>Vertrauenslauf</td>
+            <td class="int-cell">Zusammenwachsen</td>
+            <td class="stufe-cell"></td>
+            <td><div class="wb-segs"><div class="wb-col"><div class="wb-block wb-k"></div></div><div class="wb-col"><div class="wb-block wb-g"></div><div class="wb-block wb-g"></div><div class="wb-block wb-g"></div></div><div class="wb-col"><div class="wb-block wb-i"></div></div><div class="wb-col"><div class="wb-empty wb-es"></div></div></div></td>
+            <td class="time-cell">15–25 min</td>
+          </tr>
+          <tr class="tr">
+            <td class="src-cell"></td>
+            <td>Gordischer Knoten</td>
+            <td class="int-cell">Zusammenwachsen</td>
+            <td class="stufe-cell"></td>
+            <td><div class="wb-segs"><div class="wb-col"><div class="wb-block wb-k"></div></div><div class="wb-col"><div class="wb-block wb-g"></div><div class="wb-block wb-g"></div><div class="wb-block wb-g"></div></div><div class="wb-col"><div class="wb-block wb-i"></div></div><div class="wb-col"><div class="wb-empty wb-es"></div></div></div></td>
+            <td class="time-cell">10–15 min</td>
+          </tr>
+          <tr class="tr">
+            <td class="src-cell"><i class="ti ti-trees" title="Stammkontext"></i></td>
+            <td>Stammolympiade</td>
+            <td class="int-cell">Herausfordern</td>
+            <td class="stufe-cell"></td>
+            <td><div class="wb-segs"><div class="wb-col"><div class="wb-block wb-k"></div><div class="wb-block wb-k"></div></div><div class="wb-col"><div class="wb-block wb-g"></div></div><div class="wb-col"><div class="wb-block wb-i"></div></div><div class="wb-col"><div class="wb-empty wb-es"></div></div></div></td>
+            <td class="time-cell">45–60 min</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Gruppe: Basteln/Bauen (offen, ohne Intentionen) -->
+  <div class="group">
+    <div class="group-header">
+      <i class="ti ti-chevron-right chevron open" aria-hidden="true"></i>
+      <i class="ti ti-hammer group-icon" aria-hidden="true"></i>
+      <span class="group-label">Basteln/Bauen</span>
+      <span class="group-count">3</span>
+    </div>
+    <div class="table-card">
+      <table class="table">
+        <colgroup><col class="col-src"><col class="col-name"><col class="col-int"><col class="col-stufe"><col class="col-wb"><col class="col-time"></colgroup>
+        <thead class="table-head">
+          <tr>
+            <th class="no-sort"></th>
+            <th>Name</th>
+            <th></th>
+            <th class="c">Stufe</th>
+            <th class="c no-sort"></th>
+            <th class="r">Dauer</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="tr">
+            <td class="src-cell"></td>
+            <td>Traumfänger basteln</td>
+            <td></td>
+            <td class="stufe-cell"></td>
+            <td><div class="wb-segs"><div class="wb-col"><div class="wb-block wb-k"></div><div class="wb-block wb-k"></div></div><div class="wb-col"><div class="wb-empty wb-eg"></div></div><div class="wb-col"><div class="wb-block wb-i"></div><div class="wb-block wb-i"></div></div><div class="wb-col"><div class="wb-empty wb-es"></div></div></div></td>
+            <td class="time-cell">30–45 min</td>
+          </tr>
+          <tr class="tr">
+            <td class="src-cell"><i class="ti ti-book-2" title="Vorinstalliert"></i></td>
+            <td>Nistkasten bauen</td>
+            <td></td>
+            <td class="stufe-cell"><span class="stufe">KS+</span></td>
+            <td><div class="wb-segs"><div class="wb-col"><div class="wb-block wb-k"></div><div class="wb-block wb-k"></div></div><div class="wb-col"><div class="wb-empty wb-eg"></div></div><div class="wb-col"><div class="wb-block wb-i"></div><div class="wb-block wb-i"></div></div><div class="wb-col"><div class="wb-empty wb-es"></div></div></div></td>
+            <td class="time-cell">45–60 min</td>
+          </tr>
+          <tr class="tr">
+            <td class="src-cell"></td>
+            <td>Freundschaftsbänder</td>
+            <td></td>
+            <td class="stufe-cell"></td>
+            <td><div class="wb-segs"><div class="wb-col"><div class="wb-block wb-k"></div><div class="wb-block wb-k"></div></div><div class="wb-col"><div class="wb-empty wb-eg"></div></div><div class="wb-col"><div class="wb-block wb-i"></div><div class="wb-block wb-i"></div></div><div class="wb-col"><div class="wb-empty wb-es"></div></div></div></td>
+            <td class="time-cell">20–30 min</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Gruppen: zugeklappt -->
+  <div class="group">
+    <div class="group-header">
+      <i class="ti ti-chevron-right chevron" aria-hidden="true"></i>
+      <i class="ti ti-music group-icon" aria-hidden="true"></i>
+      <span class="group-label">Musik/Lobpreis</span>
+      <span class="group-count">2</span>
+    </div>
+  </div>
+  <div class="group">
+    <div class="group-header">
+      <i class="ti ti-chevron-right chevron" aria-hidden="true"></i>
+      <i class="ti ti-coffee group-icon" aria-hidden="true"></i>
+      <span class="group-label">Kochen/Essen</span>
+      <span class="group-count">1</span>
+    </div>
+  </div>
+  <div class="group">
+    <div class="group-header">
+      <i class="ti ti-chevron-right chevron" aria-hidden="true"></i>
+      <i class="ti ti-map group-icon" aria-hidden="true"></i>
+      <span class="group-label">Wandern/Exkursion</span>
+      <span class="group-count">2</span>
+    </div>
+  </div>
+  <div class="group">
+    <div class="group-header">
+      <i class="ti ti-chevron-right chevron" aria-hidden="true"></i>
+      <i class="ti ti-heart group-icon" aria-hidden="true"></i>
+      <span class="group-label">Dienst/Nächstenliebe</span>
+      <span class="group-count">1</span>
+    </div>
+  </div>
+  <div class="group">
+    <div class="group-header">
+      <i class="ti ti-chevron-right chevron" aria-hidden="true"></i>
+      <i class="ti ti-dots group-icon" aria-hidden="true"></i>
+      <span class="group-label">Sonstiges</span>
+      <span class="group-count">1</span>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
